@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <filter id="shadowSoft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="960" height="460" fill="#ffffff"/>
+  <text x="480" y="40" font-size="22" font-weight="600" fill="#111827" text-anchor="middle">warmup + cosine：LLM 训练的事实默认 lr 调度</text>
+
+  <!-- Plot frame -->
+  <g transform="translate(80,80)">
+    <!-- axes -->
+    <line x1="0" y1="280" x2="800" y2="280" stroke="#374151" stroke-width="1.5"/>
+    <line x1="0" y1="0"   x2="0"   y2="280" stroke="#374151" stroke-width="1.5"/>
+
+    <!-- grid -->
+    <g stroke="#e5e7eb" stroke-width="1">
+      <line x1="0" y1="40"  x2="800" y2="40"/>
+      <line x1="0" y1="120" x2="800" y2="120"/>
+      <line x1="0" y1="200" x2="800" y2="200"/>
+    </g>
+
+    <!-- y axis labels -->
+    <text x="-10" y="44"  font-size="13" fill="#6b7280" text-anchor="end">η_max</text>
+    <text x="-10" y="124" font-size="13" fill="#6b7280" text-anchor="end">0.5·η_max</text>
+    <text x="-10" y="204" font-size="13" fill="#6b7280" text-anchor="end">η_min</text>
+    <text x="-10" y="284" font-size="13" fill="#6b7280" text-anchor="end">0</text>
+
+    <!-- y axis title -->
+    <text x="0" y="-12" font-size="13" fill="#374151" text-anchor="start">learning rate</text>
+
+    <!-- x axis labels -->
+    <text x="0"   y="305" font-size="13" fill="#6b7280" text-anchor="middle">0</text>
+    <text x="120" y="305" font-size="13" fill="#6b7280" text-anchor="middle">T_w</text>
+    <text x="800" y="305" font-size="13" fill="#6b7280" text-anchor="middle">T</text>
+    <text x="400" y="328" font-size="14" fill="#374151" text-anchor="middle">training step</text>
+
+    <!-- warmup region shading -->
+    <rect x="0" y="0" width="120" height="280" fill="#fef3c7" opacity="0.55"/>
+    <!-- cosine region shading -->
+    <rect x="120" y="0" width="680" height="280" fill="#dbeafe" opacity="0.45"/>
+
+    <!-- warmup line: linear from (0,280) to (120,40) -->
+    <line x1="0" y1="280" x2="120" y2="40" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- cosine curve: from (120, 40) to (800, 200) -->
+    <!-- y(t) = 200 - (200-40)/2 * (1 + cos(pi * (x-120)/(800-120))) -->
+    <!-- evaluate at sampled points -->
+    <path d="M 120 40 C 250 40, 320 80, 460 120 S 700 200, 800 200" fill="none" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- floor line at η_min -->
+    <line x1="120" y1="200" x2="800" y2="200" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/>
+
+    <!-- peak marker -->
+    <circle cx="120" cy="40" r="5" fill="#ef4444"/>
+    <text x="135" y="34" font-size="13" fill="#b91c1c" font-weight="600">peak η_max</text>
+
+    <!-- end marker -->
+    <circle cx="800" cy="200" r="5" fill="#0ea5e9"/>
+    <text x="785" y="194" font-size="13" fill="#0369a1" text-anchor="end">η_min ≈ 10% η_max</text>
+
+    <!-- region labels -->
+    <text x="60"  y="22" font-size="13" fill="#92400e" text-anchor="middle" font-weight="600">warmup</text>
+    <text x="60"  y="40" font-size="11" fill="#92400e" text-anchor="middle">linear ramp</text>
+    <text x="460" y="22" font-size="13" fill="#1e3a8a" text-anchor="middle" font-weight="600">cosine annealing</text>
+    <text x="460" y="40" font-size="11" fill="#1e3a8a" text-anchor="middle">η_min + ½(η_max−η_min)·(1+cos(π·(t−T_w)/(T−T_w)))</text>
+  </g>
+</svg>

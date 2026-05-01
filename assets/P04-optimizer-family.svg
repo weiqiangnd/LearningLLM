@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" width="1100" height="620" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <filter id="shadowSoft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrEvolve" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="620" fill="#ffffff"/>
+  <text x="550" y="38" font-size="22" font-weight="600" fill="#111827" text-anchor="middle">优化器演进链 —— SGD → +Momentum → Adam → AdamW</text>
+  <text x="550" y="60" font-size="13" fill="#6b7280" text-anchor="middle">每一步都在解决前一步的具体痛点；LLM 训练的事实标准是最右端的 AdamW</text>
+
+  <!-- 4 boxes in a row -->
+  <!-- SGD -->
+  <g filter="url(#shadowSoft)">
+    <rect x="30" y="100" width="240" height="280" rx="14" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
+  </g>
+  <text x="150" y="130" font-size="18" font-weight="700" fill="#111827" text-anchor="middle">SGD</text>
+  <text x="150" y="148" font-size="11" fill="#6b7280" text-anchor="middle">最朴素的梯度下降</text>
+  <line x1="55" y1="160" x2="245" y2="160" stroke="#9ca3af" stroke-width="1"/>
+  <text x="150" y="190" font-size="13" fill="#1f2937" text-anchor="middle">θ ← θ − η · g</text>
+  <text x="50" y="225" font-size="11" fill="#374151">状态：仅 θ 本身</text>
+  <text x="50" y="245" font-size="11" fill="#374151">显存：1× 参数量</text>
+  <text x="50" y="265" font-size="11" fill="#374151">缺点：</text>
+  <text x="60" y="285" font-size="11" fill="#6b7280">· 长椭圆山谷上来回振荡</text>
+  <text x="60" y="303" font-size="11" fill="#6b7280">· 所有参数共用一个 lr</text>
+  <text x="60" y="321" font-size="11" fill="#6b7280">· 对 lr 极其敏感</text>
+  <text x="60" y="339" font-size="11" fill="#6b7280">· LLM 上几乎跑不动</text>
+  <text x="150" y="368" font-size="11" fill="#6b7280" text-anchor="middle" font-style="italic">PyTorch: torch.optim.SGD</text>
+
+  <!-- + Momentum -->
+  <g filter="url(#shadowSoft)">
+    <rect x="295" y="100" width="240" height="280" rx="14" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  </g>
+  <text x="415" y="130" font-size="18" font-weight="700" fill="#1e3a8a" text-anchor="middle">SGD + Momentum</text>
+  <text x="415" y="148" font-size="11" fill="#1d4ed8" text-anchor="middle">加梯度的指数移动平均</text>
+  <line x1="320" y1="160" x2="510" y2="160" stroke="#60a5fa" stroke-width="1"/>
+  <text x="415" y="184" font-size="12" fill="#1f2937" text-anchor="middle">v ← μ · v + g</text>
+  <text x="415" y="202" font-size="12" fill="#1f2937" text-anchor="middle">θ ← θ − η · v</text>
+  <text x="315" y="232" font-size="11" fill="#374151">状态：θ + v</text>
+  <text x="315" y="252" font-size="11" fill="#374151">显存：2× 参数量</text>
+  <text x="315" y="272" font-size="11" fill="#374151" font-weight="600">解决了什么：</text>
+  <text x="325" y="292" font-size="11" fill="#1e40af">· 沿主方向加速（同向累加）</text>
+  <text x="325" y="310" font-size="11" fill="#1e40af">· 抵消震荡（相反方向相消）</text>
+  <text x="315" y="338" font-size="11" fill="#374151" font-weight="600">仍未解决：</text>
+  <text x="325" y="358" font-size="11" fill="#6b7280">参数间梯度量级差异巨大</text>
+  <text x="415" y="376" font-size="11" fill="#1d4ed8" text-anchor="middle" font-style="italic">SGD(.., momentum=0.9)</text>
+
+  <!-- Adam -->
+  <g filter="url(#shadowSoft)">
+    <rect x="560" y="100" width="240" height="280" rx="14" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  </g>
+  <text x="680" y="130" font-size="18" font-weight="700" fill="#5b21b6" text-anchor="middle">Adam</text>
+  <text x="680" y="148" font-size="11" fill="#7c3aed" text-anchor="middle">+ 梯度二阶矩 → 自适应步长</text>
+  <line x1="585" y1="160" x2="775" y2="160" stroke="#a78bfa" stroke-width="1"/>
+  <text x="680" y="182" font-size="11" fill="#1f2937" text-anchor="middle">m ← β₁m + (1−β₁)g</text>
+  <text x="680" y="198" font-size="11" fill="#1f2937" text-anchor="middle">v ← β₂v + (1−β₂)g²</text>
+  <text x="680" y="216" font-size="11" fill="#1f2937" text-anchor="middle">θ ← θ − η · m̂ / (√v̂ + ε)</text>
+  <text x="580" y="244" font-size="11" fill="#374151">状态：θ + m + v</text>
+  <text x="580" y="264" font-size="11" fill="#374151">显存：3× 参数量</text>
+  <text x="580" y="284" font-size="11" fill="#374151" font-weight="600">解决了什么：</text>
+  <text x="590" y="302" font-size="11" fill="#5b21b6">· 每参数自适应步长</text>
+  <text x="590" y="318" font-size="11" fill="#5b21b6">· √v̂ 把梯度量级归一</text>
+  <text x="590" y="334" font-size="11" fill="#5b21b6">· bias correction 救开头几步</text>
+  <text x="580" y="356" font-size="11" fill="#374151" font-weight="600">仍未解决：</text>
+  <text x="590" y="372" font-size="11" fill="#6b7280">weight decay 走 g 路径会被 √v̂ 缩放</text>
+
+  <!-- AdamW -->
+  <g filter="url(#shadowSoft)">
+    <rect x="825" y="100" width="245" height="280" rx="14" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  </g>
+  <text x="947" y="130" font-size="18" font-weight="700" fill="#92400e" text-anchor="middle">AdamW</text>
+  <text x="947" y="148" font-size="11" fill="#d97706" text-anchor="middle">把 weight decay 从 g 解耦</text>
+  <line x1="850" y1="160" x2="1045" y2="160" stroke="#fbbf24" stroke-width="1"/>
+  <text x="947" y="184" font-size="11" fill="#1f2937" text-anchor="middle">θ ← θ − η · m̂ / (√v̂ + ε)</text>
+  <text x="947" y="200" font-size="11" fill="#dc2626" text-anchor="middle">       − η · λ · θ ← 直接加</text>
+  <text x="845" y="228" font-size="11" fill="#374151">状态：θ + m + v</text>
+  <text x="845" y="248" font-size="11" fill="#374151">显存：3× 参数量</text>
+  <text x="845" y="270" font-size="11" fill="#374151" font-weight="600">解决了什么：</text>
+  <text x="855" y="288" font-size="11" fill="#92400e">· wd 不再被 √v̂ 缩放</text>
+  <text x="855" y="304" font-size="11" fill="#92400e">· 大模型长训练显著更稳</text>
+  <text x="845" y="328" font-size="11" fill="#374151" font-weight="600">事实标准：</text>
+  <text x="855" y="346" font-size="11" fill="#6b7280">GPT-2/3 · LLaMA · Qwen</text>
+  <text x="855" y="362" font-size="11" fill="#6b7280">几乎全用 AdamW</text>
+  <text x="947" y="376" font-size="11" fill="#d97706" text-anchor="middle" font-style="italic">torch.optim.AdamW</text>
+
+  <!-- arrows between -->
+  <line x1="270" y1="240" x2="293" y2="240" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrEvolve)"/>
+  <line x1="535" y1="240" x2="558" y2="240" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrEvolve)"/>
+  <line x1="800" y1="240" x2="823" y2="240" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrEvolve)"/>
+
+  <!-- Bottom: typical lr ranges + practical tips -->
+  <g filter="url(#shadowSoft)">
+    <rect x="30" y="420" width="1040" height="80" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+  </g>
+  <text x="50" y="446" font-size="13" font-weight="600" fill="#065f46">LLM 训练的典型 peak lr（这些是 warmup + cosine 调度的"峰值"，实际 lr 会从 0 升上去再退回去）</text>
+  <text x="50" y="470" font-size="11" fill="#374151">预训练 7B–70B：1e-4 ~ 3e-4   ·   全量 SFT：1e-5 ~ 5e-5   ·   LoRA SFT：1e-4 ~ 5e-4   ·   RLHF / DPO：5e-7 ~ 5e-6（比 SFT 低 10–100×）</text>
+  <text x="50" y="490" font-size="11" fill="#374151">默认 betas=(0.9, 0.95) — β₂ 比经典默认 0.999 略小，对早期梯度更敏感；weight_decay 0.01 ~ 0.1 都常见</text>
+
+  <!-- Bottom: ordering rule -->
+  <g filter="url(#shadowSoft)">
+    <rect x="30" y="520" width="1040" height="74" rx="10" fill="#1f2937" stroke="#111827"/>
+  </g>
+  <text x="50" y="544" font-size="12" fill="#fcd34d" font-family="'JetBrains Mono', Menlo, Consolas, monospace">训练循环里的调用顺序（绝不能反过来）：</text>
+  <text x="50" y="563" font-size="12" fill="#a7f3d0" font-family="'JetBrains Mono', Menlo, Consolas, monospace">  optimizer.zero_grad();  loss.backward();  optimizer.step();  scheduler.step()</text>
+  <text x="50" y="582" font-size="11" fill="#9ca3af" font-family="'JetBrains Mono', Menlo, Consolas, monospace">  ① 清零        ② 算梯度       ③ 用梯度更新     ④ 调下一步 lr（warmup + cosine）</text>
+
+  <!-- Legend / direction hint -->
+  <text x="550" y="395" font-size="11" fill="#6b7280" text-anchor="middle" font-style="italic">每一步只新增一两行公式，但每一步都解决前一步的具体痛点</text>
+</svg>

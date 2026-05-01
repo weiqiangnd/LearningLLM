@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" font-family="'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <filter id="shadowSoft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="960" height="460" fill="#ffffff"/>
+  <text x="480" y="36" font-size="22" font-weight="600" fill="#111827" text-anchor="middle">forward KL vs reverse KL：mode-covering 还是 mode-seeking</text>
+  <text x="480" y="58" font-size="13" fill="#6b7280" text-anchor="middle">真实分布 p（双峰，灰色）固定；模型 q（蓝色）选用单峰高斯，看它最终长成什么样</text>
+
+  <!-- LEFT: forward KL -->
+  <g transform="translate(40, 90)">
+    <rect x="0" y="0" width="430" height="320" rx="10" fill="#fafafa" stroke="#e5e7eb"/>
+    <text x="215" y="26" text-anchor="middle" font-size="15" fill="#111827" font-weight="600">forward KL：D_KL(p ∥ q)</text>
+    <text x="215" y="44" text-anchor="middle" font-size="12" fill="#6b7280">"哪里 p 高、q 也得高" → q 被逼覆盖 p 的<tspan fill="#1d4ed8" font-weight="600">所有模式</tspan></text>
+
+    <!-- plot frame -->
+    <line x1="40" y1="280" x2="400" y2="280" stroke="#374151" stroke-width="1.2"/>
+
+    <!-- p (true): two Gaussian bumps -->
+    <!-- bump 1 centered around x=120, bump 2 around x=280, y=280 baseline, peak ~80 -->
+    <path d="M 40 280
+             Q 80 280 100 230
+             Q 120 145 140 230
+             Q 160 280 200 280
+             Q 240 280 260 230
+             Q 280 145 300 230
+             Q 320 280 400 280 Z"
+          fill="#cbd5e1" opacity="0.85"/>
+
+    <!-- q under forward KL: a wide single Gaussian covering both peaks, lower amplitude -->
+    <path d="M 40 280
+             Q 100 270 140 235
+             Q 200 175 260 235
+             Q 300 270 400 280 Z"
+          fill="none" stroke="#2563eb" stroke-width="3"/>
+
+    <!-- legend -->
+    <g transform="translate(60, 70)" font-size="12">
+      <rect x="0" y="0" width="14" height="10" fill="#cbd5e1"/>
+      <text x="20" y="9" fill="#374151">p（真实分布，双峰）</text>
+      <line x1="170" y1="5" x2="194" y2="5" stroke="#2563eb" stroke-width="3"/>
+      <text x="200" y="9" fill="#374151">q（学到的模型分布）</text>
+    </g>
+
+    <!-- annotations -->
+    <g font-size="11">
+      <text x="120" y="170" fill="#6b7280" text-anchor="middle">mode 1</text>
+      <text x="280" y="170" fill="#6b7280" text-anchor="middle">mode 2</text>
+      <text x="200" y="220" fill="#1d4ed8" text-anchor="middle" font-weight="600">q 同时盖住两座峰（amplitude 低也行）</text>
+    </g>
+
+    <!-- penalty note -->
+    <text x="215" y="310" text-anchor="middle" font-size="11" fill="#475569">惩罚：p_i log(p_i / q_i)。p 高的位置 q 不能为 0 —— 否则 log 爆。</text>
+  </g>
+
+  <!-- RIGHT: reverse KL -->
+  <g transform="translate(490, 90)">
+    <rect x="0" y="0" width="430" height="320" rx="10" fill="#fafafa" stroke="#e5e7eb"/>
+    <text x="215" y="26" text-anchor="middle" font-size="15" fill="#111827" font-weight="600">reverse KL：D_KL(q ∥ p)</text>
+    <text x="215" y="44" text-anchor="middle" font-size="12" fill="#6b7280">"哪里 q 高、p 也得高" → q 收敛到 p 的<tspan fill="#b91c1c" font-weight="600">某一个模式</tspan></text>
+
+    <!-- plot frame -->
+    <line x1="40" y1="280" x2="400" y2="280" stroke="#374151" stroke-width="1.2"/>
+
+    <!-- p (true): same two bumps -->
+    <path d="M 40 280
+             Q 80 280 100 230
+             Q 120 145 140 230
+             Q 160 280 200 280
+             Q 240 280 260 230
+             Q 280 145 300 230
+             Q 320 280 400 280 Z"
+          fill="#cbd5e1" opacity="0.85"/>
+
+    <!-- q under reverse KL: a single sharp Gaussian sitting on mode 1 only, taller -->
+    <path d="M 40 280
+             Q 90 280 100 240
+             Q 120 130 140 240
+             Q 150 280 400 280 Z"
+          fill="none" stroke="#dc2626" stroke-width="3"/>
+
+    <!-- legend -->
+    <g transform="translate(60, 70)" font-size="12">
+      <rect x="0" y="0" width="14" height="10" fill="#cbd5e1"/>
+      <text x="20" y="9" fill="#374151">p（真实分布，双峰）</text>
+      <line x1="170" y1="5" x2="194" y2="5" stroke="#dc2626" stroke-width="3"/>
+      <text x="200" y="9" fill="#374151">q（学到的模型分布）</text>
+    </g>
+
+    <!-- annotations -->
+    <g font-size="11">
+      <text x="120" y="155" fill="#b91c1c" text-anchor="middle" font-weight="600">q 集中在一座峰</text>
+      <text x="280" y="170" fill="#6b7280" text-anchor="middle">另一座峰被忽略</text>
+      <line x1="280" y1="180" x2="280" y2="225" stroke="#9ca3af" stroke-width="1" stroke-dasharray="3 3"/>
+    </g>
+
+    <text x="215" y="310" text-anchor="middle" font-size="11" fill="#475569">惩罚：q_i log(q_i / p_i)。q 高的位置 p 不能为 0；q 在 p 低处只要也低就没罚。</text>
+  </g>
+
+  <!-- bottom note -->
+  <text x="480" y="438" text-anchor="middle" font-size="12" fill="#374151">
+    工程结果：SFT/预训练 = forward KL（覆盖训练数据多样性）；RLHF/DPO 的 β·D_KL(π_θ ∥ π_ref) 是 reverse KL（逼新策略不要离参考太远）
+  </text>
+</svg>
