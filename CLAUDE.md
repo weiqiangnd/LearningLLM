@@ -17,7 +17,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 写作或修改章节时务必同时更新两份文件，保持术语、代码片段、命名一致。**在 markdown 文档里给出代码片段时，确保它与 NN.ipynb 里的对应 cell 逐字一致（包括注释）**——这是本仓库刻意的内容分工。
 
-**`.md` 必须自包含**——所有代码片段、表格、示意图都在 `.md` 里直接给出，**不要出现「详见 `NN.ipynb` 的 Cell X」这类把内容外包给 ipynb 的句式**。读者只看 `.md` 就能获取完整信息；ipynb 是同步的可运行版本，不是 `.md` 的"代码附录"。文中需要引用某段实战代码时，用「实战中的 Cell N」这种章节内坐标，不要写成「`NN.ipynb` 的 Cell N」。**例外**：每章顶部的「Open in Colab」直链是导航元素，URL 里包含 `NN.ipynb` 是必要的，不算违反这条约定。
+**每一章必须自包含**——`.md` 与 `.ipynb` 都不允许把内容外包给"另一章"。具体两条：
+
+- **`.md` 自包含**：所有代码片段、表格、示意图都在 `.md` 里直接给出，**不要出现「详见 `NN.ipynb` 的 Cell X」这类把内容外包给 ipynb 的句式**。读者只看 `.md` 就能获取完整信息；ipynb 是同步的可运行版本，不是 `.md` 的"代码附录"。文中需要引用某段实战代码时，用「实战中的 Cell N」这种章节内坐标，不要写成「`NN.ipynb` 的 Cell N」。**例外**：每章顶部的「Open in Colab」直链是导航元素，URL 里包含 `NN.ipynb` 是必要的，不算违反这条约定。
+- **`.ipynb` 自包含**：每章 ipynb 都要从硬件自检 → 装依赖 → 加载模型这套样板从头跑起，**不允许出现「（与第 NN 章一致）」「沿用上一章环境」之类把 cell 内容外包给其他章节的注释**——读者从任意一章 Run All 都应能跑通。`.md` 中介绍铺垫 cell 时，可点明"和第 NN 章相同"以避免重复阅读，但代码与逐行注释仍要在本章 ipynb 中完整列出，不省略。
 
 文件命名上 `.md` 文件名带描述（如 `01-IPython-Jupyter-Colab入门.md`），`.ipynb` 只用编号（`01.ipynb`）。新增章节请沿用此命名。
 
@@ -27,6 +30,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 一份目录（TOC），列出本章二级标题及主要三级标题，方便长文档导航
 
 `README.md` 顶部维护一份「学习路径」与「已完成章节」清单，每完成新章节需要追加更新；「已完成章节」中每一章要附 Open in Colab 徽章直链。
+
+学习路径中**阶段 0 的 P0N 先修章节不要求读者一次读完**——改在主线**首次实际用到**该项背景知识的那一章下方，用一行 `〔先修〕首次用到 ... ——若不熟悉，建议先读 P0N。` 内联标注，已熟悉者可直接跳过。新增主线章节或新增 P0N 时同步维护这些"首次出现点"，不要把所有先修标注堆在某一章。
 
 ## 运行环境
 
@@ -51,12 +56,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - 抽象原理尽量配最小可手算的数值示例（2×2 矩阵、长度为 3 的序列），让读者能在草稿纸上跟着算。
   - 形状变换（reshape、transpose、broadcasting）每一步标注张量形状，如 `(B, L, D) → (B, L, H, D/H) → (B, H, L, D/H)`。
 
+### 架构图 / 原理图
+
+仓库引入 [`fireworks-tech-graph`](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) skill 用来生成 SVG 架构图、流程图、原理图，已安装在 `.claude/skills/fireworks-tech-graph/`，依赖系统包 `librsvg2-bin`（提供 `rsvg-convert`）。绘图时遵循以下约定：
+
+- **统一使用默认 style 1（Flat Icon）**——白底、淡色填充、彩色边框、Helvetica/PingFang 字体；除非有特别理由，否则不要切换到 Dark Terminal、Blueprint 等其他 style，保持全仓库视觉一致。
+- **生成方式**：调 `python3 .claude/skills/fireworks-tech-graph/scripts/generate-from-template.py <template-type> <output.svg> '<json>'`，再 `rsvg-convert -w <宽度> <svg> -o <tmp.png> && pngquant --quality=85-100 --strip --force --output <png> <tmp.png>` 导出 PNG（系统依赖 `librsvg2-bin` + `pngquant`）。**优先保证清晰度**，不再卡 PNG 体积上限。
+- **导出宽度按信息密度选**：默认 `-w 720` 适用于节点 ≤ 6 / 文本稀疏的图；信息密度高（多容器、并排矩阵、长 sublabel、>10 节点）的图升到 `-w 1200`，避免缩放后字糊成一片。中间档 `-w 960` 用得少。
+- **画面留白要"刚好"**：SVG 设计时让内容在 viewBox 里**四周留一圈适度留白**——边距太小（接近 0）会让框线压在边缘看着压抑；留白太多则正文显得空旷。一个简单参考：标题与最近的内容上沿留 ~20 px，最外层节点离左右边界 ~40 px、距底部 ~30 px；JSON 里的 `width`/`height` 跟着内容实际占用范围调整，不要无脑沿用 960×600 默认值。
+- **生成后必须人眼复核 PNG**：`rsvg-convert` 不会检测越界——viewBox 太小、legend 装不下、节点重叠都不会报错，但 PNG 里会出现"被裁掉一半的字"。每张图渲染完都要用 Read 工具看一眼，确认（a）底部 legend 整条都在画面内（b）节点之间无重叠（c）容器内的标签没有被里面的子节点压住（d）主图与 legend、注解之间没有大段空白。
+- **几个生成器常见的"看不见的坑"**（都来自 fireworks-tech-graph 的 `generate-from-template.py`）：
+    - **legend 是纵向布局**，每条占 22 px。viewBox 高度必须 ≥ `legend_y + 22 × N + 20`，否则末尾几条会被静默裁掉（最容易踩）。
+    - **container 的 `subtitle` 字段会与内部节点重叠**——容器副标题画在节点位置上方一点，节点稍矮就盖住它。要么不写 `subtitle`、要么把 `container.height` 拉大 ~30 px 给副标题让位。
+    - **container 内节点的 `type_label` 也是上压**，节点本身要至少 60 px 高才装得下「TYPE_LABEL + label」两行；放 50 px 高的节点会被 type_label 遮住。
+    - **手写 SVG（不走模板）时**底部 legend / caption 别紧贴 H 边——`pngquant` 偶尔会让边缘 1–2 px 颜色塌陷，看起来像被裁。统一留 ≥ 18 px。
+- **文件存放在仓库根目录的 `assets/`**：每张图同时提交 `.svg`（源文件，便于以后微调）和 `.png`（实际引用的位图）。命名 `NN-用途.svg`/`NN-用途.png`，`NN` 与所属章节编号对齐（如 `01-stack.png`、`02-generate-pipeline.png`）；先修章节用 `P0N-用途.png`。
+- **在 `.md` 中通过相对路径引用 PNG**：`![alt 文本](./assets/NN-用途.png)`。GitHub 上 PNG 渲染最稳定；`.svg` 在 GitHub README 里的 inline 渲染对外部字体不友好，所以默认引用 PNG。
+- **不替换原有 ASCII 框图**：现有 `.md` 里的 ASCII 流程图保留（适合监控终端、纯文本 diff、复制粘贴），新生成的 SVG/PNG 作为视觉辅助插在 ASCII 之后，让两种形态各自发挥所长。
+- **新增/修改章节时主动配图**：每章在「架构总览」「流水线/工作流」「关键算法步骤」这类抽象概念处至少配 1 张图；超长章节（>500 行）建议 3–5 张分散在不同小节。
+
 ### 公式的 GitHub 渲染避坑
 
 GitHub 用 MathJax 渲染数学公式，但 markdown 解析先于 MathJax，下列写法已踩过坑：
 
 - **`$$` 块级公式独占一行，前后各留空行**——否则部分 GitHub 渲染路径会吞掉它。
-- **`$...$` 行内公式与中文之间留半角空格**（如「其中 $\ell_i$ 是 logit」），紧贴中文易识别失败。
+- **`$...$` 行内公式与中文之间留半角空格**（如「其中 $\ell_i$ 是 logit」），紧贴中文易识别失败。**这条对中文标点同样适用**：`，。；：）（——「」` 等紧贴 `$` 也会让 MathJax 识别失败。例如 `差 1，$\exp$ 之后` 的逗号紧贴 `$`，会让 `$\exp$` 渲染成字面字符；正确写法是 `差 1， $\exp$ 之后` 或干脆把逗号挪开。同理 `（temperature）$T$ 后是` → `（temperature） $T$ 后是`，`$\exp(\ell_i)$——把` → `$\exp(\ell_i)$ ——把`。规则要在 `$` **两侧**都成立。
 - **不要写 `\left\{ ... \right\}`**：会报 `Missing or unrecognized delimiter for \left`。改用普通 `\{ ... \}`；需变长用 `\left\lbrace ... \right\rbrace`。
 - **`\text{}` 内不要放下划线（无论 `_` 还是 `\_` 都不行）**——GitHub markdown 在 `$$` 块内仍会把 `\_` 还原为 `_`，而 MathJax 的 `\text{}` 不接受裸 `_`，会报 `'_' allowed only in math mode`。下划线分隔的标识符改用连字符（`\text{next-token}`）或拆开成 `\text{next}\_\text{token}` 让 `_` 变成下标。
 - **数组/列表里的负数包成 `{-1.23}`**——`,\ -1.23` 这种写法 MathJax 会把 `-` 当二元减号，渲染成 `, − 1.23,`（前后自动加空格、看起来像断成两段）。用 `{}` 包起来让 `-` 变一元负号即可：`,\ {-1.23},`。

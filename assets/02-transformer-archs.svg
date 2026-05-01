@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" width="1280" height="620">
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
+  </style>
+  <defs>
+    <marker id="cross-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="620" fill="#ffffff"/>
+  <text x="640.0" y="44" text-anchor="middle" fill="#111827" font-size="24" font-weight="700">三种 Transformer 架构：注意力可见性对比</text>
+  <text x="640.0" y="68" text-anchor="middle" fill="#6b7280" font-size="13">行 = 当前位置（Q），列 = 它能 "看见" 的位置（K）；蓝 = 可见，灰 = 被 mask</text>
+  <text x="200" y="105" text-anchor="middle" fill="#111827" font-size="18" font-weight="600">encoder-only</text>
+  <text x="200" y="127" text-anchor="middle" fill="#6b7280" font-size="12">代表：BERT / RoBERTa</text>
+  <text x="200" y="145" text-anchor="middle" fill="#6b7280" font-size="12">训练目标：MLM（遮一部分让模型猜）</text>
+  <text x="200" y="163" text-anchor="middle" fill="#6b7280" font-size="12">注意力：双向（每个 token 看全句）</text>
+  <text x="125" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t1</text>
+  <text x="155" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t2</text>
+  <text x="185" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t3</text>
+  <text x="215" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t4</text>
+  <text x="245" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t5</text>
+  <text x="275" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t6</text>
+  <text x="102" y="219" text-anchor="end" fill="#9ca3af" font-size="11">t1</text>
+  <rect x="110" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="140" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="170" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="200" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="230" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="260" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="102" y="249" text-anchor="end" fill="#9ca3af" font-size="11">t2</text>
+  <rect x="110" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="140" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="170" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="200" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="230" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="260" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="102" y="279" text-anchor="end" fill="#9ca3af" font-size="11">t3</text>
+  <rect x="110" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="140" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="170" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="200" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="230" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="260" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="102" y="309" text-anchor="end" fill="#9ca3af" font-size="11">t4</text>
+  <rect x="110" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="140" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="170" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="200" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="230" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="260" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="102" y="339" text-anchor="end" fill="#9ca3af" font-size="11">t5</text>
+  <rect x="110" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="140" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="170" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="200" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="230" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="260" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="102" y="369" text-anchor="end" fill="#9ca3af" font-size="11">t6</text>
+  <rect x="110" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="140" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="170" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="200" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="230" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="260" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="200.0" y="178" text-anchor="middle" fill="#6b7280" font-size="11">K (被看的 token) →</text>
+  <text transform="translate(82,290.0) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">Q (查询) →</text>
+  <text x="200.0" y="402" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">full self-attention</text>
+  <text x="200.0" y="420" text-anchor="middle" fill="#6b7280" font-size="11">擅长：分类、NER、向量检索</text>
+  <text x="580" y="105" text-anchor="middle" fill="#111827" font-size="18" font-weight="600">decoder-only</text>
+  <text x="580" y="127" text-anchor="middle" fill="#6b7280" font-size="12">代表：GPT / LLaMA / Qwen</text>
+  <text x="580" y="145" text-anchor="middle" fill="#6b7280" font-size="12">训练目标：CLM（预测下一个 token）</text>
+  <text x="580" y="163" text-anchor="middle" fill="#6b7280" font-size="12">注意力：因果（只能看自己 + 左侧）</text>
+  <text x="505" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t1</text>
+  <text x="535" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t2</text>
+  <text x="565" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t3</text>
+  <text x="595" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t4</text>
+  <text x="625" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t5</text>
+  <text x="655" y="194" text-anchor="middle" fill="#9ca3af" font-size="11">t6</text>
+  <text x="482" y="219" text-anchor="end" fill="#9ca3af" font-size="11">t1</text>
+  <rect x="490" y="200" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="520" y="200" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="550" y="200" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="580" y="200" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="610" y="200" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="640" y="200" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="482" y="249" text-anchor="end" fill="#9ca3af" font-size="11">t2</text>
+  <rect x="490" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="520" y="230" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="550" y="230" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="580" y="230" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="610" y="230" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="640" y="230" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="482" y="279" text-anchor="end" fill="#9ca3af" font-size="11">t3</text>
+  <rect x="490" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="520" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="550" y="260" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="580" y="260" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="610" y="260" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="640" y="260" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="482" y="309" text-anchor="end" fill="#9ca3af" font-size="11">t4</text>
+  <rect x="490" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="520" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="550" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="580" y="290" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="610" y="290" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="640" y="290" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="482" y="339" text-anchor="end" fill="#9ca3af" font-size="11">t5</text>
+  <rect x="490" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="520" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="550" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="580" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="610" y="320" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="640" y="320" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="482" y="369" text-anchor="end" fill="#9ca3af" font-size="11">t6</text>
+  <rect x="490" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="520" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="550" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="580" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="610" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="640" y="350" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="580.0" y="178" text-anchor="middle" fill="#6b7280" font-size="11">K (被看的 token) →</text>
+  <text transform="translate(462,290.0) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">Q (查询) →</text>
+  <text x="580.0" y="402" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">causal self-attention（下三角）</text>
+  <text x="580.0" y="420" text-anchor="middle" fill="#6b7280" font-size="11">擅长：生成、对话、代码、推理</text>
+  <text x="1000" y="105" text-anchor="middle" fill="#111827" font-size="18" font-weight="600">encoder-decoder</text>
+  <text x="1000" y="127" text-anchor="middle" fill="#6b7280" font-size="12">代表：T5 / BART / 原始 Transformer</text>
+  <text x="1000" y="145" text-anchor="middle" fill="#6b7280" font-size="12">训练目标：seq2seq（输入 → 输出）</text>
+  <text x="1000" y="163" text-anchor="middle" fill="#6b7280" font-size="12">注意力：encoder 双向 + decoder 因果 + cross</text>
+  <text x="865" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">x1</text>
+  <text x="895" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">x2</text>
+  <text x="925" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">x3</text>
+  <text x="955" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">x4</text>
+  <text x="842" y="239" text-anchor="end" fill="#9ca3af" font-size="11">x1</text>
+  <rect x="850" y="220" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="880" y="220" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="910" y="220" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="940" y="220" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="842" y="269" text-anchor="end" fill="#9ca3af" font-size="11">x2</text>
+  <rect x="850" y="250" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="880" y="250" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="910" y="250" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="940" y="250" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="842" y="299" text-anchor="end" fill="#9ca3af" font-size="11">x3</text>
+  <rect x="850" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="880" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="910" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="940" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="842" y="329" text-anchor="end" fill="#9ca3af" font-size="11">x4</text>
+  <rect x="850" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="880" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="910" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="940" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="910.0" y="198" text-anchor="middle" fill="#6b7280" font-size="11">K (被看的 token) →</text>
+  <text transform="translate(822,280.0) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">Q (查询) →</text>
+  <text x="910.0" y="362" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">encoder（输入侧 / full）</text>
+  <text x="1045" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">y1</text>
+  <text x="1075" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">y2</text>
+  <text x="1105" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">y3</text>
+  <text x="1135" y="214" text-anchor="middle" fill="#9ca3af" font-size="11">y4</text>
+  <text x="1022" y="239" text-anchor="end" fill="#9ca3af" font-size="11">y1</text>
+  <rect x="1030" y="220" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1060" y="220" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="1090" y="220" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="1120" y="220" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="1022" y="269" text-anchor="end" fill="#9ca3af" font-size="11">y2</text>
+  <rect x="1030" y="250" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1060" y="250" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1090" y="250" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <rect x="1120" y="250" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="1022" y="299" text-anchor="end" fill="#9ca3af" font-size="11">y3</text>
+  <rect x="1030" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1060" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1090" y="280" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1120" y="280" width="30" height="30" rx="3" ry="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="1022" y="329" text-anchor="end" fill="#9ca3af" font-size="11">y4</text>
+  <rect x="1030" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1060" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1090" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <rect x="1120" y="310" width="30" height="30" rx="3" ry="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="1090.0" y="198" text-anchor="middle" fill="#6b7280" font-size="11">K (被看的 token) →</text>
+  <text transform="translate(1002,280.0) rotate(-90)" text-anchor="middle" fill="#6b7280" font-size="11">Q (查询) →</text>
+  <text x="1090.0" y="362" text-anchor="middle" fill="#111827" font-size="13" font-weight="600">decoder（输出侧 / causal）</text>
+  <path d="M 910.0 396 Q 1000.0 424, 1090.0 396" stroke="#d97706" stroke-width="1.8" fill="none" stroke-dasharray="4 3" marker-end="url(#cross-arrow)"/>
+  <text x="1000.0" y="446" text-anchor="middle" fill="#d97706" font-size="12" font-weight="600">cross-attention</text>
+  <text x="1000.0" y="463" text-anchor="middle" fill="#6b7280" font-size="11">decoder 每个位置都能看 encoder 全部输出</text>
+  <text x="1000" y="486" text-anchor="middle" fill="#6b7280" font-size="11">擅长：翻译、摘要、改写</text>
+  <g transform="translate(60,560)">
+    <rect x="0" y="0" width="20" height="20" rx="3" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="28" y="14" fill="#6b7280" font-size="12">可见（Q 能看到 K）</text>
+    <rect x="200" y="0" width="20" height="20" rx="3" fill="#f3f4f6" stroke="#e5e7eb"/>
+    <text x="228" y="14" fill="#6b7280" font-size="12">被 mask（attention 设 -∞）</text>
+    <rect x="440" y="0" width="20" height="20" rx="3" fill="#fef3c7" stroke="#d97706"/>
+    <text x="468" y="14" fill="#6b7280" font-size="12">cross-attention（看另一栈）</text>
+  </g>
+  <text x="640.0" y="602" text-anchor="middle" fill="#9ca3af" font-size="11">核心区别：注意力是双向（看全句）还是单向（只看左侧）；及训练目标是 MLM / CLM / seq2seq。</text>
+</svg>
