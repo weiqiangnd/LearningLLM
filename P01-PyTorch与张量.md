@@ -8,7 +8,7 @@
 
 ## 目录
 
-- [一、PyTorch 在 LLM 学习中的位置](#一pytorch-在-llm-学习中的位置)
+- [一、主流大模型几乎全部基于 PyTorch 实现](#一主流大模型几乎全部基于-pytorch-实现)
 - [二、张量（Tensor）：四个核心属性](#二张量tensor四个核心属性)
   - [2.1 shape：维度与形状](#21-shape维度与形状)
   - [2.2 dtype：数值精度](#22-dtype数值精度)
@@ -28,7 +28,7 @@
 
 ---
 
-## 一、PyTorch 在 LLM 学习中的位置
+## 一、主流大模型几乎全部基于 PyTorch 实现
 
 主流大模型（Qwen、LLaMA、DeepSeek、Mistral）以及训练 / 微调 / 推理生态（HuggingFace `transformers` / `peft` / `trl` / `accelerate`、vLLM、SGLang）几乎全部基于 **PyTorch**。读论文实现、跟着官方仓库 debug、自己写训练脚本，都绕不开两类操作：
 
