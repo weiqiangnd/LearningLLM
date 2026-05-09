@@ -169,5 +169,7 @@
 
 本仓库采用**双协议**授权，方便代码与文字内容按各自最适合的方式被复用：
 
-- **代码**（`.ipynb` 中的代码 cell、未来可能加入的脚本）采用 [MIT License](https://opensource.org/licenses/MIT)：任何人可自由使用、修改、再分发，仅需保留版权声明。
-- **文字与图片内容**（`.md` 文档、`assets/` 下的 SVG / PNG）采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)：可自由分享与改编，需署名（注明来源仓库）。
+- **代码**（`.ipynb` 中的代码 cell、未来可能加入的脚本）采用 [MIT License](https://opensource.org/licenses/MIT)：任何人可自由使用、修改、再分发，仅需保留版权声明。全文见 [`LICENSE-MIT`](./LICENSE-MIT)。
+- **文字与图片内容**（`.md` 文档、`assets/` 下的 SVG / PNG）采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)：可自由分享与改编，需署名（注明来源仓库）。全文见 [`LICENSE-CC-BY-4.0`](./LICENSE-CC-BY-4.0)。
+
+仓库根目录的 [`LICENSE`](./LICENSE) 文件给出了双协议的简要说明与指引。
