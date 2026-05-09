@@ -41,7 +41,7 @@
 | 01 环境与工具：IPython / Jupyter / Colab + 在 T4 上跑通 Qwen3-8B | 介绍 IPython / Jupyter / Colab 的关系与使用，讨论 Colab 上的 GPU 选型与大模型选型，并在 T4 上用 4-bit 量化跑通 Qwen3-8B 的对话生成。 | [文档](./01-IPython-Jupyter-Colab入门.md) · [ipynb](./01.ipynb) · [Open in Colab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/01.ipynb) | ✅ |
 | 02 生成参数与采样策略：logits / softmax / temperature / top-p/top-k / 思考模式 | 拆解 `generate()` 的完整工作流（logits → temperature → top-k / top-p → softmax → 采样），逐个讲解 `do_sample` / `temperature` / `top_p` / `top_k` / `repetition_penalty` 的作用与数学定义，并通过 6 组对比实验（贪心 vs 采样、不同 temperature、不同 top_p、是否抑制重复、思考模式 vs 非思考模式、复现性）让读者直观理解每个旋钮的效果。 | [文档](./02-生成参数与采样策略.md) · [ipynb](./02.ipynb) · [Open in Colab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/02.ipynb) | ✅ |
 
-〔预备知识〕首次用到 softmax 与概率分布——若不熟悉，建议先读 P03。
+〔预备知识〕02 章首次用到 softmax 与概率分布——若不熟悉，建议先读 P03。
 
 ### 阶段 2：Transformer 架构精讲
 
