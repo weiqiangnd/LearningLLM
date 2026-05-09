@@ -1,6 +1,16 @@
 # LearningLLM
 
-这是一份大模型（LLM）学习过程中的笔记与代码示例。每一章对应一个 Markdown 文档（理论与逐行代码讲解）和一个 Jupyter Notebook（可直接运行的示例）。所有示例默认在 **Google Colab** 中运行（免费 T4 GPU 即可起步）。
+## 仓库介绍
+
+这是一份大模型（LLM）学习过程中的笔记与代码示例。每一章对应一个 Markdown 文档（理论与逐行代码讲解）和一个 Jupyter Notebook（可直接运行的示例），两者**互为对照**——`.md` 回答「为什么这样做」，`.ipynb` 回答「代码每一行做什么」，公式与代码片段刻意逐字一致。所有示例默认在 **Google Colab** 中运行（免费 T4 GPU 即可起步）。
+
+仓库特色：
+
+- **`.md` + `.ipynb` 双轨并行**：每章一份概念讲解、一份可直接 Run All 的代码，互为对照、术语一致。
+- **真实模型而非玩具示例**：默认在 Colab 免费 T4（15 GB）上用 4-bit 量化跑通 Qwen3-8B；显存吃紧的进阶章节才升 L4 / A100。
+- **概念不跳步**：读者基线只要求「会 Python + 矩阵乘法」，softmax / KL / MDP 等首次出现都先定义再使用，并配最小可手算的数值例子（2×2 矩阵、长度为 3 的序列）。
+- **形状变换全程标注**：reshape / transpose / broadcasting 每一步都给张量形状，如 `(B, L, D) → (B, L, H, D/H) → (B, H, L, D/H)`。
+- **预备知识按需回查**：阶段 0 的 P0N 章节与主线 NN 解耦，无需一次读完——主线在首次用到时会用〔预备知识〕标注提醒。
 
 ## 学习路径
 
@@ -154,3 +164,10 @@
 ## 反馈与交流
 
 欢迎通过 [Issue](https://github.com/weiqiangnd/LearningLLM/issues) 提问、讨论或纠错。
+
+## License
+
+本仓库采用**双协议**授权，方便代码与文字内容按各自最适合的方式被复用：
+
+- **代码**（`.ipynb` 中的代码 cell、未来可能加入的脚本）采用 [MIT License](https://opensource.org/licenses/MIT)：任何人可自由使用、修改、再分发，仅需保留版权声明。
+- **文字与图片内容**（`.md` 文档、`assets/` 下的 SVG / PNG）采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)：可自由分享与改编，需署名（注明来源仓库）。
