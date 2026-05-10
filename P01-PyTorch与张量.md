@@ -519,7 +519,7 @@ with torch.no_grad():
 
 `detach()` 是**针对单个张量**的"切断"——返回一个新张量，**和原张量共享数据**但**与计算图断开**。常见用途：
 
-- 保存 loss 数值用于打印 / 记录到日志：`losses.append(loss.detach().cpu().item())`——避免无意中拉住整张计算图，导致内存爆掉
+- 保存 loss 数值用于打印 / 记录到日志：`losses.append(loss.detach().cpu().item())`——避免无意中拉住整张计算图，导致内存溢出
 - RLHF / 蒸馏里把"reference model 的输出"当成静态目标，不让梯度回流：`ref_logits = ref_model(x).detach()`
 
 ```python
