@@ -78,8 +78,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     - **container 的 `subtitle` 字段会与内部节点重叠**——容器副标题画在节点位置上方一点，节点稍矮就盖住它。要么不写 `subtitle`、要么把 `container.height` 拉大 ~30 px 给副标题让位。
     - **container 内节点的 `type_label` 也是上压**，节点本身要至少 60 px 高才装得下「TYPE_LABEL + label」两行；放 50 px 高的节点会被 type_label 遮住。
     - **手写 SVG（不走模板）时**底部 legend / caption 别紧贴 H 边——`pngquant` 偶尔会让边缘 1–2 px 颜色塌陷，看起来像被裁。统一留 ≥ 18 px。
-- **文件存放在仓库根目录的 `assets/`**：每张图同时提交 `.svg`（源文件，便于以后微调）和 `.png`（实际引用的位图）。命名 `NN-用途.svg`/`NN-用途.png`，`NN` 与所属章节编号对齐（如 `01-stack.png`、`02-generate-pipeline.png`）；预备知识章节用 `P0N-用途.png`。
-- **在 `.md` 中通过相对路径引用 PNG**：`![alt 文本](./assets/NN-用途.png)`。GitHub 上 PNG 渲染最稳定；`.svg` 在 GitHub README 里的 inline 渲染对外部字体不友好，所以默认引用 PNG。
+- **文件按章节分目录存放在仓库根目录的 `assets/<NN>/`**（如 `assets/01/`、`assets/P05/`）：每张图同时提交 `.svg`（源文件，便于以后微调）和 `.png`（实际引用的位图）。文件名不再带章节前缀（目录已表达），改为 `用途.svg` / `用途.png`，例如 `assets/01/stack.png`、`assets/02/generate-pipeline.png`、`assets/P05/v-q-tree.png`。如果某章配图需要 build 脚本，统一放在同一子目录下，命名 `build_diagrams.py`。
+- **在 `.md` 中通过相对路径引用 PNG**：`![alt 文本](./assets/<NN>/用途.png)`。GitHub 上 PNG 渲染最稳定；`.svg` 在 GitHub README 里的 inline 渲染对外部字体不友好，所以默认引用 PNG。
 - **不替换原有 ASCII 框图**：现有 `.md` 里的 ASCII 流程图保留（适合监控终端、纯文本 diff、复制粘贴），新生成的 SVG/PNG 作为视觉辅助插在 ASCII 之后，让两种形态各自发挥所长。
 - **新增/修改章节时主动配图**：每章在「架构总览」「流水线/工作流」「关键算法步骤」这类抽象概念处至少配 1 张图；超长章节（>500 行）建议 3–5 张分散在不同小节。
 
