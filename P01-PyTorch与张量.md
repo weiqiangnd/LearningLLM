@@ -24,7 +24,7 @@
   - [7.3 关闭梯度：`torch.no_grad` 与 `detach`](#73-关闭梯度torchno_grad-与-detach)
   - [7.4 梯度不会自动清零：`zero_grad()`](#74-梯度不会自动清零zero_grad)
 - [八、关键概念回顾](#八关键概念回顾)
-- [九、本节小结](#九本节小结)
+- [九、本章小结](#九本章小结)
 
 ---
 
@@ -121,7 +121,7 @@ z = x.to(y.device) + y                    # ✅ 把 x 搬到同一 device 再加
 - 输入数据（input_ids、图片像素）默认 `requires_grad=False`——我们不需要对输入求导（除了"adversarial attack"（对抗攻击：通过对输入加微小扰动让模型误判）这类特殊场景）
 - 推理时整体禁用：`with torch.no_grad():`，节省内存
 
-具体怎么用，留到第七节展开。
+具体怎么用，留到第 7 节展开。
 
 ---
 
@@ -569,7 +569,7 @@ for batch in loader:
 
 ---
 
-## 九、本节小结
+## 九、本章小结
 
 这一章把 PyTorch 用到的最底层工具讲清楚了：
 

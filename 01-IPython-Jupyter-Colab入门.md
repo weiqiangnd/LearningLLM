@@ -19,7 +19,7 @@
   - [关于 4-bit 量化](#关于-4-bit-量化)
   - [Colab Pro 用户的配卡策略](#colab-pro-用户的配卡策略)
 - [六、实战示例：在 Colab 中加载并运行 Qwen3-8B](#六实战示例在-colab-中加载并运行-qwen3-8b)
-- [七、本节小结](#七本节小结)
+- [七、本章小结](#七本章小结)
 
 ---
 
@@ -680,7 +680,7 @@ Transformer 是一种基于自注意力机制（Self-Attention）的神经网络
 
 ---
 
-## 七、本节小结
+## 七、本章小结
 
 - **IPython** 提供了 Magic 命令、shell 集成、富文本显示等增强能力
 - **Jupyter** 是基于浏览器的 Notebook 前端，IPython 是它默认的 Python 内核
