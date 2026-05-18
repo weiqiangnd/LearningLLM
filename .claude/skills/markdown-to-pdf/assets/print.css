@@ -189,6 +189,19 @@ code.math-error {
   color: #663c00;
 }
 
+/* Pygments marks unrecognised tokens with `.err` and the default style
+   wraps them in a red 1px border. This shows up as a red box around the
+   leading `!` in Jupyter shell magics like `!pip install ...` when the
+   surrounding fence is tagged ```python — IPython's `!` / `%%` magics
+   aren't valid Python, so the Python lexer flags them. We keep the
+   `python` lang tag (the rest of the code is real Python and should
+   highlight as such) and just hide the red border on stray `.err`
+   tokens. GitHub itself does the same thing visually. */
+.markdown-body .highlight .err {
+  border: none;
+  background: transparent;
+}
+
 /* ============================================================
    Unify nested-list bullets.
    GitHub's CSS defaults nested `<ul ul>` to `list-style: circle`,
@@ -209,7 +222,22 @@ code.math-error {
 }
 
 /* ============================================================
-   Tables: keep Latin words intact, let CJK break naturally.
+   Tables: short / atomic cells shouldn't ladder CJK characters
+   down a narrow column.
+
+   WeasyPrint's auto-layout sizes columns from min/max-content,
+   and `word-break: keep-all` is NOT honored — every CJK char is
+   treated as a break opportunity, so a 4-char label "状态空间"
+   gets a 1-char min-width and wraps to "状\n态\n空\n间" when a
+   neighbouring column dominates the width budget.
+
+   We can't use a positional CSS rule (e.g. `td:not(:last-child)`)
+   because some tables have multiple non-last columns holding
+   long prose, and nowrap-ing those overflows the page width.
+   Instead, render.py walks each <td>/<th> and tags cells whose
+   plain text is short AND has no whitespace / punctuation break
+   point with `class="nowrap"` — exactly the cells that benefit
+   from nowrap and never the ones that would overflow.
    ============================================================ */
 .markdown-body table {
   word-break: normal;
@@ -221,4 +249,18 @@ code.math-error {
   overflow-wrap: break-word;
   /* "3 维张量" should stay together rather than ladder down a column. */
   line-break: strict;
+}
+.markdown-body table th.nowrap,
+.markdown-body table td.nowrap {
+  white-space: nowrap;
+}
+
+/* Keep a single table row from being split across pages — fixes
+   the case where the bottom of one page shows half a row's CJK
+   text and the top of the next page shows the rest. Long-row
+   tables (≥ page-height) still fall back to splitting between
+   rows naturally; only the per-row split is forbidden. */
+.markdown-body table tr {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }

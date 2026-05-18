@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import base64
 import glob
+import html as html_lib
 import json
 import mimetypes
 import os
@@ -261,6 +262,86 @@ def _fetch_remote_image(url: str) -> tuple[bytes, str] | None:
         return None
 
 
+# ---------- table cell post-processing ----------
+
+# Cells that are "short and atomic" — short plain text with no whitespace
+# and no break-opportunity punctuation — get `class="nowrap"`. This is the
+# only reliable way to keep WeasyPrint's table auto-layout from laddering
+# "状态空间" down a column: with `word-break: normal` every CJK char is a
+# break opportunity (and WeasyPrint does NOT honor `word-break: keep-all`),
+# so a column whose neighbours hold long prose collapses to ~1 char wide
+# and the short label wraps to one char per line.
+#
+# We can't use a blanket CSS rule like `td:not(:last-child)` because some
+# chapters have wide tables (6 cols, multiple long-prose non-last cells)
+# where forcing all non-last cells to nowrap blows past the page width.
+# The right discriminator is "does the cell content have any natural break
+# points?" — which is per-cell, not per-column.
+
+_CELL_RE = re.compile(r'<(td|th)\b([^>]*)>(.*?)</\1>', re.DOTALL | re.IGNORECASE)
+_TAG_RE = re.compile(r'<[^>]+>')
+# Whitespace + Western punctuation + CJK punctuation that all introduce a
+# legitimate line-break opportunity in mixed CJK/Latin text.
+# Note: ASCII hyphen `-` is intentionally NOT a break char — keep kebab-case
+# identifiers like "encoder-only" / "decoder-only" together. Em-dash `—`
+# and en-dash `–` remain break points because they're used as sentence-
+# level dashes in the prose.
+_BREAK_CHAR_RE = re.compile(
+    r'[\s,.;:/+=\(\)\[\]\\<>'                    # ASCII punctuation (no `-`)
+    r'，。、；：／（）【】「」『』《》〈〉—–·]'  # CJK punctuation + em/en dash
+)
+# Plain-text cells longer than this still get nowrap suppressed — at some
+# point a "single word" is wide enough that nowrapping it would crowd out
+# the rest of the table. 14 CJK chars ≈ 56mm at 14px, leaves room on A4.
+_NOWRAP_MAX_CHARS = 14
+
+
+def _cell_plain_text(inner_html: str) -> str:
+    # Strip tags (including KaTeX math spans — their text content is the
+    # rendered glyph stream, which is fine for length estimation, but it
+    # has no spaces/punctuation that would mark a break point anyway, so
+    # the cell still reads as "atomic" the way we want).
+    no_tags = _TAG_RE.sub('', inner_html)
+    return html_lib.unescape(no_tags).strip()
+
+
+def _should_nowrap(plain: str) -> bool:
+    if not plain:
+        # Cell is image / pure math / empty — atomic, safe to nowrap.
+        return True
+    if len(plain) > _NOWRAP_MAX_CHARS:
+        return False
+    return not _BREAK_CHAR_RE.search(plain)
+
+
+def annotate_short_table_cells(html: str) -> str:
+    """Tag <td>/<th> cells whose content has no break opportunities with
+    `class="nowrap"` so the print CSS can keep them on a single line."""
+    def repl(m: re.Match) -> str:
+        tag, attrs, inner = m.group(1), m.group(2), m.group(3)
+        if not _should_nowrap(_cell_plain_text(inner)):
+            return m.group(0)
+        # Merge into existing class attribute if present, else add one.
+        if re.search(r'\bclass\s*=', attrs):
+            new_attrs = re.sub(
+                r'class\s*=\s*"([^"]*)"',
+                lambda c: f'class="{c.group(1)} nowrap"',
+                attrs,
+                count=1,
+            )
+            new_attrs = re.sub(
+                r"class\s*=\s*'([^']*)'",
+                lambda c: f"class='{c.group(1)} nowrap'",
+                new_attrs,
+                count=1,
+            )
+        else:
+            new_attrs = attrs + ' class="nowrap"'
+        return f'<{tag}{new_attrs}>{inner}</{tag}>'
+
+    return _CELL_RE.sub(repl, html)
+
+
 def inline_images(html: str, base_dir: Path) -> str:
     def repl(m: re.Match) -> str:
         pre, src, post = m.group(1), m.group(2), m.group(3)
@@ -428,6 +509,9 @@ def render_markdown_to_html(md_path: Path) -> str:
             rf"<p>\s*{re.escape(marker)}\s*</p>", replacement, html
         )
         html = html.replace(marker, replacement)
+
+    # Mark short / atomic table cells with class="nowrap".
+    html = annotate_short_table_cells(html)
 
     # Inline local images.
     html = inline_images(html, md_path.parent)
