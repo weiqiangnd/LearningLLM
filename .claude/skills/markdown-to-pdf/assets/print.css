@@ -1,0 +1,251 @@
+/* ============================================================
+   Page layout — A4, with running footer (URL · author · page).
+   The footer area lives inside the `margin` band, so we bump
+   the bottom margin a bit to leave it room.
+   ============================================================ */
+@page {
+  size: A4;
+  margin: 13mm 12mm 16mm 12mm;
+
+  @bottom-left {
+    content: "GitHub: https://github.com/weiqiangnd/LearningLLM";
+    font-family: "Mona Sans", "LXGW WenKai", sans-serif;
+    font-size: 8pt;
+    color: #6e7781;
+    vertical-align: top;
+    padding-top: 4mm;
+    white-space: nowrap;
+  }
+  @bottom-center {
+    content: "Author: WeiQiang";
+    font-family: "Mona Sans", "LXGW WenKai", sans-serif;
+    font-size: 8pt;
+    color: #6e7781;
+    vertical-align: top;
+    padding-top: 4mm;
+    white-space: nowrap;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: "Mona Sans", "LXGW WenKai", sans-serif;
+    font-size: 8pt;
+    color: #6e7781;
+    vertical-align: top;
+    padding-top: 4mm;
+    white-space: nowrap;
+  }
+}
+
+html, body {
+  background: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================================================
+   Web fonts — Latin: Mona Sans VF (GitHub's font)
+   `url(...)` paths here are rewritten to base64 data URIs at
+   render time by render.py, so the PDF is self-contained.
+   ============================================================ */
+@font-face {
+  font-family: "Mona Sans";
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url(fonts/MonaSans-VF.woff2) format("woff2-variations"),
+       url(fonts/MonaSans-VF.woff2) format("woff2");
+  /* U+0020–U+024F = Basic Latin + Latin-1 + Latin Extended A/B */
+  unicode-range: U+0020-024F, U+0300-036F, U+2000-206F, U+2070-209F,
+                 U+20A0-20CF, U+2100-214F, U+2200-22FF, U+25A0-25FF;
+}
+@font-face {
+  font-family: "Mona Sans";
+  font-style: italic;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url(fonts/MonaSans-VF-Italic.woff2) format("woff2-variations"),
+       url(fonts/MonaSans-VF-Italic.woff2) format("woff2");
+}
+@font-face {
+  font-family: "Mona Sans";
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url(fonts/MonaSans-VF-Ext.woff2) format("woff2-variations"),
+       url(fonts/MonaSans-VF-Ext.woff2) format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+                 U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ============================================================
+   Body text: Mona Sans for Latin, LXGW WenKai for CJK
+   LXGW WenKai (霞鹜文楷) is installed via the system package
+   `fonts-lxgw-wenkai` in install.sh and picked up by fontconfig.
+   ============================================================ */
+.markdown-body {
+  font-family:
+    "Mona Sans",
+    "LXGW WenKai", "霞鹜文楷",
+    "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+  /* Variable-font axis tuning: a touch heavier than the default 400 so
+     CJK strokes don't look thin next to Mona Sans. */
+  font-weight: 400;
+  font-variation-settings: "wght" 420;
+  max-width: none;
+  padding: 0;
+  /* Allow long unbreakable strings (URLs etc.) to wrap, but don't shred
+     short Latin words like "Rank" or "loss" mid-character. */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  /* Note: do NOT add "Apple Color Emoji" / "Noto Color Emoji" to the stack.
+     With WeasyPrint+Pango, listing an emoji font in font-family inflates
+     advance widths around digit/CJK transitions ("0 维" becomes "0    维").
+     Emoji glyphs (☑ ✅ etc.) are still picked up via system fontconfig fallback. */
+}
+
+/* Bold should pick a real Mona Sans weight, not synthesized bold. */
+.markdown-body b,
+.markdown-body strong {
+  font-weight: 700;
+  font-variation-settings: "wght" 680;
+}
+
+/* Headings: heavier weight on Mona Sans, slightly tighter tracking. */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-family:
+    "Mona Sans",
+    "LXGW WenKai", "霞鹜文楷",
+    "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  letter-spacing: 0;
+  font-variation-settings: "wght" 700;
+}
+.markdown-body h1 { font-variation-settings: "wght" 760; }
+.markdown-body h2 { font-variation-settings: "wght" 720; }
+
+/* ============================================================
+   Inline + block code: keep monospace.
+   GitHub uses ui-monospace + Liberation/Consolas/Menlo.
+   For Chinese inside code, LXGW WenKai Mono if available.
+   ============================================================ */
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre,
+.markdown-body samp,
+.markdown-body tt {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", "DejaVu Sans Mono",
+    "LXGW WenKai Mono", "霞鹜文楷等宽",
+    "Noto Sans Mono CJK SC", monospace;
+  font-size: 12.8px;
+  letter-spacing: 0;
+  font-variation-settings: normal;
+}
+
+.markdown-body pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3,
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+.markdown-body pre, .markdown-body table, .markdown-body img {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================================================
+   Display math
+   ============================================================ */
+.katex-block {
+  margin: 0.7em 0;
+  text-align: center;
+}
+.katex-display {
+  margin: 0;
+}
+/* KaTeX defaults to ~1.21em relative to its container. Trim it a bit so
+   inline math doesn't tower over body Chinese, and display math doesn't
+   eat unnecessary vertical space. */
+.katex {
+  font-size: 0.95em;
+}
+/* KaTeX bundles its own fonts; don't let our body letter-spacing leak in. */
+.katex, .katex * {
+  letter-spacing: normal !important;
+  font-variation-settings: normal !important;
+}
+
+/* ============================================================
+   Pygments code blocks: match GitHub's look (#f6f8fa background)
+   ============================================================ */
+.markdown-body .highlight {
+  margin-bottom: 16px;
+  background: #f6f8fa;
+  border-radius: 6px;
+  padding: 12px 14px;
+  overflow: auto;
+  font-size: 12.8px;
+  line-height: 1.55;
+}
+.markdown-body .highlight pre {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+code.math-error {
+  background: #fff3cd;
+  color: #663c00;
+}
+
+/* ============================================================
+   Unify nested-list bullets.
+   GitHub's CSS defaults nested `<ul ul>` to `list-style: circle`,
+   which renders the `◦` codepoint (U+25E6). In WeasyPrint+Pango
+   that codepoint can land on a color-emoji font in our fallback
+   stack and come out looking like a colored octocat-shaped glyph
+   next to TOC items (2.1 / 2.2 …). Force the same `disc` marker
+   used at the top level — clean, predictable, no emoji surprise.
+   ============================================================ */
+.markdown-body ul,
+.markdown-body ul ul,
+.markdown-body ul ul ul {
+  list-style-type: disc;
+}
+.markdown-body ol ul,
+.markdown-body ol ul ul {
+  list-style-type: disc;
+}
+
+/* ============================================================
+   Tables: keep Latin words intact, let CJK break naturally.
+   ============================================================ */
+.markdown-body table {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.markdown-body table th,
+.markdown-body table td {
+  word-break: normal;
+  overflow-wrap: break-word;
+  /* "3 维张量" should stay together rather than ladder down a column. */
+  line-break: strict;
+}

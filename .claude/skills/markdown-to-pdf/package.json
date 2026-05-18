@@ -1,0 +1,10 @@
+{
+  "name": "markdown-to-pdf-skill",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Skill: render project markdown to GitHub-style PDF.",
+  "dependencies": {
+    "katex": "^0.16.11",
+    "github-markdown-css": "^5.6.1"
+  }
+}

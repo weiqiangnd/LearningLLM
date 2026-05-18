@@ -8,10 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 章节结构约定
 
-每一章由两份**互为对照**的文件组成（主线章节用 `NN` 两位数字编号；阶段 0 预备知识章节用 `P0N` 编号，与主线解耦，避免后续插入新预备知识内容时打乱主线编号）：
+每一章由两份**互为对照**的文件组成（主线章节用 `NN` 两位数字编号；阶段 0 预备知识章节用 `P0N` 编号，与主线解耦，避免后续插入新预备知识内容时打乱主线编号）。**所有章节文件统一放在仓库 `src/` 目录下**，配图资源仍在仓库根目录的 `assets/` 下（与 `src/` 平级，章节 md 里通过 `../assets/<NN>/...` 引用）：
 
-- `NN-标题.md` / `P0N-标题.md` —— 概念讲解、原理推导、对比表格、踩坑记录。回答「**为什么这样做**」。
-- `NN.ipynb` / `P0N.ipynb` —— 可在 Colab 上直接跑通的代码示例。回答「**代码每一行做什么**」，逐行注释非常密集。
+- `src/NN-标题.md` / `src/P0N-标题.md` —— 概念讲解、原理推导、对比表格、踩坑记录。回答「**为什么这样做**」。
+- `src/NN.ipynb` / `src/P0N.ipynb` —— 可在 Colab 上直接跑通的代码示例。回答「**代码每一行做什么**」，逐行注释非常密集。
 
 下文若无特别说明，`NN` 同时涵盖主线和预备知识两种编号。
 
@@ -23,14 +23,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **`.ipynb` 自包含**：每章 ipynb 都要从硬件自检 → 装依赖 → 加载模型这套样板从头跑起，**不允许出现「（与第 NN 章一致）」「沿用上一章环境」之类把 cell 内容外包给其他章节的注释**——读者从任意一章 Run All 都应能跑通。`.md` 中介绍铺垫 cell 时，可点明"和第 NN 章相同"以避免重复阅读，但代码与逐行注释仍要在本章 ipynb 中完整列出，不省略。
 - **预备知识 P0N 章节不引用主线 NN 章节**：阶段 0 的内容与主线**完全解耦**，是任何 LLM 学习者都能独立读完的通用 PyTorch / 概率 / 优化 / RL 入门——`.md` 与 `.ipynb` **均不要出现「主线第 NN 章」「后续 NN 章会用到」「这就是 NN 章 attention 里的形状变换」之类把预备知识内容钉死到本仓库主线编号上的句式**。需要给"这个工具后面会怎么用"一点上下文时，用通用的领域语言（如「Transformer 的 multi-head attention 里」「LLM 训练中的下一个 token 预测」「写训练脚本时几乎都会遇到」）替代具体章节号。理由：预备知识编号 P0N 与主线 NN 解耦的初衷就是允许主线随时插入新章节、调整顺序而不打乱预备知识；预备知识文档里钉死主线章节号会让这种重排自动产生大量待修订的"幽灵引用"。主线 NN 章节之间倒可以彼此引用具体章节号——它们本就是顺序读物。
 
-文件命名上 `.md` 文件名带描述（如 `01-IPython-Jupyter-Colab入门.md`），`.ipynb` 只用编号（`01.ipynb`）。新增章节请沿用此命名。
+文件命名上 `.md` 文件名带描述（如 `src/01-IPython-Jupyter-Colab入门.md`），`.ipynb` 只用编号（`src/01.ipynb`）。新增章节请沿用此命名并放到 `src/` 下。
 
-每一份 `NN-标题.md` 顶部需要包含三个固定元素：
-- 一句「Open in Colab」直链（指向同章 `NN.ipynb`），格式：`https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/NN.ipynb`
+每一份 `src/NN-标题.md` 顶部需要包含三个固定元素：
+- 一句「Open in Colab」直链（指向同章 `src/NN.ipynb`），格式：`https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/NN.ipynb`
 - 一份**硬件门槛**标注，明确本章 ipynb 在哪种 Colab 运行时上能跑通（如「T4（15 GB）✅」/「需要 L4 或 A100，T4 显存不足」/「概念章，CPU 即可」）。读者不切到对应运行时就贸然 Run All 会浪费时间。
 - 一份目录（TOC），列出本章二级标题及主要三级标题，方便长文档导航
 
-`README.md` 学习路径表格里的对应链接则一律写成 `[OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/NN.ipynb)`。
+`README.md` 学习路径表格里的对应链接则一律写成 `[OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/NN.ipynb)`，文档与 ipynb 链接写成 `./src/NN-...md` / `./src/NN.ipynb`。
 
 `README.md` 中维护一份「学习路径」表格清单，每完成新章节需把对应行的「链接」列（文档 / ipynb / OpenInColab 文字链接）填上，并把「状态」列标 ✅。
 
@@ -84,7 +84,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     - **container 内节点的 `type_label` 也是上压**，节点本身要至少 60 px 高才装得下「TYPE_LABEL + label」两行；放 50 px 高的节点会被 type_label 遮住。
     - **手写 SVG（不走模板）时**底部 legend / caption 别紧贴 H 边——`pngquant` 偶尔会让边缘 1–2 px 颜色塌陷，看起来像被裁。统一留 ≥ 18 px。
 - **文件按章节分目录存放在仓库根目录的 `assets/<NN>/`**（如 `assets/01/`、`assets/P05/`）：每张图同时提交 `.svg`（源文件，便于以后微调）和 `.png`（实际引用的位图）。文件名不再带章节前缀（目录已表达），改为 `用途.svg` / `用途.png`，例如 `assets/01/stack.png`、`assets/02/generate-pipeline.png`、`assets/P05/v-q-tree.png`。如果某章配图需要 build 脚本，统一放在同一子目录下，命名 `build_diagrams.py`。
-- **在 `.md` 中通过相对路径引用 PNG**：`![alt 文本](./assets/<NN>/用途.png)`。GitHub 上 PNG 渲染最稳定；`.svg` 在 GitHub README 里的 inline 渲染对外部字体不友好，所以默认引用 PNG。
+- **在 `.md` 中通过相对路径引用 PNG**：章节 md 现在位于 `src/`、`assets/` 在仓库根，写 `![alt 文本](../assets/<NN>/用途.png)`。GitHub 上 PNG 渲染最稳定；`.svg` 在 GitHub README 里的 inline 渲染对外部字体不友好，所以默认引用 PNG。
 - **不替换原有 ASCII 框图**：现有 `.md` 里的 ASCII 流程图保留（适合监控终端、纯文本 diff、复制粘贴），新生成的 SVG/PNG 作为视觉辅助插在 ASCII 之后，让两种形态各自发挥所长。
 - **新增/修改章节时主动配图**：每章在「架构总览」「流水线/工作流」「关键算法步骤」这类抽象概念处至少配 1 张图；超长章节（>500 行）建议 3–5 张分散在不同小节。
 

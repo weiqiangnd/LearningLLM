@@ -31,3 +31,6 @@ Thumbs.db
 # Hugging Face cache (本地缓存目录，避免误提交几 GB 权重)
 .cache/
 hf_cache/
+
+# Skill / build artifacts
+.claude/skills/*/node_modules/
