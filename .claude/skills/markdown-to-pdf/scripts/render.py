@@ -31,7 +31,7 @@ from mdit_py_plugins.tasklists import tasklists_plugin
 from mdit_py_plugins.deflist import deflist_plugin
 from pygments import highlight as pyg_highlight
 from pygments.formatters import HtmlFormatter
-from pygments.lexers import get_lexer_by_name, guess_lexer
+from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
 
@@ -165,13 +165,17 @@ CODE_CSS = _FORMATTER.get_style_defs(".highlight")
 
 
 def highlight_code(code: str, lang: str | None) -> str:
+    # No language specified → render as plain text. Don't call guess_lexer:
+    # Pygments will happily pick the highest-confidence match for an ASCII
+    # directory tree / log output / etc., then flag the unrecognized parts
+    # as Token.Error which gets a red 1px border in the default style. GitHub
+    # itself never auto-guesses; we match that behavior.
+    if not lang:
+        return f'<div class="highlight"><pre><code>{escape_html(code)}</code></pre></div>'
     try:
-        lexer = get_lexer_by_name(lang) if lang else guess_lexer(code)
+        lexer = get_lexer_by_name(lang)
     except ClassNotFound:
-        try:
-            lexer = guess_lexer(code)
-        except Exception:
-            return f"<pre><code>{escape_html(code)}</code></pre>"
+        return f'<div class="highlight"><pre><code>{escape_html(code)}</code></pre></div>'
     return pyg_highlight(code, lexer, _FORMATTER)
 
 

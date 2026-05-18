@@ -23,8 +23,8 @@ description: >-
   - **数学公式**：行内 `$...$` 与块级 `$$...$$` 走 KaTeX 服务端渲染（不依赖运行时 JS）。
   - **图片**：相对路径（章节 md 在 `src/`，配图在仓库根 `assets/`，所以写 `../assets/P01/foo.png`）一律读取本地文件并嵌入为 base64 data URI；HTTP/HTTPS 图片也会**尝试下载并 base64 内嵌**（带 10 秒超时和 4 MB 上限），网络失败时保留原 `src`。已知的「Open in Colab」徽章直接走 skill 自带的本地 SVG（见 `assets/colab-badge.svg`），即便环境出网受限也能渲染出来。
   - **字体**：
-    - Latin / 数字：**Mona Sans VF**（GitHub 同款变量字体），woff2 内嵌为 base64，PDF 自包含。
-    - 中文：**LXGW WenKai**（霞鹜文楷），由 `install.sh` 通过 `apt install fonts-lxgw-wenkai` 安到系统字体；找不到时回退到 Noto Sans CJK SC。
+    - 正文（中英文）：**LXGW WenKai**（霞鹜文楷），由 `install.sh` 通过 `apt install fonts-lxgw-wenkai` 安到系统字体。这是一份双语字体——Latin 字母按楷体风格画、与汉字同 x-height，混排时高度齐平。找不到时回退到 Noto Sans CJK SC。
+    - 代码：`Liberation Mono` / `DejaVu Sans Mono`（系统自带）；含中文的代码段落回退到 `LXGW WenKai Mono`。
   - **样式**：套用 `github-markdown.css`，整体观感对齐 GitHub.com 网页。
   - **页脚**：每页底部统一渲染 `GitHub: https://github.com/weiqiangnd/LearningLLM`（左）/ `Author: WeiQiang`（中）/ `当前页 / 总页数`（右），由 `assets/print.css` 里的 `@page` margin box 控制——改署名 / 仓库地址直接编辑该文件。
 
@@ -51,7 +51,7 @@ python3 .claude/skills/markdown-to-pdf/scripts/render.py src/P01-*.md src/02-*.m
 - **数学公式**：`scripts/render_math.js` 接收 stdin 上一行一条的 JSON（`{"tex": "...", "display": true/false}`），逐条用 KaTeX 渲染回 HTML 字符串。Python 端通过单次 Node 子进程一次性处理整篇文章里的全部公式，避免反复启动 Node。
 - **数学定界提取**：先把 fenced code block / inline code 用占位符遮起来，再用正则提取 `$$...$$` / `$...$`，最后恢复 code block——避免错误地把代码里的 `$` 当成公式。
 - **TeX 反转义 `\_` / `\*` / `\$` → `_` / `*` / `$`**：本仓库 md 源里为了避开 markdown emphasis 经常写 `\mathbb{E}\_{...}` 这种「反斜杠 + 下划线」。GitHub 走 markdown → MathJax 是两段管线，markdown 先把 `\_` 还原成 `_` 再交给 MathJax，所以网页上下标正常。我们的管线是「先把数学整段拽出来再交给 KaTeX」，反斜杠会原样进 KaTeX，结果 `\_` 被当成字面下划线、整段下标变成一坨 `E_τ∼π_θ`。`render.py` 的 `_unescape_markdown_in_tex()` 在数学提取阶段统一把这三种 markdown 级转义还原。
-- **字体内嵌**：`render.py` 的 `inline_font_urls()` 通用函数会把 CSS 里所有 `url(fonts/*.woff2)` 改写成 base64 data URI；`assets/katex.min.css`（KaTeX 数学字体）与 `assets/print.css`（Mona Sans VF）都走这条路径。`install.sh` 负责从 `node_modules/katex/dist/` 复制 KaTeX 资源到 `assets/`。
+- **字体内嵌**：`render.py` 的 `inline_font_urls()` 通用函数会把 CSS 里所有 `url(fonts/*.woff2)` 改写成 base64 data URI。目前只有 `assets/katex.min.css`（KaTeX 数学字体）走这条路径——正文 LXGW 文楷由系统 fontconfig 提供、不走 CSS @font-face。`install.sh` 负责从 `node_modules/katex/dist/` 复制 KaTeX 资源到 `assets/`。
 - **图片嵌入**：扫描 `<img src="...">`，本地路径全部转 base64；HTTP/HTTPS 图片走 `urllib` 抓回来再内嵌（带 10s 超时和 4 MB 上限，失败时保留原 `src`、只打 warn）；`data:` URI 原样透传。少数已知图（目前只有 Colab 徽章）通过 `_REMOTE_IMAGE_LOCAL_MAP` 直接映射到 `assets/colab-badge.svg`（来源是 GitHub Camo 缓存的官方原图），保证哪怕网络拒绝出站也能渲染出徽章。
 - **TOC 锚点**：md 里 `[xxx](#锚点)` 形式的目录链接保留，但 WeasyPrint 输出的 PDF 内部跳转依赖 `id` 锚点——`markdown-it-py` 的 `anchor` 插件按 GitHub slug 规则生成 `id`，行为应与 GitHub 一致。
 - **页脚**：`assets/print.css` 的 `@page` 用 `@bottom-left` / `@bottom-center` / `@bottom-right` 三个 margin box 渲染「仓库链接 · 作者 · 页码」，8 pt 灰字、`white-space: nowrap`、`padding-top: 6mm` 把文字压在底边距下方。要改署名、加页眉或换页码格式，直接动这段 `@page` 即可。
