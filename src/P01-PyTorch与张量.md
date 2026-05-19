@@ -8,7 +8,7 @@
 
 ## 目录
 
-- [一、主流大模型几乎全部基于 PyTorch 实现](#一主流大模型几乎全部基于-pytorch-实现)
+- [一、PyTorch 是大模型训练的基础底层框架](#一pytorch-是大模型训练的基础底层框架)
 - [二、张量（Tensor）：四个核心属性](#二张量tensor四个核心属性)
   - [2.1 shape：维度与形状](#21-shape维度与形状)
   - [2.2 dtype：数值精度](#22-dtype数值精度)
@@ -28,7 +28,7 @@
 
 ---
 
-## 一、主流大模型几乎全部基于 PyTorch 实现
+## 一、PyTorch 是大模型训练的基础底层框架
 
 主流大模型（Qwen、LLaMA、DeepSeek、Mistral）以及训练 / 微调 / 推理生态（HuggingFace `transformers` / `peft` / `trl` / `accelerate`、vLLM、SGLang）几乎全部基于 **PyTorch**。读论文实现、跟着官方仓库 debug、自己写训练脚本，都绕不开两类操作：
 
@@ -69,7 +69,7 @@ print(x.requires_grad) # False
 
 LLM 里最常见的形状是 `(B, L, D)`：B = batch size、L = sequence length、D = hidden dim——后续 attention / FFN 等几乎所有模块都基于这种 3 维张量。
 
-> **小心** `tensor.size()` 等价于 `tensor.shape`——前者是方法调用、后者是属性访问，都返回一个 `torch.Size`（tuple 的子类）；想拿单维长度则 `tensor.size(dim)` 等价于 `tensor.shape[dim]`，两者都返回 `int`。
+> **注意**：`tensor.size()` 等价于 `tensor.shape` ——前者是方法调用、后者是属性访问，都返回一个 `torch.Size`（tuple 的子类）；想拿单维长度则 `tensor.size(dim)` 等价于 `tensor.shape[dim]`，两者都返回 `int`。
 
 ### 2.2 dtype：数值精度
 
