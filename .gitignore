@@ -34,3 +34,6 @@ hf_cache/
 
 # Skill / build artifacts
 .claude/skills/*/node_modules/
+
+# check-github-render previews are regeneratable; don't bloat the repo with them
+dist/check-github-render/

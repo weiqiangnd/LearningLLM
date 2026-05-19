@@ -162,7 +162,14 @@
 2. 点击章节「链接」列里的 **OpenInColab** 直接打开对应 Notebook（或在 VS Code 中连接 Colab 运行时）
 3. 文档与代码相互对照——`.md` 里有原理解析，`.ipynb` 注释里有逐行说明
 
-> **关于数学公式渲染**：本仓库 `.md` 文件**优先保障在 GitHub 上的渲染效果**。GitHub 走的是「markdown 解析 → MathJax 渲染」两段管线，会先把 `\_` 等转义字符还原再交给 MathJax，行内 / 块级公式（`$...$` / `$$...$$`）大多能正常显示。但本地 markdown 阅读器（Typora、VS Code 预览、Obsidian、各种网页版 markdown viewer 等）的渲染机制各异——有的用 KaTeX、有的用不同配置的 MathJax、有的根本不渲染数学，因此**部分公式（尤其是带 `\_` 转义、`\left\{`、`\text{}` 中带下划线等写法）在这些阅读器里可能显示异常**。如果你在本地阅读时遇到公式渲染问题，可以直接看 `dist/` 目录下的 PDF 文档——PDF 走 KaTeX 服务端渲染、字体内嵌、样式与 GitHub 网页一致，跨平台稳定。
+> **关于数学公式渲染**：仓库里**每一章实际上有四份**，分工不同：
+>
+> - `src/<name>.md` —— **源文档**，优先保障 **GitHub 网页上的渲染效果**。GitHub 走「markdown 解析 → MathJax 渲染」两段管线，会先把 `\_` 等转义字符还原再交给 MathJax，所以 `$...$` / `$$...$$` 大多能正常显示。但本地 markdown 阅读器（Typora、VS Code 预览、Obsidian 等）多数走 KaTeX，且**先抽数学块再渲染**，少了 GitHub 的那一步反转义——结果 `\mathbb{E}\_\pi` 里的 `\_` 进 KaTeX 就变字面下划线，**下标视觉丢失**。所以 src 里的 md 适合在 GitHub 上读，**不建议在 KaTeX 类本地阅读器里打开**。
+> - `dist/<name>.md` —— **KaTeX 兼容版**。除了 `$...$` 内的 `\_` `\*` `\$` 被反转义为 `_` `*` `$`，与 src 字节一致。VS Code 预览、Obsidian 等任何 KaTeX 前端都能直接渲染。**注意它在 GitHub 上反而不渲染数学**（少了反转义的下划线会被 emphasis 吃掉）——这是有意的分工。
+> - `dist/<name>.html` —— **自包含 HTML**。KaTeX 服务端渲染、所有图片 base64 内嵌、字体 / 样式全打包，离线浏览器双击即看，跨平台一致。
+> - `dist/<name>.pdf` —— 上面那份 HTML 经 WeasyPrint 出的 PDF，便于打印 / 离线归档。
+>
+> 这套 `dist/` 三件套由 `.claude/skills/markdown-to-pdf/` 一条命令从 src 重新生成；生成过程会做跨阶段的数学一致性校验（原始 md、KaTeX md、HTML 渲染三方对齐），任何异常都会阻止 PDF 生成，确保 dist 里看到的公式与作者写下的一致。本地阅读时按上面四份的"渲染场景"挑一份就好。
 
 ## 反馈与交流
 

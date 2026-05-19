@@ -1,0 +1,9 @@
+{
+  "name": "check-github-render",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Server-side MathJax 3 renderer for verifying that src/*.md math will render on github.com.",
+  "dependencies": {
+    "mathjax-full": "^3.2.2"
+  }
+}

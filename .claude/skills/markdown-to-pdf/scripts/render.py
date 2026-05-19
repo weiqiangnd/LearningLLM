@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
-"""Render a project markdown file to GitHub-style PDF under ./dist.
+"""Render a project markdown file to dist/ as a {md, html, pdf} triplet.
 
 Usage:
     python3 render.py <input.md> [more.md ...]
 
-For each input file `dir/name.md`, writes `dist/name.pdf` (relative to CWD).
+For each input file `dir/<name>.md`, writes (all under ./dist/):
+    dist/<name>.md     -- KaTeX-compatible markdown (math regions unescaped)
+    dist/<name>.html   -- self-contained HTML, KaTeX rendered server-side
+    dist/<name>.pdf    -- the same HTML run through WeasyPrint
+
+Between producing the HTML and the PDF, the pipeline runs a math consistency
+check that compares math regions across the three representations and aborts
+PDF generation if any anomaly is detected (lost subscript, leftover
+backslash-escape, KaTeX parse error, MathML/source mismatch).
 """
 from __future__ import annotations
 
@@ -52,6 +60,15 @@ _BLOCK_MATH_RE = re.compile(r"(?<!\\)\$\$(.+?)\$\$", re.DOTALL)
 # to the $ on each side.
 _INLINE_MATH_RE = re.compile(r"(?<![\\$])\$(?!\s)([^\n$]+?)(?<!\s)\$(?!\d)")
 
+# Combined regex used by `extract_math_in_order` to walk math regions in
+# document order while keeping block-vs-inline distinguishable.
+_ANY_MATH_RE = re.compile(
+    r"(?<!\\)\$\$(?P<block>.+?)\$\$"
+    r"|"
+    r"(?<![\\$])\$(?!\s)(?P<inline>[^\n$]+?)(?<!\s)\$(?!\d)",
+    re.DOTALL,
+)
+
 
 def _unescape_markdown_in_tex(tex: str) -> str:
     r"""Reverse the markdown-level escapes that are only meaningful before
@@ -82,21 +99,27 @@ def _unescape_markdown_in_tex(tex: str) -> str:
     )
 
 
-def mask_code_and_math(md_text: str):
-    """Replace code blocks, inline code, and math with placeholders.
+def _mask_code(md_text: str) -> tuple[str, list[str], list[str]]:
+    """Replace fenced code blocks and inline code with opaque placeholders.
 
-    Returns (masked_text, code_blocks, inline_codes, block_math, inline_math).
+    Used by both `mask_code_and_math` (full pipeline) and `unescape_math_in_md`
+    / `extract_math_in_order` (verification helpers) so neither touches `$`
+    that happens to live inside a code span.
     """
     code_blocks: list[str] = []
     inline_codes: list[str] = []
-    block_math: list[str] = []
-    inline_math: list[str] = []
 
     def repl_fenced(m: re.Match) -> str:
         idx = len(code_blocks)
-        code_blocks.append(m.group(0))
-        # Keep the leading newline so markdown still sees a paragraph break.
-        return (m.group(1) or "") + _CODE_MARK.format(idx=idx)
+        # The fenced-block regex anchors on the leading `^` or `\n` so it only
+        # fires on a new line. We keep that newline in the masked text so
+        # markdown still sees a paragraph break, and strip it from the saved
+        # body so `_restore_code` doesn't reintroduce it — otherwise the dist
+        # md ends up with an extra blank line before every code fence.
+        leading = m.group(1) or ""
+        body = m.group(0)[len(leading):]
+        code_blocks.append(body)
+        return leading + _CODE_MARK.format(idx=idx)
 
     text = _FENCED_RE.sub(repl_fenced, md_text)
 
@@ -106,6 +129,72 @@ def mask_code_and_math(md_text: str):
         return _ICODE_MARK.format(idx=idx)
 
     text = _INLINE_CODE_RE.sub(repl_inline_code, text)
+    return text, code_blocks, inline_codes
+
+
+def _restore_code(text: str, code_blocks: list[str], inline_codes: list[str]) -> str:
+    for i, raw in enumerate(inline_codes):
+        text = text.replace(_ICODE_MARK.format(idx=i), raw)
+    for i, raw in enumerate(code_blocks):
+        text = text.replace(_CODE_MARK.format(idx=i), raw)
+    return text
+
+
+def unescape_math_in_md(md_text: str) -> str:
+    """Produce a KaTeX-compatible variant of `md_text` by unescaping `\\_`,
+    `\\*`, `\\$` *inside math regions only*. Prose and code are byte-for-byte
+    unchanged.
+
+    Why this is a separate step now (instead of unescaping inline during the
+    HTML pipeline as before): we emit this string to `dist/<name>.md` so the
+    verification step can compare math regions across three representations
+    (original md → KaTeX-compatible md → rendered HTML annotations). Keeping
+    the unescape as a single, inspectable transformation also makes it
+    auditable — you can diff `src/...md` vs `dist/...md` and the only
+    differences should be `\\_ -> _` etc. within `$...$` blocks.
+    """
+    text, code_blocks, inline_codes = _mask_code(md_text)
+    text = _BLOCK_MATH_RE.sub(
+        lambda m: "$$" + _unescape_markdown_in_tex(m.group(1)) + "$$",
+        text,
+    )
+    text = _INLINE_MATH_RE.sub(
+        lambda m: "$" + _unescape_markdown_in_tex(m.group(1)) + "$",
+        text,
+    )
+    return _restore_code(text, code_blocks, inline_codes)
+
+
+def extract_math_in_order(md_text: str, unescape: bool = False) -> list[tuple[str, bool]]:
+    """Walk `md_text` (after masking code) and return all math regions in
+    document order as `[(tex, is_display), ...]`. The two helpers above are
+    used to build the lists compared in `verify_math_consistency`."""
+    text, _, _ = _mask_code(md_text)
+    out: list[tuple[str, bool]] = []
+    for m in _ANY_MATH_RE.finditer(text):
+        if m.group("block") is not None:
+            tex = m.group("block").strip()
+            is_display = True
+        else:
+            tex = m.group("inline").strip()
+            is_display = False
+        if unescape:
+            tex = _unescape_markdown_in_tex(tex)
+        out.append((tex, is_display))
+    return out
+
+
+def mask_code_and_math(md_text: str):
+    """Replace code blocks, inline code, and math with placeholders.
+
+    Returns (masked_text, code_blocks, inline_codes, block_math, inline_math).
+    Math content is unescaped (`\\_` -> `_` etc.) before being collected — by
+    the time this is called in the HTML pipeline the input is the already
+    KaTeX-compatible md, so the unescape is a no-op safety net.
+    """
+    text, code_blocks, inline_codes = _mask_code(md_text)
+    block_math: list[str] = []
+    inline_math: list[str] = []
 
     def repl_block_math(m: re.Match) -> str:
         idx = len(block_math)
@@ -456,8 +545,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 
-def render_markdown_to_html(md_path: Path) -> str:
-    md_text = md_path.read_text(encoding="utf-8")
+def render_markdown_to_html(md_text: str, base_dir: Path) -> str:
     masked, code_blocks, inline_codes, block_math, inline_math = mask_code_and_math(md_text)
 
     md = build_md()
@@ -471,12 +559,19 @@ def render_markdown_to_html(md_path: Path) -> str:
 
     # Restore block math (likely wrapped in <p>...</p> by markdown). Wrap in a
     # display-math div for cleaner spacing.
+    #
+    # Note on `re.sub` repl callable: the rendered KaTeX HTML carries literal
+    # LaTeX source inside `<annotation encoding="application/x-tex">...`,
+    # which contains command backslashes (`\leq`, `\log`, ...). Passing those
+    # as a plain string to `re.sub` makes the regex engine try to interpret
+    # `\l` etc. as a backreference escape and explode with "bad escape \l".
+    # Using a lambda as repl bypasses that template processing entirely.
     for idx, html_math in enumerate(rendered_block):
         marker = _BLOCK_MARK.format(idx=idx)
         wrapped = f'<div class="katex-block">{html_math}</div>'
         # Replace whole paragraph if marker is alone in a <p>.
         html = re.sub(
-            rf"<p>\s*{re.escape(marker)}\s*</p>", wrapped, html
+            rf"<p>\s*{re.escape(marker)}\s*</p>", lambda _m, w=wrapped: w, html
         )
         html = html.replace(marker, wrapped)
 
@@ -506,38 +601,282 @@ def render_markdown_to_html(md_path: Path) -> str:
         else:
             replacement = f"<pre><code>{escape_html(stripped)}</code></pre>"
         html = re.sub(
-            rf"<p>\s*{re.escape(marker)}\s*</p>", replacement, html
+            rf"<p>\s*{re.escape(marker)}\s*</p>",
+            lambda _m, r=replacement: r,
+            html,
         )
         html = html.replace(marker, replacement)
 
     # Mark short / atomic table cells with class="nowrap".
     html = annotate_short_table_cells(html)
 
+    # Wrap the in-body TOC so `@media print` can hide it from the PDF
+    # (PDF viewers get their navigation from WeasyPrint-generated bookmarks
+    # instead). No-op for chapters without a `## 目录` section.
+    html = wrap_toc_section(html)
+
     # Inline local images.
-    html = inline_images(html, md_path.parent)
+    html = inline_images(html, base_dir)
     return html
 
 
-def md_to_pdf(md_path: Path, dist_dir: Path) -> Path:
-    from weasyprint import HTML, CSS
+# Matches the in-body TOC region: an `## 目录` heading, the bullet list that
+# follows (markdown-it renders nested ULs without intervening text), and the
+# trailing `<hr />` that the `---` rule in the source markdown becomes.
+# Stays a `count=1` substitution since chapters only ever have one TOC.
+_TOC_SECTION_RE = re.compile(
+    r'(<h2[^>]*>\s*目录\s*</h2>\s*<ul\b.*?</ul>\s*<hr\s*/?>)',
+    re.DOTALL,
+)
 
-    body = render_markdown_to_html(md_path)
+
+def wrap_toc_section(html: str) -> str:
+    """Wrap the body-level TOC block in `<div class="toc-section">…</div>` so
+    the print stylesheet can hide it. We intentionally keep the wrapping
+    tight (h2 + first <ul> + trailing <hr>) rather than greedy-matching all
+    the way to the next h2 — that way a chapter that for some reason puts
+    real content between its TOC and first section still survives unscathed.
+
+    Returns the HTML unchanged if no TOC is found (e.g. shorter notes that
+    skip the convention). The `<hr>` is included so the PDF doesn't end up
+    with a dangling horizontal rule above the first body section.
+    """
+    return _TOC_SECTION_RE.sub(
+        lambda m: f'<div class="toc-section">{m.group(1)}</div>',
+        html,
+        count=1,
+    )
+
+
+# ---------- math consistency verification ----------
+
+# Strip every HTML tag — used to inspect rendered visual spans / MathML for
+# residue (literal `\_`, leftover `\,`, etc.).
+_HTML_TAG_RE = re.compile(r"<[^>]+>")
+# Pull the source TeX KaTeX echoes back inside `<annotation>` for every
+# rendered formula. Content is HTML-entity encoded. The pattern is
+# deliberately tolerant of attribute reordering / quote style so a future
+# KaTeX upgrade doesn't silently break the roundtrip check.
+_ANNOTATION_RE = re.compile(
+    r'<annotation\b[^>]*\bencoding=["\']application/x-tex["\'][^>]*>'
+    r'([^<]*)</annotation>'
+)
+# KaTeX failure signatures in the rendered HTML body:
+#  - `katex-error`: emitted when KaTeX gives up entirely (no MathML at all).
+#  - `class="math-error"`: our Python-side fallback when render_math.js
+#    reports `{"error": "..."}` for a snippet.
+#  - `mathcolor="#cc0000"` / `color:#cc0000;`: KaTeX's "silent failure" red
+#    used in non-strict mode for unknown commands. The color is hard-coded
+#    in KaTeX's source — matching the hex string is the most reliable signal.
+# Scoped to the body (see `_html_body_slice`) so the embedded CSS bundles
+# (`github-markdown.css` etc.) can't false-positive — and so a future KaTeX
+# CSS that legitimately names `.katex-error` won't either.
+_KATEX_ERROR_MARKERS = (
+    "katex-error",
+    'class="math-error"',
+    'mathcolor="#cc0000"',
+    "color:#cc0000",
+)
+
+
+def _html_body_slice(html: str) -> str:
+    """Return just the rendered article portion of the full HTML — everything
+    between `<body>` and `</body>`. We use this for the error-marker scan so
+    KaTeX class names that happen to live inside embedded CSS rules don't get
+    misread as real KaTeX failures."""
+    m = re.search(r"<body[^>]*>(.*)</body>", html, re.DOTALL)
+    return m.group(1) if m else html
+
+
+class MathInconsistency(RuntimeError):
+    """Raised when the cross-stage math consistency check fails. The message
+    lists every detected issue so a single run reports as much as possible
+    instead of dying on the first one."""
+
+
+def _normalize_for_compare(tex: str) -> str:
+    """KaTeX trims a bit of whitespace before echoing source into the
+    `<annotation>` payload, and the markdown extraction also `.strip()`s the
+    captured group. Collapse runs of whitespace so the two sides line up even
+    when one has `\\;` rendered as a single space and the other kept a tab."""
+    return re.sub(r"\s+", " ", tex).strip()
+
+
+def verify_math_consistency(
+    original_md: str,
+    katex_md: str,
+    html: str,
+) -> None:
+    """Raise `MathInconsistency` if math regions across the three stages do
+    not line up, or if KaTeX produced any output that looks like a rendering
+    anomaly.
+
+    Stages:
+      1. `original_md` — what the author wrote, may contain markdown-level
+         escapes like `\\_` inside `$...$`.
+      2. `katex_md` — what we wrote to dist/ after `unescape_math_in_md`.
+      3. `html` — what KaTeX emitted, carrying the source TeX it actually
+         parsed inside `<annotation encoding="application/x-tex">...</>`.
+
+    Checks:
+      A. Region count matches across all three.
+      B. For each position, `unescape(original[i])` == `katex_md[i]` (the
+         transformation we promised to do is exactly what we did).
+      C. For each position, `katex_md[i]` == decoded annotation source from
+         `html[i]` (KaTeX parsed exactly what we fed it; nothing dropped).
+      D. No leftover `\\_` / `\\*` reached KaTeX (would render as literal
+         underscores / asterisks instead of subscripts / emphasis).
+      E. No KaTeX error markers in the HTML.
+      F. No literal underscore glyph emitted as `<mi mathvariant="normal">_</mi>`
+         in the MathML (signature of a lost subscript even when the source
+         already had a bare `_`).
+    """
+    issues: list[str] = []
+
+    orig = extract_math_in_order(original_md, unescape=False)
+    katex = extract_math_in_order(katex_md, unescape=False)
+
+    # Annotations come out of the rendered HTML in document order. Decode the
+    # HTML entities KaTeX wrote into the payload (`&amp;`, `&lt;`, etc.).
+    annotations = [
+        html_lib.unescape(s) for s in _ANNOTATION_RE.findall(html)
+    ]
+
+    # --- A. region counts ---
+    if not (len(orig) == len(katex) == len(annotations)):
+        issues.append(
+            f"math region count mismatch: original={len(orig)} "
+            f"katex_md={len(katex)} html_annotations={len(annotations)}"
+        )
+
+    # --- B. original -> katex_md transformation ---
+    for i, ((o_tex, o_disp), (k_tex, k_disp)) in enumerate(zip(orig, katex)):
+        expected = _unescape_markdown_in_tex(o_tex)
+        if expected != k_tex:
+            issues.append(
+                f"#{i} ({'block' if o_disp else 'inline'}): "
+                f"unescape(original) != katex_md\n"
+                f"    original: {o_tex!r}\n"
+                f"    expected: {expected!r}\n"
+                f"    katex_md: {k_tex!r}"
+            )
+        if o_disp != k_disp:
+            issues.append(
+                f"#{i}: display-mode flipped between original and katex_md "
+                f"(orig={o_disp}, katex={k_disp})"
+            )
+
+    # --- C. katex_md -> html annotation roundtrip ---
+    for i, ((k_tex, k_disp), a_tex) in enumerate(zip(katex, annotations)):
+        if _normalize_for_compare(k_tex) != _normalize_for_compare(a_tex):
+            issues.append(
+                f"#{i} ({'block' if k_disp else 'inline'}): "
+                f"katex_md != html annotation\n"
+                f"    katex_md  : {k_tex!r}\n"
+                f"    annotation: {a_tex!r}"
+            )
+
+    # --- D. leftover markdown escapes inside annotations ---
+    for i, a_tex in enumerate(annotations):
+        # `\_` and `\*` are never used as real LaTeX commands in this repo's
+        # math; their presence here means the unescape pass missed something
+        # (or new content was written that needs unescaping).
+        leftover = []
+        if r"\_" in a_tex:
+            leftover.append(r"\_")
+        if r"\*" in a_tex:
+            leftover.append(r"\*")
+        if leftover:
+            issues.append(
+                f"#{i}: KaTeX received leftover markdown escapes "
+                f"{leftover} — subscripts/emphasis will render as literal "
+                f"characters.\n    source: {a_tex!r}"
+            )
+
+    body = _html_body_slice(html)
+
+    # --- E. KaTeX error spans (body-scoped, see `_html_body_slice` rationale) ---
+    for marker in _KATEX_ERROR_MARKERS:
+        if marker in body:
+            issues.append(
+                f"KaTeX error marker {marker!r} present in rendered HTML body "
+                "— at least one formula failed to parse."
+            )
+            break
+
+    # --- F. literal-underscore-as-letter in MathML (lost subscript signature)
+    # `\_X` produces `<mi mathvariant="normal">_</mi><mi>X</mi>` in KaTeX's
+    # MathML. The visual span has the same signature: an `_` glyph rendered
+    # at baseline as an `mord`. We catch it via the MathML tag pattern, which
+    # is unambiguous — a real subscript would be `<msub>...</msub>` and the
+    # underscore would never appear as `<mi>_</mi>`.
+    if re.search(r'<mi[^>]*>_</mi>', body):
+        issues.append(
+            "MathML contains `<mi>_</mi>` — a literal underscore glyph "
+            "where a subscript was almost certainly intended. Check the "
+            "source for un-unescaped `\\_` or a typo around `_`."
+        )
+
+    if issues:
+        raise MathInconsistency(
+            "math consistency check failed ({} issue{}):\n  - {}".format(
+                len(issues),
+                "" if len(issues) == 1 else "s",
+                "\n  - ".join(issues),
+            )
+        )
+
+
+# ---------- top-level pipeline: md -> {md, html, pdf} triplet ----------
+
+
+def md_to_dist(md_path: Path, dist_dir: Path) -> dict:
+    """Run the full pipeline for one input md and write the three sibling
+    artifacts under `dist_dir`. Returns paths keyed by extension.
+
+    Order matters: write the KaTeX-compatible md and the HTML first so they
+    are available for inspection (and committed via the verification step)
+    before the relatively expensive WeasyPrint PDF pass kicks in. If the
+    consistency check fails we skip the PDF entirely — there's no point
+    burning ~10 s to render a PDF whose math we've already proven wrong.
+    """
+    from weasyprint import HTML
+
+    dist_dir.mkdir(parents=True, exist_ok=True)
+    stem = md_path.stem
+
+    original_md = md_path.read_text(encoding="utf-8")
+    katex_md = unescape_math_in_md(original_md)
+
+    md_out = dist_dir / f"{stem}.md"
+    md_out.write_text(katex_md, encoding="utf-8")
+
+    body = render_markdown_to_html(katex_md, md_path.parent)
     full_html = HTML_TEMPLATE.format(
-        title=md_path.stem,
+        title=stem,
         github_css=load_text(GITHUB_MARKDOWN_CSS_PATH),
         katex_css=load_katex_css(),
         code_css=CODE_CSS,
         print_css=load_print_css(),
         body=body,
     )
-    dist_dir.mkdir(parents=True, exist_ok=True)
-    pdf_path = dist_dir / f"{md_path.stem}.pdf"
-    HTML(string=full_html, base_url=str(md_path.parent)).write_pdf(str(pdf_path))
-    return pdf_path
+    html_out = dist_dir / f"{stem}.html"
+    html_out.write_text(full_html, encoding="utf-8")
+
+    # Cross-stage math consistency. Raises on first batch of issues; we let
+    # the exception bubble up to `main`, which logs and sets exit code 1.
+    verify_math_consistency(original_md, katex_md, full_html)
+
+    pdf_out = dist_dir / f"{stem}.pdf"
+    HTML(string=full_html, base_url=str(md_path.parent)).write_pdf(str(pdf_out))
+
+    return {"md": md_out, "html": html_out, "pdf": pdf_out}
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(description="Render markdown to GitHub-style PDF.")
+    parser = argparse.ArgumentParser(
+        description="Render markdown into a {md, html, pdf} triplet under dist/.",
+    )
     parser.add_argument("inputs", nargs="+", help="Markdown file(s) or glob patterns.")
     parser.add_argument(
         "--dist", default="dist", help="Output directory (default: ./dist relative to CWD)."
@@ -564,11 +903,27 @@ def main(argv: list[str]) -> int:
             rc = 1
             continue
         try:
-            pdf = md_to_pdf(path, dist_dir)
-            print(f"[ok] {path}  ->  {pdf.relative_to(cwd) if pdf.is_relative_to(cwd) else pdf}")
+            outs = md_to_dist(path, dist_dir)
+        except MathInconsistency as e:
+            # The .md and .html were already written; we keep them so the
+            # author can inspect what KaTeX received without re-running.
+            print(f"[error] {path}: {e}", file=sys.stderr)
+            rc = 1
+            continue
         except Exception as e:
             print(f"[error] {path}: {e}", file=sys.stderr)
             rc = 1
+            continue
+
+        def _rel(p: Path) -> str:
+            return str(p.relative_to(cwd)) if p.is_relative_to(cwd) else str(p)
+
+        print(
+            f"[ok] {path}\n"
+            f"       md  -> {_rel(outs['md'])}\n"
+            f"       html-> {_rel(outs['html'])}\n"
+            f"       pdf -> {_rel(outs['pdf'])}"
+        )
     return rc
 
 

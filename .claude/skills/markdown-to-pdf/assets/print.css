@@ -264,3 +264,17 @@ code.math-error {
   page-break-inside: avoid;
   break-inside: avoid;
 }
+
+/* Hide the in-body TOC when printing / when WeasyPrint emits a PDF.
+   WeasyPrint generates PDF bookmarks automatically from h1-h6, so any
+   modern PDF viewer already has a sidebar outline that does the same
+   job — the in-body TOC just costs a page or two of visual noise.
+   The dist .html keeps the TOC visible (browsers don't have a built-in
+   outline panel); the dist .md keeps it too (most KaTeX-based markdown
+   viewers do have an Outline panel, but the in-body anchor links are
+   still handy). The wrapping `<div class="toc-section">` is added by
+   `wrap_toc_section()` in render.py around the `## 目录` H2 + its
+   bullet list + the trailing `<hr>`. */
+@media print {
+  .toc-section { display: none; }
+}

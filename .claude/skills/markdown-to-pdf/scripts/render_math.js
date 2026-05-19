@@ -25,11 +25,17 @@ rl.on("line", (line) => {
     return;
   }
   try {
+    // `htmlAndMathml` makes KaTeX emit both the visual HTML span and a MathML
+    // `<annotation encoding="application/x-tex">SOURCE</annotation>` carrying
+    // the exact TeX input. The downstream verification step reads those
+    // annotations back out of the final HTML and checks them against the math
+    // we fed in — that's the roundtrip anchor for detecting silent rendering
+    // anomalies (lost subscripts, swallowed punctuation, etc.).
     const html = katex.renderToString(item.tex, {
       displayMode: !!item.display,
       throwOnError: false,
       strict: "ignore",
-      output: "html",
+      output: "htmlAndMathml",
       trust: false,
     });
     process.stdout.write(JSON.stringify(html) + "\n");
