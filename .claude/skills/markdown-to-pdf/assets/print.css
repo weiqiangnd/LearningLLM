@@ -151,6 +151,19 @@ html, body {
 .katex {
   font-size: 1.0em;
 }
+/* Treat each inline `$...$` as an atomic unit, mirroring how GitHub's
+   MathJax renders math. KaTeX's own CSS only sets `white-space: nowrap`
+   on the inner `.katex .base`, and it ends a `.base` and starts a new
+   one at every binary relation / operator (`\mid`, `=`, `\leq`, …).
+   In a narrow table cell, WeasyPrint will happily break between those
+   bases — e.g. `$P(s' \mid s, a)$` splits into `P(s'∣` and `s,a)` on
+   two lines. The fix is to forbid line breaks anywhere inside the
+   outer `.katex` span. Display math (`.katex-display`) is block-level
+   and unaffected; surrounding prose wraps freely at the spaces before
+   and after each `.katex` span. */
+.katex {
+  white-space: nowrap;
+}
 /* KaTeX bundles its own fonts; don't let our body letter-spacing leak in. */
 .katex, .katex * {
   letter-spacing: normal !important;
