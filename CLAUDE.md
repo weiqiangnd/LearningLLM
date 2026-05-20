@@ -74,10 +74,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 仓库引入 [`fireworks-tech-graph`](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) skill 用来生成 SVG 架构图、流程图、原理图，已安装在 `.claude/skills/fireworks-tech-graph/`，依赖系统包 `librsvg2-bin`（提供 `rsvg-convert`）。绘图时遵循以下约定：
 
 - **统一使用默认 style 1（Flat Icon）**——白底、淡色填充、彩色边框、Helvetica/PingFang 字体；除非有特别理由，否则不要切换到 Dark Terminal、Blueprint 等其他 style，保持全仓库视觉一致。
-- **生成方式**：调 `python3 .claude/skills/fireworks-tech-graph/scripts/generate-from-template.py <template-type> <output.svg> '<json>'`，再 `rsvg-convert -w <宽度> <svg> -o <tmp.png> && pngquant --quality=85-100 --strip --force --output <png> <tmp.png>` 导出 PNG（系统依赖 `librsvg2-bin` + `pngquant`）。**优先保证清晰度**，不再卡 PNG 体积上限。
-- **导出宽度按信息密度选**：默认 `-w 720` 适用于节点 ≤ 6 / 文本稀疏的图；信息密度高（多容器、并排矩阵、长 sublabel、>10 节点）的图升到 `-w 1200`，避免缩放后字糊成一片。中间档 `-w 960` 用得少。
+- **生成方式**：调 `python3 .claude/skills/fireworks-tech-graph/scripts/generate-from-template.py <template-type> <output.svg> '<json>'`，再 `rsvg-convert -w <实际像素> <svg> -o <tmp.png> && pngquant --quality=100 --strip --force --output <png> <tmp.png>` 导出 PNG（系统依赖 `librsvg2-bin` + `pngquant`）。**优先保证清晰度**，不再卡 PNG 体积上限；`--quality=100` 让 pngquant 只在能保真的前提下做压缩，避免 8-bit 调色板把抗锯齿边缘搞脏。
+- **导出宽度按信息密度选**：默认 `-w 1080`（节点 ≤ 6 / 文本稀疏）、`-w 1800`（多容器 / 并排矩阵 / >10 节点 / 长 sublabel），中间档 `-w 1440` 少用。这套数值是按 retina 屏和 PDF 打印需要的实际像素定的，直接选最终值传给 `rsvg-convert -w`，不用再乘倍率。
 - **画面留白要"刚好"**：SVG 设计时让内容在 viewBox 里**四周留一圈适度留白**——边距太小（接近 0）会让框线压在边缘看着压抑；留白太多则正文显得空旷。一个简单参考：标题与最近的内容上沿留 ~20 px，最外层节点离左右边界 ~40 px、距底部 ~30 px；JSON 里的 `width`/`height` 跟着内容实际占用范围调整，不要无脑沿用 960×600 默认值。
-- **生成后必须人眼复核 PNG**：`rsvg-convert` 不会检测越界——viewBox 太小、legend 装不下、节点重叠都不会报错，但 PNG 里会出现"被裁掉一半的字"。每张图渲染完都要用 Read 工具看一眼，确认（a）底部 legend 整条都在画面内（b）节点之间无重叠（c）容器内的标签没有被里面的子节点压住（d）主图与 legend、注解之间没有大段空白。
+- **生成后必须人眼复核 PNG**：`rsvg-convert` 不会检测越界——viewBox 太小、legend 装不下、节点重叠都不会报错，但 PNG 里会出现"被裁掉一半的字"。每张图渲染完都要用 Read 工具看一眼，确认（a）底部 legend 整条都在画面内（b）节点之间无重叠（c）容器内的标签没有被里面的子节点压住（d）主图与 legend、注解之间没有大段空白（e）**所有文字都"看得清"——不是"勉强能辨认"**。
+- **文字颜色不要太淡**：fireworks-tech-graph 默认模板里 `type_label_fill` 是 `#9ca3af`（gray-400）、`text_muted` / `section_sub_fill` 是 `#94a3b8`（slate-400）、`text_secondary` / `arrow_label_fill` / `legend_fill` 是 `#6b7280`（gray-500），这套配色在 Figma / mockup 里看着"高级灰"，但 GitHub PNG 缩放到正文宽度后字会糊。**最低对比度基线**：所有正文级别（节点 sublabel、axis label、legend、arrow label、caption / footnote）一律用 `#374151`（gray-700）或更深；带强调意味的 type_label / section_sub 用 `#334155`（slate-700）或更深；唯一允许 gray-600 / slate-600 量级的是**带边框的装饰性标签**（节点头上方的小 caps tag、有底色衬托的角标），因为有色块衬底会拉回对比。手写 SVG 时直接用上面这套色；调模板时如果发现还在用 `#9ca3af` / `#94a3b8` / `#6b7280` 这一类的 gray-400/500，**渲完一定要看一眼是否需要再调深**。
 - **几个生成器常见的"看不见的坑"**（都来自 fireworks-tech-graph 的 `generate-from-template.py`）：
     - **legend 是纵向布局**，每条占 22 px。viewBox 高度必须 ≥ `legend_y + 22 × N + 20`，否则末尾几条会被静默裁掉（最容易踩）。
     - **container 的 `subtitle` 字段会与内部节点重叠**——容器副标题画在节点位置上方一点，节点稍矮就盖住它。要么不写 `subtitle`、要么把 `container.height` 拉大 ~30 px 给副标题让位。

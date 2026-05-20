@@ -134,6 +134,11 @@ html, body {
 .markdown-body img {
   max-width: 100%;
   height: auto;
+  /* Diagram PNGs are exported at 1.5x the intended CSS width so retina
+     viewers and PDF print get a sharp source. When WeasyPrint downsamples
+     them to fit the column, prefer the high-contrast resampler instead of
+     the default smooth blur — text labels inside diagrams stay legible. */
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* ============================================================

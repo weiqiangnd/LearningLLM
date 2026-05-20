@@ -57,30 +57,38 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
                                        —— 还把 \, → , 、\! → ! 等吃掉
 ```
 
-这条 skill 同样走两段：
+这条 skill 走三段：
 
 1. **抽数学区段**：用与 `markdown-to-pdf` 一致的正则（已经验证过对 src/*.md 全集 0 误抓），按文档顺序拿到所有 `$...$` / `$$...$$`，并记下每段在源文件里的 byte offset → 行号。
 2. **模拟反转义**：对每段数学内容，**只反转义 GitHub 实际在 `$...$` 内会还原的那些**（`\_` `\*` `\$` —— 实测 github.com 上的工作流），保留 `\\` `\{` `\}` 这类 TeX 命令字符。
 3. **MathJax 渲染**：把反转义后的 TeX 喂给 mathjax-full（服务端，Node + liteAdaptor），逐条检查输出里是不是含 `<merror>` 元素或 `data-mjx-error` 属性。
-4. **静态层补一脚**：MathJax 3 看不到 `\,` `\!` `\;` `\>` 这类被 CommonMark 吃掉的间距宏（它们到 MathJax 时已经变成裸标点，没法报错），单独 grep 源里的这几个模式，在 mathjax-full 之外补报。
+4. **静态层补一脚**：MathJax 3 看不到下面这些"在 markdown 解析阶段就坏了"的形态——它们到 MathJax 时要么已经被还原成裸标点（`\,` → `,`、`\|` → `|`），要么整个数学段根本没被识别（CJK 紧贴、表格列分隔吃 `|` 等），MathJax 自然无法报错。脚本对源 md 直接 grep 这些模式补报：
+   - `\,` `\!` `\;` `\>` `\|` 这五个 CommonMark 会无声吃掉的反斜杠转义
+   - `$$...$$` 块级公式没独占一行 / 缺前后空行
+   - CJK 字符或全角标点紧贴 `$`（如 `中文$x$中文`、`$y$。`）
+   - 表格行（`| ... |`）内数学段里出现裸 `|`
+   - `_{<...}` / `^{<...}` 这种下标里塞了 `<` `>` 字面字符的写法
+   - inline `$..[..]..}_<letter>..$` 里没把 `_` 转义的高危形态
 
 ## 这条 skill 能抓到的、抓不到的
 
 | CLAUDE.md 规则 | 抓得到？ | 怎么抓的 |
 |---|---|---|
-| 3 `\left\{ ... \right\}` | ❌ | 实测 MathJax 3 已经支持（早期 MathJax 2 才报错）。CLAUDE.md 那条**过时了**——可以放心写 `\left\{`。 |
+| 1 `$$` 块级独占一行 + 前后空行 | ✅ | 静态层扫源 md，发现 `$$...$$` 同行有其他文字、或前后非空行就报 `block-math-not-isolated` |
+| 2 `$..$` 与 CJK 字符/全角标点邻接 | ✅ | 静态层扫每段 inline math 外侧字符，CJK / 全角标点贴边就报 `cjk-adjacent-to-math` |
+| 3 `\left\{ ... \right\}` | ❌（无需抓） | 实测 MathJax 3 已经支持（早期 MathJax 2 才报错）。CLAUDE.md 那条**过时了**——可以放心写 `\left\{`。 |
 | 4 `\text{}` 内裸 `_` | ✅ | MathJax 3 报 `'_' allowed only in math mode` |
+| 5 `{+1.23}` 包数字 | ❌ | TeX 语义层（两个引擎一致），渲不出错；只是视觉上前后多一截空白 |
 | 6 `\,` `\!` `\;` `\>` 间距宏 | ✅ | 静态层 grep |
-| 9 `}_V` workaround 必要性 | ❌ | 这条是 CommonMark **emphasis 分词**层的，不是 MathJax 层；要抓需要跑 GitHub `/markdown` API 或本地复刻 GFM tokenizer |
-| 1 `$$` 块级空行 | ❌ | markdown 解析层 |
-| 2 `$..$` 与 CJK 邻接 | ❌ | markdown 解析层 |
-| 5 `{+1.23}` 包数字 | ❌ | TeX 语义层（两个引擎一致），渲不出错 |
-| 7 表格里裸 `\|` | ❌ | markdown 表格 parser 层 |
-| 8 下标里 `<` | ❌ | markdown HTML-标签解析层 |
+| 7 `\|` 应改 `\Vert` | ✅ | 同上静态层，并入 `commonmark-eats-escape`——`\|` 在 GitHub 上渲染成单竖线，与 KaTeX 管线不一致 |
+| 8 `[ ]` 内侧加 `\thinspace` | ❌ | 纯视觉风格选择，不会渲染失败 |
+| 9 表格单元格内裸 `\|` | ✅ | 静态层识别 `\| ... \|` 表格行，扫该行的 `$...$` 内是否含未转义 `\|`，命中报 `pipe-in-table-math` |
+| 10 下标里 `<` / `>` | ✅ | 静态层在每段抽出的 TeX 里搜 `[_^]\s*\{[^}]*[<>]`，命中报 `angle-in-subscript` |
+| 11 inline `[…]` 旁 `}_<letter>` workaround | ✅ | 静态层只在 inline math 同时包含 `[` 和 `}_<letter>`（且 `_` 未被转义）时报 `emphasis-eats-subscript`；`}\_V` 的修正形态不报 |
 | 任意 TeX 语法错（`Misplaced &`、`Missing argument for \frac` 等） | ✅ | MathJax 自报 |
 | `\mathcal{L}\_V` 这种 workaround 写法 | ✅ 不报（这是正常写法） | 反转义后 `\mathcal{L}_V`，渲染正常 |
 
-简单说：**MathJax 层的渲染错误抓得到；CommonMark / markdown 解析层的怪事抓不到**——那些需要真跑 GitHub `/markdown` API 才能 100% 复刻。CLAUDE.md 的 1/2/7/8 几条仍然要靠人在 github.com 上肉眼复查。
+简单说：CLAUDE.md「公式的 GitHub 渲染避坑」一节里 1/2/4/6/7/9/10/11 全部静态可查（部分靠 MathJax 自报，部分靠脚本 grep 源 md），剩下 5/8 是视觉风格选择（不破渲染、两个引擎一致）、3 已过时。**理论上推一次 commit 之前跑一次 `check.py src/*.md` 应该够覆盖**——再加上 `--visual` 出一份 contact-sheet 给多模态 reviewer 复核，可以彻底不用去 github.com 肉眼检查。
 
 ## `--visual` 模式做了什么
 
@@ -110,6 +118,9 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
 
 ## 已知限制
 
-- **不验证 markdown 解析层**：rule 1/2/7/8 这种"GitHub 在解析阶段就没把这段识别成 math"的情况抓不到。最严重的实例（rule 9 那种 emphasis 吃下标）需要真跑 GFM tokenizer 才能复刻，本 skill 没做。
-- **不验证视觉布局**：公式宽度超出 GitHub 网页的容器、字体回退等视觉问题，render 层都看不见。
-- **静态层假设**：`\,` `\!` `\;` `\>` 一律被 CommonMark 吃，不区分上下文。如果某些位置上 GitHub 没吃（理论上不应该），会有假阳性——但 CLAUDE.md 的 rule 6 经验观察确实是无差别吃。
+- **markdown 解析层是用启发式 grep 模拟的，不是真正的 GFM tokenizer**：rule 1/2/9/10/11 走的是源 md 上的正则扫描，覆盖到 CLAUDE.md 列举过的高频形态，但理论上还可能有别的 markdown 解析路径会出 bug 而脚本看不见。要 100% 复刻需要直接跑 GitHub `/markdown` API 或本地接入完整的 GFM 解析器，本 skill 没做。
+- **不验证视觉布局**：公式宽度超出 GitHub 网页的容器、字体回退等视觉问题，render 层都看不见——`--visual` 出的 contact-sheet 是用 mathjax-full 的 SVG-as-path 输出，能体现"形状/语法"是否对，但跟 github.com 上 STIX TTF 渲染的字体粗细可能略有差异。
+- **静态层假设**：
+  - `\,` `\!` `\;` `\>` `\|` 一律被 CommonMark 吃，不区分上下文。如果某些位置上 GitHub 没吃（理论上不应该），会有假阳性——但 CLAUDE.md 的经验观察确实是无差别吃。前缀加了 `(?<!\\)` 让 `\\,` `\\|` 这种 array 换行 + 列分隔的形态不会被误报。
+  - rule 9 表格识别走"行首是 `|` 且 ≥2 个未转义 `|`"的简易启发，对非标准表格（如 setext / pipe-table 之外的形态）可能漏报。
+  - rule 11 只在 inline math 同时出现 `[` 和 `}_<letter>` 时触发——CLAUDE.md 观察到的实际触发条件就是这两个共存，单独的 `}_V` 不会出问题。

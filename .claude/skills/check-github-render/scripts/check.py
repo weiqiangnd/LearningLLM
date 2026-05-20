@@ -118,18 +118,65 @@ def simulate_github_unescape(tex: str) -> str:
     return _GITHUB_UNESCAPE_RE.sub(r"\1", tex)
 
 
-# Spacing macros that CommonMark *also* eats but whose stripped form is
-# semantically wrong. `\,` was a thin space, `,` is just a comma; etc.
-# MathJax can't tell us about this because by the time MathJax sees the
-# input the macro is already gone — we have to detect it on the source.
-_COMMONMARK_EATS_RE = re.compile(r"\\([,!;>])")
+# Backslash-escapes that CommonMark *also* eats but whose stripped form is
+# semantically wrong. `\,` was a thin space, `,` is just a comma; `\|` was
+# a double-bar ‖, `|` is single. MathJax can't tell us about any of this
+# because by the time MathJax sees the input the macro is already gone —
+# we have to detect it on the source. The leading `(?<!\\)` keeps `\\|`
+# (line-break followed by pipe in an array) and `\\,` from false-firing.
+_COMMONMARK_EATS_RE = re.compile(r"(?<!\\)\\([,!;>|])")
 
 _BAD_SPACING_HINT = {
     ",": r"`\,` (thin space) — use `\thinspace`",
     "!": r"`\!` (negative thin space) — use `\negthinspace`",
     ";": r"`\;` (thick space) — use `\quad` / `\qquad`",
     ">": r"`\>` (medium space) — use `\quad` / `\qquad`",
+    "|": r"`\|` becomes single `|` on GitHub — use `\Vert` for the double-bar ‖",
 }
+
+
+# ---------- markdown-layer checks (rules 1, 2, 9, 10, 11) ----------
+
+# These run on the *source* markdown, not on the extracted math TeX,
+# because the bugs they catch happen *before* MathJax sees anything —
+# GitHub's CommonMark / GFM tokenizer either fails to recognize the math
+# region in the first place, or mangles its contents at the markdown
+# parsing layer. MathJax can't report on regions it never received.
+
+# CJK ideograph blocks + CJK punctuation + halfwidth/fullwidth forms.
+# Covers the chars that most commonly sit adjacent to `$...$` in this
+# repo's notes: Han ideographs, full-width punctuation like `，。：（）「」`,
+# and the `　` ideographic space.
+_CJK_RE = re.compile(
+    "["
+    "　-〿"   # CJK symbols and punctuation (incl. ideographic space, 「」 etc.)
+    "㐀-䶿"   # CJK unified ideographs ext A
+    "一-鿿"   # CJK unified ideographs
+    "＀-￯"   # halfwidth/fullwidth forms (incl. ，。：（）！？)
+    "]"
+)
+
+# Rule 10: `<` / `>` literal inside a subscript/superscript brace group.
+# `x_{<t}` (typical NLP "first t-1 tokens" notation) breaks because
+# CommonMark treats `<t...` as a candidate HTML tag and confuses the
+# parser. The regex looks at `_` or `^`, optional whitespace, an
+# *unescaped* `{`, then any non-`}` content, then a literal `<` or `>`.
+_SUBSCRIPT_ANGLE_RE = re.compile(r"[_^]\s*(?<!\\)\{[^}]*([<>])")
+
+# Rule 11: `}_<letter>` inside inline math that also contains `[`. The
+# combination flips CommonMark into thinking the `_` is an emphasis
+# delimiter (right-flanking after `}`, paired with another `_` somewhere
+# inside the brackets), and the whole math span fall back to plain text.
+# Skip if the `_` is already escaped (`}\_X`) — that's the workaround.
+_EMPHASIS_BAIT_RE = re.compile(r"(?<!\\)\}_([A-Za-z])")
+
+
+def _is_table_row(line: str) -> bool:
+    """Heuristic: a GFM table row starts with `|` and has ≥2 unescaped pipes."""
+    s = line.strip()
+    if not s.startswith("|"):
+        return False
+    return len(re.findall(r"(?<!\\)\|", s)) >= 2
 
 
 # ---------- MathJax bridge ----------
@@ -168,13 +215,22 @@ def render_via_mathjax(items: list[tuple[str, bool]]) -> list[dict]:
 
 # ---------- per-file check ----------
 
+# Recognised `Issue.kind` values:
+#   mathjax-error            — MathJax 3 refused to render the post-unescape TeX.
+#   commonmark-eats-escape   — `\,` `\!` `\;` `\>` `\|` stripped by CommonMark.
+#   block-math-not-isolated  — `$$...$$` not on its own line / no surrounding blanks.
+#   cjk-adjacent-to-math     — CJK char or full-width punct touching `$`.
+#   pipe-in-table-math       — literal `|` inside math on a GFM table row.
+#   angle-in-subscript       — `<` / `>` inside `_{...}` / `^{...}`.
+#   emphasis-eats-subscript  — `}_<letter>` inside inline math with `[`.
+
 
 class Issue:
     __slots__ = ("line", "kind", "snippet", "message")
 
     def __init__(self, line: int, kind: str, snippet: str, message: str):
         self.line = line
-        self.kind = kind  # "mathjax-error" or "commonmark-eats-spacing"
+        self.kind = kind
         self.snippet = snippet
         self.message = message
 
@@ -192,12 +248,20 @@ def check_file(
 ) -> list[Issue]:
     md_text = path.read_text(encoding="utf-8")
     items = extract_math_with_positions(md_text)
+    neutral = _neutralize_dollars_in_code(md_text)
+    lines = md_text.splitlines()
+    block_ranges = [(m.start(), m.end()) for m in _BLOCK_MATH_RE.finditer(neutral)]
     issues: list[Issue] = []
 
-    # ---- static layer: CommonMark-eats-spacing patterns ----
-    # Done on the *original* TeX, before our unescape simulation, because
-    # these are precisely the patterns whose author-intended form is the
-    # backslash version. If we unescape them first there'd be nothing to flag.
+    def _in_block(pos: int) -> bool:
+        return any(s <= pos < e for s, e in block_ranges)
+
+    # ---- static layer: CommonMark-eats backslash-escapes ----
+    # `\,` `\!` `\;` `\>` (silently stripped to bare punctuation) and `\|`
+    # (silently stripped to single bar, breaking ‖ semantics). Done on the
+    # *original* TeX, before our unescape simulation, because these are
+    # precisely the patterns whose author-intended form is the backslash
+    # version. If we unescape them first there'd be nothing to flag.
     for tex, _disp, offset in items:
         for m in _COMMONMARK_EATS_RE.finditer(tex):
             line = _offset_to_line(md_text, offset)
@@ -205,7 +269,7 @@ def check_file(
             issues.append(
                 Issue(
                     line=line,
-                    kind="commonmark-eats-spacing",
+                    kind="commonmark-eats-escape",
                     snippet=tex,
                     message=(
                         f"CommonMark will strip `{m.group(0)}` to `{m.group(1)}` "
@@ -213,6 +277,110 @@ def check_file(
                     ),
                 )
             )
+
+    # ---- markdown-layer: `$$` block must stand alone (CLAUDE.md rule 1) ----
+    # `$$...$$` only renders as a math block when both delimiters sit on
+    # their own line and the block has blank lines around it. Otherwise
+    # GitHub may inline it, or worse silently swallow it.
+    for m in _BLOCK_MATH_RE.finditer(neutral):
+        start, end = m.start(), m.end()
+        start_line_idx = md_text.count("\n", 0, start)
+        end_line_idx = md_text.count("\n", 0, end - 1)
+        line_start = md_text.rfind("\n", 0, start) + 1
+        before_text = md_text[line_start:start]
+        nl_after_end = md_text.find("\n", end)
+        if nl_after_end == -1:
+            nl_after_end = len(md_text)
+        after_text = md_text[end:nl_after_end]
+        snippet = md_text[start:min(end, start + 80)]
+        if before_text.strip():
+            issues.append(Issue(
+                start_line_idx + 1, "block-math-not-isolated", snippet,
+                f"text before opening `$$` on same line "
+                f"({before_text.strip()[:30]!r}) — `$$` must be on its own line.",
+            ))
+        elif after_text.strip():
+            issues.append(Issue(
+                end_line_idx + 1, "block-math-not-isolated", snippet,
+                f"text after closing `$$` on same line "
+                f"({after_text.strip()[:30]!r}) — `$$` must be on its own line.",
+            ))
+        else:
+            if start_line_idx > 0 and lines[start_line_idx - 1].strip():
+                issues.append(Issue(
+                    start_line_idx + 1, "block-math-not-isolated", snippet,
+                    "missing blank line before opening `$$`.",
+                ))
+            if end_line_idx < len(lines) - 1 and lines[end_line_idx + 1].strip():
+                issues.append(Issue(
+                    end_line_idx + 1, "block-math-not-isolated", snippet,
+                    "missing blank line after closing `$$`.",
+                ))
+
+    # ---- markdown-layer: CJK adjacent to inline `$` (CLAUDE.md rule 2) ----
+    # MathJax recognition needs a half-width space between CJK chars/punct
+    # and the `$` delimiters. Walking the inline regex over the source
+    # (not the extracted TeX) is the only way to see what's outside.
+    for m in _INLINE_MATH_RE.finditer(neutral):
+        if _in_block(m.start()):
+            continue
+        before_char = md_text[m.start() - 1] if m.start() > 0 else ""
+        after_char = md_text[m.end()] if m.end() < len(md_text) else ""
+        line_no = _offset_to_line(md_text, m.start())
+        snippet = md_text[m.start():m.end()]
+        if before_char and _CJK_RE.match(before_char):
+            issues.append(Issue(
+                line_no, "cjk-adjacent-to-math", snippet,
+                f"CJK char {before_char!r} immediately before opening `$` — "
+                f"insert a half-width space so MathJax recognizes the math.",
+            ))
+        if after_char and _CJK_RE.match(after_char):
+            issues.append(Issue(
+                line_no, "cjk-adjacent-to-math", snippet,
+                f"CJK char {after_char!r} immediately after closing `$` — "
+                f"insert a half-width space so MathJax recognizes the math.",
+            ))
+
+    # ---- markdown-layer: literal `|` inside math on a table row (rule 9) ----
+    # GFM splits the table row at every `|` *before* MathJax sees it, so
+    # `$a|b$` becomes two separate cells with broken math fragments.
+    for line_idx, line in enumerate(lines):
+        if not _is_table_row(line):
+            continue
+        for m in re.finditer(r"\$[^$\n]+\$", line):
+            inner = m.group(0)[1:-1]
+            if re.search(r"(?<!\\)\|", inner):
+                issues.append(Issue(
+                    line_idx + 1, "pipe-in-table-math", m.group(0),
+                    "literal `|` in math on a table row — GFM splits the row "
+                    "at the pipe before MathJax. Use `\\mid` or move the "
+                    "formula to a block `$$…$$` outside the table.",
+                ))
+
+    # ---- markdown-layer: rules 10 & 11 on extracted math TeX ----
+    for tex, is_display, offset in items:
+        line_no = _offset_to_line(md_text, offset)
+        # Rule 10: `<` / `>` literal inside `_{...}` / `^{...}`.
+        for am in _SUBSCRIPT_ANGLE_RE.finditer(tex):
+            sign = am.group(1)
+            issues.append(Issue(
+                line_no, "angle-in-subscript", tex[:80],
+                f"`{sign}` inside subscript/superscript braces — GitHub may "
+                f"treat it as the start of an HTML tag and break brace "
+                f"matching. Use `\\lt` / `\\gt` (or rewrite e.g. `x_{{1:t-1}}`).",
+            ))
+        # Rule 11: `}_<letter>` workaround — only when the inline math
+        # also contains a `[`, which is the form that actually flips
+        # CommonMark into emphasis-parsing mode.
+        if not is_display and "[" in tex:
+            for em in _EMPHASIS_BAIT_RE.finditer(tex):
+                issues.append(Issue(
+                    line_no, "emphasis-eats-subscript", tex[:80],
+                    f"`}}_{em.group(1)}` inside inline math containing `[…]` — "
+                    f"CommonMark may consume the `_` as emphasis and drop "
+                    f"all subscripts. Escape this `_` as `\\_` or move to "
+                    f"block `$$…$$`.",
+                ))
 
     # ---- render layer: MathJax 3 ----
     payload = [(simulate_github_unescape(tex), disp) for tex, disp, _ in items]
