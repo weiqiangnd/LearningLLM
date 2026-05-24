@@ -50,7 +50,7 @@
 
 | 标题 | 涵盖内容 | 链接 | 状态 |
 |------|---------|------|------|
-| 03 Tokenizer：BPE / BBPE / 词表 / 特殊 token；用 tokenizers 库训一个小 tokenizer |  |  |  |
+| 03 Tokenizer：BPE / BBPE / 词表 / 特殊 token；用 tokenizers 库训一个小 tokenizer | 从「模型只认识整数 id」讲清 tokenizer 在流水线两端的位置，对比 char / word / subword 三种切分粒度的取舍（词表大小 vs 序列长度 vs OOV），用最小可手算的 hug/pug 例子推导 BPE 的训练（统计高频相邻对 → 合并 → 记规则）与编码（按学习顺序套规则、生僻词也能切），讲解 BBPE 如何用「先转 UTF-8 字节 + 256 字节打底」根除 OOV（含「中」= E4 B8 AD 的字节示例），以及词表大小权衡与特殊 token 不被 BPE 拆开的两条铁律；实战加载 Qwen3 tokenizer 观察中英文 / 代码 / emoji 的切法、纯 Python 手写 BPE 跑通算法、用 tokenizers 库从零训一个 byte-level BPE 验证「永不 OOV + 完美还原」，并量化中英文的 token 压缩率差异。 | [文档](./src/03-Tokenizer.md) · [ipynb](./src/03.ipynb) · [OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/03.ipynb) | ✅ |
 | 04 Embedding 与位置编码：token embedding / sinusoidal / learned / RoPE / ALiBi |  |  |  |
 | 05 从 RNN 到 attention：seq2seq、Bahdanau / Luong attention（"attention 为什么会出现"） |  |  |  |
 | 06 Scaled Dot-Product Attention：Q/K/V、softmax、causal mask |  |  |  |
