@@ -37,6 +37,17 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parent.parent
 NODE_SCRIPT = SKILL_DIR / "scripts" / "mathjax-render.js"
 
+# markdown-it-py drives the bold-flanking check (rule A below). It's the same
+# CommonMark engine CLAUDE.md's排查 snippet uses, so results agree with what a
+# maintainer would get running that snippet by hand. Optional: if it's missing
+# the math + other markdown-layer checks still run; only flanking is skipped.
+try:
+    from markdown_it import MarkdownIt as _MarkdownIt
+
+    _COMMONMARK = _MarkdownIt("commonmark")
+except ImportError:  # pragma: no cover - degraded mode
+    _COMMONMARK = None
+
 
 # ---------- math extraction (position-preserving) ----------
 
@@ -153,6 +164,10 @@ _CJK_RE = re.compile(
     "㐀-䶿"   # CJK unified ideographs ext A
     "一-鿿"   # CJK unified ideographs
     "＀-￯"   # halfwidth/fullwidth forms (incl. ，。：（）！？)
+    # General Punctuation used as CJK punctuation: em dash 破折号 (— ―),
+    # ellipsis (…), curly quotes (‘ ’ “ ”). `$\exp(x)$——把` etc. fail the
+    # same way fullwidth punctuation does, so they belong in this class.
+    "—―‘’“”…"
     "]"
 )
 
@@ -177,6 +192,88 @@ def _is_table_row(line: str) -> bool:
     if not s.startswith("|"):
         return False
     return len(re.findall(r"(?<!\\)\|", s)) >= 2
+
+
+# ---------- non-math markdown-layer checks (CLAUDE.md「非公式」一节) ----------
+# These have nothing to do with math, but they break GitHub rendering the same
+# silent way and no other tool in this repo runs them automatically. CLAUDE.md
+# ships manual grep/python snippets for each; we fold them in here so one
+# `check.py` run covers both the math and the non-math GitHub pitfalls.
+
+_INLINE_CODE_SPAN_RE = re.compile(r"`[^`]*`")
+# A fence opener: optional leading whitespace, then 3+ backticks/tildes (info
+# string allowed after). A fence closer is a line that is *only* a fence.
+_FENCE_OPEN_RE = re.compile(r"^(\s*)(`{3,}|~{3,})")
+_FENCE_CLOSE_RE = re.compile(r"^\s*(`{3,}|~{3,})\s*$")
+
+
+def markdown_layer_issues(md_text: str, lines: list[str]) -> list[Issue]:
+    """Scan source lines for the three non-math GFM pitfalls from CLAUDE.md:
+
+      A. `**bold**` whose closing `**` is wedged between full-width punctuation
+         and a CJK char — CommonMark flanking fails and literal `**` leaks.
+      B. ≥2 bare `~` in one scope (a cell on table rows, else the whole line) —
+         GFM strikethrough pairs them and strikes the text between.
+      C. An indented ```-fence (the list-nested-fence smell) — GitHub may
+         collapse it into an inline code span and drop the line breaks.
+
+    Code blocks are skipped so `~`, `**`, and ``` appearing as literal sample
+    text inside fences never false-fire. Fence tracking mirrors CLAUDE.md's own
+    snippets (toggle on a fence line), so behaviour agrees with running those.
+    """
+    issues: list[Issue] = []
+    in_fence = False
+
+    for idx, line in enumerate(lines, 1):
+        if in_fence:
+            if _FENCE_CLOSE_RE.match(line):
+                in_fence = False
+            continue
+
+        fm = _FENCE_OPEN_RE.match(line)
+        if fm:
+            in_fence = True
+            # Rule C: a fence opened with leading whitespace is almost always a
+            # fence nested in a list item. Column-0 fences and the recommended
+            # 6-space *indented code block* (no ```) are both fine and unflagged.
+            if fm.group(1):
+                issues.append(Issue(
+                    idx, "fenced-code-in-list", line.strip()[:80],
+                    "indented ```-fence (likely inside a list item) — GitHub may "
+                    "render it as an inline code span and drop the line breaks. "
+                    "Use a 6-space indented code block instead.",
+                ))
+            continue
+
+        no_code = _INLINE_CODE_SPAN_RE.sub("", line)
+
+        # Rule B: strikethrough collision. Drop real `~~strikethrough~~` first,
+        # then within each scope (table cell, else whole line) count bare `~`.
+        scope_src = no_code.replace("~~", "")
+        cells = scope_src.split("|") if "|" in scope_src else [scope_src]
+        if any(c.count("~") >= 2 for c in cells):
+            issues.append(Issue(
+                idx, "stray-tilde", line.strip()[:80],
+                "≥2 bare `~` in one scope — GFM strikethrough pairs them and "
+                "strikes the text between. Use en-dash `–` for ranges, `≈N` for "
+                "approximations; a single lone `~` is safe.",
+            ))
+
+        # Rule A: bold flanking. Render the line as CommonMark inline; if any
+        # `**` survives outside <code>, the emphasis never paired.
+        if _COMMONMARK is not None and "**" in no_code:
+            rendered = re.sub(r"<code>.*?</code>", "",
+                              _COMMONMARK.renderInline(line))
+            if "**" in rendered:
+                issues.append(Issue(
+                    idx, "emphasis-flanking", line.strip()[:80],
+                    "`**` did not pair into bold — a closing `**` touching "
+                    "full-width punctuation + CJK fails CommonMark flanking. "
+                    "Move the parenthetical/punctuation outside the emphasis "
+                    "(`**输出层**（lm_head）`, not `**输出层（lm_head）**`).",
+                ))
+
+    return issues
 
 
 # ---------- MathJax bridge ----------
@@ -223,6 +320,11 @@ def render_via_mathjax(items: list[tuple[str, bool]]) -> list[dict]:
 #   pipe-in-table-math       — literal `|` inside math on a GFM table row.
 #   angle-in-subscript       — `<` / `>` inside `_{...}` / `^{...}`.
 #   emphasis-eats-subscript  — `}_<letter>` inside inline math with `[`.
+#   emphasis-flanking        — `**bold**` closing `**` wedged between full-width
+#                              punctuation and CJK; leaks literal `**`.
+#   stray-tilde              — ≥2 bare `~` in one scope; GFM strikes the middle.
+#   fenced-code-in-list      — indented ```-fence (list-nested); GitHub collapses
+#                              it to an inline code span and drops line breaks.
 
 
 class Issue:
@@ -381,6 +483,9 @@ def check_file(
                     f"all subscripts. Escape this `_` as `\\_` or move to "
                     f"block `$$…$$`.",
                 ))
+
+    # ---- non-math markdown layer (CLAUDE.md「非公式」一节) ----
+    issues.extend(markdown_layer_issues(md_text, lines))
 
     # ---- render layer: MathJax 3 ----
     payload = [(simulate_github_unescape(tex), disp) for tex, disp, _ in items]
@@ -567,6 +672,13 @@ def main(argv: list[str]) -> int:
             paths.append(Path(pattern))
 
     preview_dir = Path.cwd() / args.preview_dir if args.visual else None
+
+    if _COMMONMARK is None:
+        print(
+            "[warn] markdown-it-py not installed — the bold-flanking check "
+            "(emphasis-flanking) is skipped. Run install.sh to enable it.",
+            file=sys.stderr,
+        )
 
     rc = 0
     total_files = 0

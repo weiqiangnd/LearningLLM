@@ -6,7 +6,10 @@ description: >-
   (CommonMark backslash-unescape inside math regions, then MathJax 3) to
   catch failures the local `markdown-to-pdf` pipeline can't see — GitHub
   uses MathJax while our PDF uses KaTeX, and the two engines have subtly
-  different leniency. Pass `--visual` to additionally generate a contact-
+  different leniency. Also folds in a few non-formula markdown pitfalls
+  (bold flanking against full-width punctuation, stray `~` strikethrough,
+  fenced code blocks indented inside list items). Pass `--visual` to
+  additionally generate a contact-
   sheet PDF showing every formula's actual MathJax 3 rendering side-by-
   side with its source TeX — let a multimodal reviewer eyeball it instead
   of manually checking github.com. Trigger on: "check github render"
@@ -16,7 +19,7 @@ description: >-
 
 # Check GitHub Math Rendering
 
-针对 `src/*.md` 的一个**渲染层校验**，专门回答一个问题：**这份 md 推到 github.com 上之后，里面的数学公式能正确渲染么？**
+针对 `src/*.md` 的一个**渲染层校验**，回答一个问题：**这份 md 推到 github.com 上之后能正确渲染么？** 主体是数学公式（MathJax 3 那套），外加 CLAUDE.md 记录的几条**非公式 markdown 坑**（粗体 flanking、裸 `~` 删除线、list 内三反引号围栏）——这些与数学无关、却同样把 GitHub 渲染搞坏，本仓库又没别的工具自动跑它们，所以一并收进来。
 
 跟 `markdown-to-pdf` skill 的校验**不重复**——那条管线用 KaTeX、保证 PDF 三件套对；这条用 MathJax 3、模拟 github.com 的实际渲染路径。两个引擎在「看到的输入」「能接受的语法」上都有差异，所以两套校验**互补不替代**。
 
@@ -57,7 +60,7 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
                                        —— 还把 \, → , 、\! → ! 等吃掉
 ```
 
-这条 skill 走三段：
+这条 skill 走五段（前四段管公式，第五段管非公式的 markdown 坑）：
 
 1. **抽数学区段**：用与 `markdown-to-pdf` 一致的正则（已经验证过对 src/*.md 全集 0 误抓），按文档顺序拿到所有 `$...$` / `$$...$$`，并记下每段在源文件里的 byte offset → 行号。
 2. **模拟反转义**：对每段数学内容，**只反转义 GitHub 实际在 `$...$` 内会还原的那些**（`\_` `\*` `\$` —— 实测 github.com 上的工作流），保留 `\\` `\{` `\}` 这类 TeX 命令字符。
@@ -65,10 +68,14 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
 4. **静态层补一脚**：MathJax 3 看不到下面这些"在 markdown 解析阶段就坏了"的形态——它们到 MathJax 时要么已经被还原成裸标点（`\,` → `,`、`\|` → `|`），要么整个数学段根本没被识别（CJK 紧贴、表格列分隔吃 `|` 等），MathJax 自然无法报错。脚本对源 md 直接 grep 这些模式补报：
    - `\,` `\!` `\;` `\>` `\|` 这五个 CommonMark 会无声吃掉的反斜杠转义
    - `$$...$$` 块级公式没独占一行 / 缺前后空行
-   - CJK 字符或全角标点紧贴 `$`（如 `中文$x$中文`、`$y$。`）
+   - CJK 字符或全角标点紧贴 `$`（如 `中文$x$中文`、`$y$。`）——CJK 集合除了汉字 / 全角标点，**也含 General Punctuation 区里当中文标点用的破折号 `——`、省略号 `…`、弯引号 `“” ‘’`**（`$\exp(x)$——把` 这种照样报），但**不含**当范围号用的 en dash `–`。
    - 表格行（`| ... |`）内数学段里出现裸 `|`
    - `_{<...}` / `^{<...}` 这种下标里塞了 `<` `>` 字面字符的写法
    - inline `$..[..]..}_<letter>..$` 里没把 `_` 转义的高危形态
+5. **非公式 markdown 层**：CLAUDE.md「非公式（markdown 层）的 GitHub 渲染避坑」一节那三条坑，与数学无关、但同样把 GitHub 渲染搞坏，而且本仓库没有别的工具自动跑它们，所以一并折进来（实现对齐 CLAUDE.md 里那几段手动 grep/python 片段，跳过代码块）：
+   - **粗体 flanking 失效**：`**bold**` 的闭合 `**` 卡在全角标点 + CJK 之间会漏出字面 `**`。用 markdown-it-py 的 CommonMark 把整行渲成 inline，看 `<code>` 之外是否残留 `**` → 报 `emphasis-flanking`。
+   - **裸 `~` 删除线误配对**：同一作用域（表格行收窄到单元格、否则整行）≥2 个裸 `~` → 报 `stray-tilde`；先剔除真正的 `~~删除线~~`，孤立单个 `~`（如 `~16 GB`）放行。
+   - **list 里直接套三反引号围栏**：带前导空格的 ```` ``` ```` 围栏（list 内嵌的典型形态）→ 报 `fenced-code-in-list`；列 0 围栏和推荐的 6 空格缩进 code block 都不报。
 
 ## 这条 skill 能抓到的、抓不到的
 
@@ -88,7 +95,17 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
 | 任意 TeX 语法错（`Misplaced &`、`Missing argument for \frac` 等） | ✅ | MathJax 自报 |
 | `\mathcal{L}\_V` 这种 workaround 写法 | ✅ 不报（这是正常写法） | 反转义后 `\mathcal{L}_V`，渲染正常 |
 
-简单说：CLAUDE.md「公式的 GitHub 渲染避坑」一节里 1/2/4/6/7/9/10/11 全部静态可查（部分靠 MathJax 自报，部分靠脚本 grep 源 md），剩下 5/8 是视觉风格选择（不破渲染、两个引擎一致）、3 已过时。**理论上推一次 commit 之前跑一次 `check.py src/*.md` 应该够覆盖**——再加上 `--visual` 出一份 contact-sheet 给多模态 reviewer 复核，可以彻底不用去 github.com 肉眼检查。
+CLAUDE.md「**非公式（markdown 层）**的 GitHub 渲染避坑」一节（与数学无关，第五段管）：
+
+| CLAUDE.md 规则 | 抓得到？ | 怎么抓的 |
+|---|---|---|
+| 粗体/斜体紧贴全角标点 flanking 失效 | ✅（仅 `**`） | markdown-it-py CommonMark 渲整行 inline，`<code>` 外残留 `**` 就报 `emphasis-flanking`。**只查 `**`（粗体）**，与 CLAUDE.md 那段排查 python 一致；裸 `*` 斜体误报率高，未纳入 |
+| 同一作用域 ≥2 个裸 `~`（删除线误配对） | ✅ | 剔除 `~~..~~` 后，表格行按单元格、否则按整行数裸 `~`，≥2 报 `stray-tilde`；孤立单 `~` 放行 |
+| list 里直接套三反引号围栏 | ✅（启发式） | 带前导空格的 ```` ``` ```` 围栏 opener 报 `fenced-code-in-list`；列 0 围栏与 6 空格缩进 code block 不报 |
+
+简单说：CLAUDE.md「公式的 GitHub 渲染避坑」一节里 1/2/4/6/7/9/10/11 全部静态可查（部分靠 MathJax 自报，部分靠脚本 grep 源 md），剩下 5/8 是视觉风格选择（不破渲染、两个引擎一致）、3 已过时；「非公式」一节那三条也已并入第五段。**理论上推一次 commit 之前跑一次 `check.py src/*.md` 应该够覆盖公式 + 非公式两类坑**——再加上 `--visual` 出一份 contact-sheet 给多模态 reviewer 复核，可以彻底不用去 github.com 肉眼检查。
+
+> `emphasis-flanking` 检查需要 `markdown-it-py`（`install.sh` 会装）。环境里没有时该项**自动跳过**并在 stderr 打一行 `[warn]`，其余检查照常跑。
 
 ## `--visual` 模式做了什么
 
@@ -124,3 +141,7 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
   - `\,` `\!` `\;` `\>` `\|` 一律被 CommonMark 吃，不区分上下文。如果某些位置上 GitHub 没吃（理论上不应该），会有假阳性——但 CLAUDE.md 的经验观察确实是无差别吃。前缀加了 `(?<!\\)` 让 `\\,` `\\|` 这种 array 换行 + 列分隔的形态不会被误报。
   - rule 9 表格识别走"行首是 `|` 且 ≥2 个未转义 `|`"的简易启发，对非标准表格（如 setext / pipe-table 之外的形态）可能漏报。
   - rule 11 只在 inline math 同时出现 `[` 和 `}_<letter>` 时触发——CLAUDE.md 观察到的实际触发条件就是这两个共存，单独的 `}_V` 不会出问题。
+- **非公式 markdown 层假设**：
+  - `emphasis-flanking` **只查 `**` 粗体**，不查 `*` 斜体——后者裸 `*`（乘号、glob、prose 里的星号）误报率太高，CLAUDE.md 那段排查 python 也只查 `**`。逐行 `renderInline` 是对整篇 CommonMark 的近似（不跨行、不建块级上下文），对本仓库的行内强调足够。
+  - `stray-tilde` / `fenced-code-in-list` 的代码块跟踪用"遇到围栏行就翻转"的简易开关（和 CLAUDE.md 片段同款），嵌套围栏 / 围栏内出现 ```` ``` ```` 当样例文本的极端情形可能误判。
+  - `fenced-code-in-list` 靠"围栏 opener 带前导空格"启发——理论上 list 外缩进的围栏（罕见）也会被报；推荐的 6 空格缩进 code block（无 ```` ``` ````）和列 0 围栏都不会误报。
