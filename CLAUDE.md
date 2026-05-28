@@ -30,6 +30,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 一份**硬件门槛**标注，明确本章 ipynb 在哪种 Colab 运行时上能跑通（如「T4（15 GB）✅」/「需要 L4 或 A100，T4 显存不足」/「概念章，CPU 即可」）。读者不切到对应运行时就贸然 Run All 会浪费时间。
 - 一份目录（TOC），列出本章二级标题及主要三级标题，方便长文档导航
 
+此外，如果本章用到了某项**预备知识**（P0N），就在**硬件门槛标注的下方**补一行 `> 〔预备知识〕…… ——若不熟悉，建议先读 P0N。` 内联标注（紧贴硬件门槛、TOC 之前），说明本章首次密集用到的背景知识及对应的预备章节，方便读者按需回查。这条**只对主线 NN 正式章节有效**——预备知识 P0N 章节本身与主线解耦、不引用其它 P0N，所以顶部不放这类标注（P0N 顶部仍需 Open in Colab、硬件门槛、TOC 三件）。注意这与 `README.md` 学习路径里那行「首次用到」标注是同一件事的两处落点，两边要同步维护。
+
 `README.md` 学习路径表格里的对应链接则一律写成 `[OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/NN.ipynb)`，文档与 ipynb 链接写成 `./src/NN-...md` / `./src/NN.ipynb`。
 
 `README.md` 中维护一份「学习路径」表格清单，每完成新章节需把对应行的「链接」列（文档 / ipynb / OpenInColab 文字链接）填上，并把「状态」列标 ✅。
