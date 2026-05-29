@@ -30,7 +30,7 @@ description: >-
     - 正文（中英文）：**LXGW WenKai**（霞鹜文楷），由 `install.sh` 通过 `apt install fonts-lxgw-wenkai` 安到系统字体。这是一份双语字体——Latin 字母按楷体风格画、与汉字同 x-height，混排时高度齐平。找不到时回退到 Noto Sans CJK SC。
     - 代码：`Liberation Mono` / `DejaVu Sans Mono`（系统自带）；含中文的代码段落回退到 `LXGW WenKai Mono`。
   - **样式**：套用 `github-markdown.css`，整体观感对齐 GitHub.com 网页。
-  - **页脚**：每页底部统一渲染 `GitHub: https://github.com/weiqiangnd/LearningLLM`（左）/ `Author: WeiQiang`（中）/ `当前页 / 总页数`（右），由 `assets/print.css` 里的 `@page` margin box 控制——改署名 / 仓库地址直接编辑该文件。
+  - **页脚**：每页底部统一渲染 `GitHub: https://github.com/weiqiangnd/LearningLLM`（左）/ `Author: WeiQiang with Claude`（中）/ `当前页 / 总页数`（右），由 `assets/print.css` 里的 `@page` margin box 控制——改署名 / 仓库地址直接编辑该文件。
 
 ## 用法
 

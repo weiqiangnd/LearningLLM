@@ -178,12 +178,20 @@ _CJK_RE = re.compile(
 # *unescaped* `{`, then any non-`}` content, then a literal `<` or `>`.
 _SUBSCRIPT_ANGLE_RE = re.compile(r"[_^]\s*(?<!\\)\{[^}]*([<>])")
 
-# Rule 11: `}_<letter>` inside inline math that also contains `[`. The
-# combination flips CommonMark into thinking the `_` is an emphasis
-# delimiter (right-flanking after `}`, paired with another `_` somewhere
-# inside the brackets), and the whole math span fall back to plain text.
+# Rule 11: `}_<char>` — a `_` right after a `}` is an emphasis-capable
+# delimiter (the `}` is punctuation, so the `_` is left-flanking and can
+# open italics). It eats every subscript on the line in two situations:
+#   (a) inside ONE inline math span that also contains `[` — the bracket
+#       supplies the matching `_`, italics forms, the span falls back to
+#       plain text (the classic `\mathcal{L}_V(\phi)=\mathbb{E}\left[…` case);
+#   (b) spread across ≥2 SEPARATE inline math spans on the same line — the
+#       `_` in one span pairs with the `_` in another across the prose gap,
+#       no bracket needed (e.g. `$\mathbf{e}_t$ … $\mathbf{p}_0$ … $\mathbf{p}_1$`).
+# A single span with multiple `}_` baits but no `[` renders fine (GitHub treats
+# the whole `$…$` atomically), so we only flag (a) and (b).
+# The char after `_` may be a letter, a digit, or `{` (e.g. `}_{pos}`).
 # Skip if the `_` is already escaped (`}\_X`) — that's the workaround.
-_EMPHASIS_BAIT_RE = re.compile(r"(?<!\\)\}_([A-Za-z])")
+_EMPHASIS_BAIT_RE = re.compile(r"(?<!\\)\}_(\{|[A-Za-z0-9])")
 
 
 def _is_table_row(line: str) -> bool:
@@ -471,9 +479,9 @@ def check_file(
                 f"treat it as the start of an HTML tag and break brace "
                 f"matching. Use `\\lt` / `\\gt` (or rewrite e.g. `x_{{1:t-1}}`).",
             ))
-        # Rule 11: `}_<letter>` workaround — only when the inline math
-        # also contains a `[`, which is the form that actually flips
-        # CommonMark into emphasis-parsing mode.
+        # Rule 11(a): `}_<char>` inside ONE inline span that also contains
+        # `[`, which supplies the matching `_` and flips CommonMark into
+        # emphasis-parsing mode.
         if not is_display and "[" in tex:
             for em in _EMPHASIS_BAIT_RE.finditer(tex):
                 issues.append(Issue(
@@ -483,6 +491,29 @@ def check_file(
                     f"all subscripts. Escape this `_` as `\\_` or move to "
                     f"block `$$…$$`.",
                 ))
+
+    # Rule 11(b): `}_<char>` baits spread across ≥2 SEPARATE inline math
+    # spans on the same line. The `_` in one span pairs with the `_` in
+    # another as CommonMark emphasis (no `[` needed), eating every subscript
+    # on the line. Count how many distinct inline spans on each line carry a
+    # bait; ≥2 means the cross-span pairing can fire.
+    spans_with_bait: dict[int, int] = {}
+    bait_example: dict[int, str] = {}
+    for tex, is_display, offset in items:
+        if is_display or not _EMPHASIS_BAIT_RE.search(tex):
+            continue
+        ln = _offset_to_line(md_text, offset)
+        spans_with_bait[ln] = spans_with_bait.get(ln, 0) + 1
+        bait_example.setdefault(ln, tex[:80])
+    for ln, n in spans_with_bait.items():
+        if n >= 2:
+            issues.append(Issue(
+                ln, "emphasis-eats-subscript", bait_example[ln],
+                f"{n} separate inline-math spans on this line each carry a "
+                f"`}}_<char>` subscript; CommonMark pairs these `_` as emphasis "
+                f"across the spans and drops every subscript on the line. "
+                f"Escape each such `_` as `\\_` (or merge into one `$$…$$` block).",
+            ))
 
     # ---- non-math markdown layer (CLAUDE.md「非公式」一节) ----
     issues.extend(markdown_layer_issues(md_text, lines))
