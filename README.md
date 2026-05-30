@@ -59,7 +59,8 @@
 | 09 Transformer 整体架构：Encoder-Decoder vs Decoder-only；Pre-LN vs Post-LN |  |  |  |
 | 10 自回归语言建模目标、cross-entropy loss、teacher forcing 与推理采样的关系 |  |  |  |
 | 11 论文精读：Attention Is All You Need 逐节解读 |  |  |  |
-| 12 论文串读：GPT / LLaMA / Qwen 系列关键改动（RoPE / RMSNorm / SwiGLU / GQA / MoE） |  |  |  |
+| 12a 论文串读（上）：GPT 系列演进——GPT-1 → GPT-2 → GPT-3，decoder-only 路线如何确立 |  |  |  |
+| 12b 论文串读（下）：LLaMA / Qwen 的现代改动逐项拆解（RoPE / RMSNorm / SwiGLU / GQA / MoE） |  |  |  |
 | 13 从零实现 mini-GPT：tiny-shakespeare 上完成训练 → 生成闭环 |  |  |  |
 
 〔预备知识〕04 章首次密集用到张量 shape / broadcasting / autograd——若不熟悉，建议先读 P01。
@@ -71,7 +72,8 @@
 | 标题 | 涵盖内容 | 链接 | 状态 |
 |------|---------|------|------|
 | 14 KV cache：原理、显存占用估算、从零加上 KV cache |  |  |  |
-| 15 量化：fp16 / bf16 / int8 / int4；GPTQ / AWQ / bitsandbytes 对比 |  |  |  |
+| 15a 量化（上）：数值精度与量化基础——fp16 / bf16 / int8 / int4、对称 vs 非对称、per-tensor / per-channel |  |  |  |
+| 15b 量化（下）：训练后量化算法——GPTQ / AWQ / bitsandbytes（NF4）原理与对比 |  |  |  |
 | 16 批处理与 continuous batching；FlashAttention 直觉 |  |  |  |
 | 17 推测解码（speculative / Medusa / EAGLE）概览 |  |  |  |
 | 18 推理框架选型：vLLM / SGLang / llama.cpp / Ollama |  |  |  |
@@ -85,7 +87,8 @@
 | 21 Scaling law 与 Chinchilla：参数量 / 数据量 / 算力的最优配比 |  |  |  |
 | 22 MoE 架构：Mixtral、DeepSeek-V3 的路由与负载均衡 |  |  |  |
 | 23 长上下文：RoPE 外推、YaRN、sliding window、attention sink |  |  |  |
-| 24 分布式训练总览：DDP / FSDP / ZeRO / TP / PP（用单卡 L4 跑最小 demo） ⚡ |  |  |  |
+| 24a 分布式训练（上）：数据并行——DDP / FSDP / ZeRO 三级显存优化（用单卡 L4 跑最小 demo） ⚡ |  |  |  |
+| 24b 分布式训练（下）：模型并行——张量并行（TP）/ 流水线并行（PP）与 3D 并行组合 ⚡ |  |  |  |
 | 25 训练加速：混合精度、梯度累积、gradient checkpointing |  |  |  |
 | 26 Continue pretraining 与领域自适应 ⚡ |  |  |  |
 
@@ -97,14 +100,16 @@
 | 28 SFT 原理：数据格式（Alpaca / ShareGPT）、loss masking、lr / epochs 选择 |  |  |  |
 | 29 SFT 实战：在 L4/A100 上 LoRA-SFT Qwen3-8B（≈ 跑通一遍真实后训练流程） ⚡ |  |  |  |
 | 30 奖励模型（RM）：偏好数据、Bradley-Terry、RM 训练与评估 ⚡ |  |  |  |
-| 31 RLHF 全景：PPO 在 RM 上的应用、KL 约束、reward hacking ⚡ |  |  |  |
-| 32 DPO 系列：DPO / IPO / KTO / SimPO（无需 RM 的偏好对齐） ⚡ |  |  |  |
+| 31a RLHF（上）：PPO 原理——从 policy gradient 到 PPO（clip、advantage、actor-critic）、KL 约束 |  |  |  |
+| 31b RLHF（下）：工程实战——在 RM 上跑 PPO 全流程、reward hacking 与训练稳定性 ⚡ |  |  |  |
+| 32a DPO 系列（上）：DPO 原理——从 RLHF 目标推导出 DPO 损失（无需 RM 的偏好对齐） ⚡ |  |  |  |
+| 32b DPO 系列（下）：DPO 变体横向对比——IPO / KTO / SimPO 的动机与差异 ⚡ |  |  |  |
 | 33 GRPO 与 RLVR（可验证奖励）：DeepSeek-R1 训练范式 ⚡ |  |  |  |
 | 34 Reasoning 模型与 test-time compute：o1 / R1 思路、长 CoT、self-consistency |  |  |  |
 | 35 Constitutional AI / RLAIF：用 AI 反馈替代人类标注 |  |  |  |
 | 36 模型蒸馏：logit 蒸馏、SFT 蒸馏、reasoning 蒸馏 |  |  |  |
 
-〔预备知识〕31 章首次用到 MDP / policy gradient / PPO——若不熟悉，建议先读 P05。
+〔预备知识〕31a 章首次用到 MDP / policy gradient / PPO——若不熟悉，建议先读 P05。
 
 ### 阶段 6：参数高效微调实战
 
@@ -133,7 +138,8 @@
 |------|---------|------|------|
 | 48 Prompt 工程与 CoT / few-shot / self-consistency |  |  |  |
 | 49 嵌入模型与 reranker：训练原理、对比学习、选型 |  |  |  |
-| 50 RAG：分块、向量库、检索增强、reranker、评测 |  |  |  |
+| 50a RAG（上）：检索基础——文档分块、embedding、向量库、相似度检索 |  |  |  |
+| 50b RAG（下）：进阶与评测——reranker、查询改写 / HyDE、RAG 评测（faithfulness / 命中率） |  |  |  |
 | 51 Function calling / Tool use / MCP |  |  |  |
 | 52 Agent：ReAct、规划、多轮工具调用、记忆 |  |  |  |
 

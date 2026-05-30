@@ -123,9 +123,15 @@ _GITHUB_UNESCAPE_RE = re.compile(r"\\([_*$])")
 
 
 def simulate_github_unescape(tex: str) -> str:
-    """Undo the markdown-level escapes that GitHub strips before MathJax.
-    Keeps every other backslash (commands like `\\frac`, `\\\\` line breaks,
-    `\\{` literal braces) intact."""
+    """Undo the markdown-level escapes that GitHub strips before MathJax
+    (only `\\_` `\\*` `\\$` here — the conservative "definitely eaten" set).
+    Keeps command backslashes (`\\frac`, `\\{`) intact.
+
+    NOTE: GitHub ALSO eats `\\\\` row breaks (CommonMark turns `\\\\` into a
+    single `\\`), collapsing matrix/cases rows — but we deliberately do NOT
+    undo that here, because a collapsed matrix is not a MathJax *error* and
+    would render silently wrong. The `backslash-rowbreak-eaten` static check
+    in `check_file` flags `\\\\`-in-math loudly instead (fix: use `\\cr`)."""
     return _GITHUB_UNESCAPE_RE.sub(r"\1", tex)
 
 
@@ -323,6 +329,8 @@ def render_via_mathjax(items: list[tuple[str, bool]]) -> list[dict]:
 # Recognised `Issue.kind` values:
 #   mathjax-error            — MathJax 3 refused to render the post-unescape TeX.
 #   commonmark-eats-escape   — `\,` `\!` `\;` `\>` `\|` stripped by CommonMark.
+#   backslash-rowbreak-eaten — `\\` row break inside math; GitHub unescapes it
+#                              to a single `\`, collapsing matrix/cases rows.
 #   block-math-not-isolated  — `$$...$$` not on its own line / no surrounding blanks.
 #   cjk-adjacent-to-math     — CJK char or full-width punct touching `$`.
 #   pipe-in-table-math       — literal `|` inside math on a GFM table row.
@@ -384,6 +392,32 @@ def check_file(
                     message=(
                         f"CommonMark will strip `{m.group(0)}` to `{m.group(1)}` "
                         f"before MathJax sees it. {hint}"
+                    ),
+                )
+            )
+
+    # ---- static layer: `\\` row break eaten by CommonMark (use \cr) ----
+    # GitHub's markdown→MathJax pipeline unescapes `\\` to a single `\` inside
+    # math, so matrix / cases / aligned rows collapse onto one line (verified:
+    # `\begin{pmatrix}…\\…\end{pmatrix}` comes back with a single <mtr> and the
+    # two rows merged into adjacent cells). KaTeX (our PDF pipeline) keeps `\\`,
+    # so writing `\\\\` would fix GitHub but double-break the PDF. `\cr` is a
+    # letter-command CommonMark never touches, and BOTH KaTeX and MathJax 3
+    # render it as a row break — the only cross-renderer-safe separator.
+    for tex, _disp, offset in items:
+        n = len(re.findall(r"(?<!\\)\\\\(?!\\)", tex))
+        if n:
+            line = _offset_to_line(md_text, offset)
+            issues.append(
+                Issue(
+                    line=line,
+                    kind="backslash-rowbreak-eaten",
+                    snippet=tex[:80],
+                    message=(
+                        f"`\\\\` row break ({n}×) inside math — GitHub unescapes it "
+                        f"to a single `\\`, collapsing matrix/cases/aligned rows "
+                        f"onto one line. Use `\\cr` instead (renders correctly in "
+                        f"both GitHub's MathJax and the KaTeX PDF pipeline)."
                     ),
                 )
             )
