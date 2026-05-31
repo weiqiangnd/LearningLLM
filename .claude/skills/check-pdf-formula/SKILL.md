@@ -85,6 +85,8 @@ python3 .claude/skills/check-pdf-formula/scripts/check_pdf_formula.py 04 --chunk
 - **为什么裁的是「新渲的 PDF」而不是 `dist/<stem>.pdf`**：盒模型坐标和 PDF 必须来自**同一次** `render()` 才能保证逐 px 对齐——所以脚本对要复核的那份 HTML 调 `weasyprint.HTML(...).render()` 拿盒模型、再 `doc.write_pdf()` 现写一份 `rendered.pdf` 去裁它（写到复核目录）。这份 PDF 与 `dist/<stem>.pdf` 同源同 HTML、视觉等价，可放心当「真实 PDF」。**全过程不写 `dist/` 主文件**：默认模式下连那份 HTML 都是 `md_to_dist(src, 复核目录)` 新渲到复核目录的，`--no-render` 模式则只读 `dist/<stem>.html`。
 - **坐标换算**：WeasyPrint 盒模型是 CSS px（96 dpi），PDF 是 pt（72 dpi），换算系数 `72/96 = 0.75`。裁剪用 PyMuPDF `get_pixmap(clip=…)`，`CROP_DPI=300` 保证文字锐利。
 - **auto-trim**：display 公式因 KaTeX 把内层 `.katex` 设成块级居中，包围盒是整行宽、两侧大片留白。裁剪后用 Pillow 按墨迹 `getbbox()` 裁紧，保留 `TRIM_MARGIN` 的白边。
+- **纵向溢出兜底「触边检测 + 有界扩展 + 墨迹带切」**（曾踩坑：P04 表格内行内 `\dfrac` 的分母被切，crop 看着像渲染坏，引起复核误判）：WeasyPrint 给行内 `.katex` 报的盒高有时只是**行高**，而 `\dfrac` / 大根号 / 高上下标的墨迹**溢出**了行盒，只按盒裁会切掉分子/分母。脚本先按行盒（+`BOX_PAD_PX`）渲一次，检测墨迹是否触到上/下边；触边就朝该方向**有界扩展约一个行高**（够补全 displaystyle 分式，又够不到表格同列上下相邻的公式）重渲，再用 `_ink_row_bands` 把墨迹按行切带、只保留**覆盖公式纵向中心那一带**（排除扩展窗里混进来的表格行边框 / 邻行残墨，`BAND_GAP_CSS` 控制断带阈值），最后才 auto-trim。**没触边的普通公式走不进这条分支，裁图与改动前逐像素一致——零回归**；做过扩展的公式在 `mapping.json` 标 `expanded:true`。注意这一路是**纯像素分析**，不依赖 KaTeX 的 `pstrut` 子树并集（实测被 strut 撑得忽大忽小、无法区分 `\dfrac` 与普通 `\frac`，不可靠）。
+- **contact-sheet 栅格化 DPI = 200**（`SHEET_PNG_DPI`）：曾踩坑——150 dpi 下二级下标 scriptscriptstyle 的小字（如 `\pi_{\theta_\text{old}}` 的 `old`）缩到列宽后会被压糊成形似 `,,` 的假象、引起复核误判。提到 200 后这类小字清晰可读。单条 crop 本身仍是 300 dpi，最清楚的复核办法是单独 Read `crops/NNNN.png`。
 - **三路对齐校验**：`源 md 公式数 == HTML <annotation> 数 == WeasyPrint .katex 盒数`，三者必须相等，否则判定 HTML 过期/抽取错位并报错（多见于 `--no-render` 复用了旧 dist html；去掉它让脚本用最新 src 重渲即可）。源 md 抽取**复用 `check-github-render` 的 `extract_math_with_positions`**（保持抽取正则全仓一致，并直接拿到源行号）。
 - **源 TeX 两份**：`tex` 是源 md 里作者写的原文（带 `\_` 等 markdown 级转义）；`tex_rendered` 是 KaTeX 实际收到的（反转义后），即 HTML `<annotation>` 里的回声。对照表展示 `tex`（作者视角），排查反转义问题时看 `tex_rendered`。
 
@@ -94,3 +96,4 @@ python3 .claude/skills/check-pdf-formula/scripts/check_pdf_formula.py 04 --chunk
 - **只复核「视觉渲染」，不复核数学正确性本身**：脚本判断不了「这条公式的数学推导对不对」，只把源 TeX 与渲染摆在一起给你看;含义层判断仍靠多模态 reviewer。
 - **盒模型是 WeasyPrint 私有 API**（`page._page_box` / `box.position_x`）：跨大版本可能变动。当前固定在 `install.sh` 装的 WeasyPrint 版本上验证过；升级后若定位异常，先核对盒模型遍历那段。
 - **跨页/折行被拆片的公式只裁主片段**：这类公式现在能被正确**计数**（按元素身份归并，三路对齐不再误报），但裁图只取面积最大的主片段——跨页的另一半截在别的页上、拼不进单张图。脚本会把它标 `fragmented` 并在对照表打橙标提示，复核这几条时去 `rendered.pdf` 看完整渲染即可。
+- **纵向有界扩展的极端边界**：触边扩展每侧上限约**一个行高**（足够 displaystyle 分式 / 单层根号）。若真有**叠得极高**的行内构造（如行内嵌套双层分式、`\sum` 带巨大上下限挤在正文行里）溢出超过一个行高，crop 仍可能差一点没补全——但这类写法本身就是排版反例，正文里几乎不会出现；真遇到时仍可去 `rendered.pdf` 看全貌。带选阈值 `BAND_GAP_CSS` 是按"分式内部缝隙 ~3-4px ＜ 相邻行间距 ~13px"定的经验值，极端紧排的表格若行距小于这个量级，理论上仍可能把相邻行并进同一带（实测本仓库各章都正常）。

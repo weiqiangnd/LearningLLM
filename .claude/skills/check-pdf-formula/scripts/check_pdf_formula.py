@@ -79,6 +79,10 @@ CROP_DPI = 300               # 裁剪渲染 DPI，文字够锐
 CROP_ZOOM = CROP_DPI / 72.0
 BOX_PAD_PX = 4               # 裁剪前在包围盒四周留的余量（CSS px），给 auto-trim 留白底
 TRIM_MARGIN = 6              # auto-trim 后保留的墨迹外白边（裁剪图像素）
+# 纵向溢出公式裁图时，把墨迹按行切带：行间空白超过这么多 CSS px 才算"断开"。
+# 取值要 > 分式内部缝隙（分子↔分数线↔分母，实测 ~3-4px），又 < 相邻行间距
+# （实测表格同列上下两式墨迹间 ~13px），这样只断在行与行之间、不切碎单条分式。
+BAND_GAP_CSS = 8.0
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -169,6 +173,11 @@ def extract_katex_boxes(html_path: Path):
     关键：盒模型与 PDF 由**同一次** render() 产出，坐标保证一致——所以不去裁
     现成的 dist PDF（可能与本次坐标系存在细微不一致），而是裁这次新渲的 PDF。
 
+    这里只取每条公式最外层 `.katex` 元素的**行盒**几何。行盒高度有时会"夹住"
+    溢出内容（行内 `\dfrac`、大根号等在表格单元格里实测只报 ~14px 行高），导致
+    单纯按盒裁会切掉分子/分母——这一层由 `crop_formula` 的"触边检测 + 有界扩展"
+    兜底，不在这里改盒几何（子树并集被 KaTeX 的 pstrut 撑得忽大忽小、不可靠）。
+
     分页/折行边界的坑：一条 `.katex` 公式若正好落在 WeasyPrint 的分页或软换行
     处，会被拆成**多个盒片段**（实测 P04 有 3 条 inline 公式跨页各拆成 2 片）。
     若按盒计数，会比"源 md 公式数 / HTML annotation 数"多出来、对不齐。所以这里
@@ -208,22 +217,115 @@ def extract_katex_boxes(html_path: Path):
 # ──────────────────────────────────────────────────────────────────────────
 # 裁剪
 # ──────────────────────────────────────────────────────────────────────────
-def crop_formula(pdf: "fitz.Document", box: dict, out_png: Path) -> dict:
-    page = pdf[box["page"]]
-    x0 = (box["x"] - BOX_PAD_PX) * CSS_PX_TO_PT
-    y0 = (box["y"] - BOX_PAD_PX) * CSS_PX_TO_PT
-    x1 = (box["x"] + box["w"] + BOX_PAD_PX) * CSS_PX_TO_PT
-    y1 = (box["y"] + box["h"] + BOX_PAD_PX) * CSS_PX_TO_PT
-    # clamp 到页面范围内
-    pr = page.rect
-    clip = fitz.Rect(max(x0, pr.x0), max(y0, pr.y0), min(x1, pr.x1), min(y1, pr.y1))
-    pix = page.get_pixmap(matrix=fitz.Matrix(CROP_ZOOM, CROP_ZOOM), clip=clip, alpha=False)
-    img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+def _ink_row_bands(bw: "Image.Image", gap_px: int) -> list[tuple[int, int]]:
+    """把二值墨迹图按行切成若干墨迹带（行间空白 ≤ gap_px 的并到一带）。
 
-    # auto-trim：display 公式因 KaTeX 块级居中两侧有大片留白，按墨迹裁紧
-    gray = img.convert("L")
-    # 反相后非零即墨迹；阈值化避免抗锯齿淡灰被当背景
-    bw = gray.point(lambda v: 0 if v > 250 else 255)
+    返回 [(top_row, bottom_row), …]（含端，像素行号）。用于在纵向扩大的裁剪窗里
+    把"本公式"那一带与混进来的相邻行墨迹 / 表格边框分开。
+    """
+    h = bw.height
+    # 每行是否含墨迹：用 crop 单行的 getbbox 判定（快且不依赖 numpy）
+    ink = [bw.crop((0, r, bw.width, r + 1)).getbbox() is not None for r in range(h)]
+    bands: list[tuple[int, int]] = []
+    r = 0
+    while r < h:
+        if not ink[r]:
+            r += 1
+            continue
+        t = r
+        while r < h and ink[r]:
+            r += 1
+        b = r - 1
+        # 向后看：若与下一段墨迹的空白 ≤ gap_px，则并入同一带
+        while r < h:
+            gs = r
+            while r < h and not ink[r]:
+                r += 1
+            if r < h and (r - gs) <= gap_px:
+                while r < h and ink[r]:
+                    r += 1
+                b = r - 1
+            else:
+                r = gs
+                break
+        bands.append((t, b))
+    return bands
+
+
+def _binary_ink(img: "Image.Image") -> "Image.Image":
+    """RGB → 墨迹二值图：墨迹处=255、背景=0（阈值避开抗锯齿淡灰）。"""
+    return img.convert("L").point(lambda v: 0 if v > 250 else 255)
+
+
+def _edge_ink(bw: "Image.Image", edge_px: int) -> tuple[bool, bool]:
+    """裁剪图上 / 下边缘 edge_px 行内是否有墨迹 → 判断墨迹有没有被裁剪窗夹断。"""
+    h = bw.height
+    top = bw.crop((0, 0, bw.width, min(edge_px, h))).getbbox() is not None
+    bot = bw.crop((0, max(0, h - edge_px), bw.width, h)).getbbox() is not None
+    return top, bot
+
+
+def crop_formula(pdf: "fitz.Document", box: dict, out_png: Path) -> dict:
+    """把一条公式从真实 PDF 里裁成 PNG。
+
+    难点：WeasyPrint 给行内 `.katex` 报的盒高有时只是**行高**，而 `\dfrac` / 大
+    根号 / 高上下标的墨迹**溢出**了行盒——只按盒裁会切掉分子/分母，crop 看着像
+    渲染坏了（实测 P04 表格内的 `\dfrac` 就是，曾误导复核）。
+
+    两段式裁剪，既补全溢出又不误抓邻行：
+      1) 先按行盒（+pad）渲一次，检测墨迹是否触到上/下边（= 被夹断）。
+      2) 若触边，朝该方向**有界扩展约一个行高**（够补全 displaystyle 分式，又
+         够不到表格同列上下相邻的公式）重渲；再按墨迹带切，只保留覆盖公式纵向
+         中心那一带（排除扩展窗里混进来的表格行边框 / 邻行残墨）。
+      3) auto-trim 收紧到墨迹 + 留白边。
+    普通公式墨迹不触边、走不进第 2 步，裁图与原来逐像素一致——零回归。
+    """
+    page = pdf[box["page"]]
+    pr = page.rect
+
+    def render(x_css, y_css, w_css, h_css):
+        x0 = max((x_css - BOX_PAD_PX) * CSS_PX_TO_PT, pr.x0)
+        y0 = max((y_css - BOX_PAD_PX) * CSS_PX_TO_PT, pr.y0)
+        x1 = min((x_css + w_css + BOX_PAD_PX) * CSS_PX_TO_PT, pr.x1)
+        y1 = min((y_css + h_css + BOX_PAD_PX) * CSS_PX_TO_PT, pr.y1)
+        clip = fitz.Rect(x0, y0, x1, y1)
+        pix = page.get_pixmap(matrix=fitz.Matrix(CROP_ZOOM, CROP_ZOOM), clip=clip, alpha=False)
+        return Image.frombytes("RGB", (pix.width, pix.height), pix.samples), clip
+
+    x, y, w, h = box["x"], box["y"], box["w"], box["h"]
+    img, clip = render(x, y, w, h)
+    bw = _binary_ink(img)
+
+    # 触边 → 墨迹被行盒夹断，朝溢出方向有界扩展重渲
+    edge_px = max(2, round(2.0 * CSS_PX_TO_PT * CROP_ZOOM))   # ~2 CSS px 的边缘带
+    et, eb = _edge_ink(bw, edge_px)
+    expanded = et or eb
+    if expanded:
+        cap = max(h, 12.0)                       # 扩展上限：约一个行高
+        ny = y - (cap if et else 0.0)
+        nh = h + (cap if et else 0.0) + (cap if eb else 0.0)
+        img, clip = render(x, ny, w, nh)
+        bw = _binary_ink(img)
+        # 扩展窗里可能混入一条表格行边框 / 邻行残墨：按墨迹带切，把"覆盖公式中心
+        # 那一带"以外的区域涂白，只保留本公式（getbbox 再收紧）。
+        gap_px = max(1, round(BAND_GAP_CSS * CSS_PX_TO_PT * CROP_ZOOM))
+        bands = _ink_row_bands(bw, gap_px)
+        if len(bands) > 1:
+            cy_img = ((y + h / 2.0) * CSS_PX_TO_PT - clip.y0) * CROP_ZOOM
+
+            def _dist(bd):
+                t, b = bd
+                return -1.0 if t <= cy_img <= b else min(abs(cy_img - t), abs(cy_img - b))
+
+            bt, bb = min(bands, key=_dist)
+            from PIL import ImageDraw
+            d = ImageDraw.Draw(bw)
+            if bt > 0:
+                d.rectangle((0, 0, bw.width, bt - 1), fill=0)
+            if bb + 1 < bw.height:
+                d.rectangle((0, bb + 1, bw.width, bw.height), fill=0)
+
+    # auto-trim：按（带选后的）墨迹裁紧，display 公式两侧大片留白也一并去掉
     bbox = bw.getbbox()
     if bbox:
         l, t, r, b = bbox
@@ -231,7 +333,7 @@ def crop_formula(pdf: "fitz.Document", box: dict, out_png: Path) -> dict:
         r = min(img.width, r + TRIM_MARGIN); b = min(img.height, b + TRIM_MARGIN)
         img = img.crop((l, t, r, b))
     img.save(out_png)
-    return {"png": out_png, "w": img.width, "h": img.height}
+    return {"png": out_png, "w": img.width, "h": img.height, "expanded": expanded}
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -321,7 +423,9 @@ def render_contact_sheets(stem: str, mapping: list[dict], out_dir: Path,
     return parts
 
 
-SHEET_PNG_DPI = 150  # contact-sheet 栅格化 DPI：清晰可读、体积适中
+SHEET_PNG_DPI = 200  # contact-sheet 栅格化 DPI：再高一档，让 scriptscriptstyle 小字
+                     # （二级下标如 \text{old} / \theta_\text{old}）缩到列宽后仍清晰，
+                     # 避免被压糊成形似 ",," 的假象、引起复核误判
 
 
 def rasterize_sheets(sheet_pdfs: list[Path]) -> list[Path]:
@@ -401,6 +505,7 @@ def main(argv: list[str]) -> int:
             "tex_rendered": ann,             # KaTeX 实际收到的 TeX（反转义后）
             "pdf_page": box["page"] + 1,     # 1-based 便于人看
             "fragmented": box.get("fragmented", False),  # 跨页/折行被拆片，单图可能不全
+            "expanded": cr.get("expanded", False),       # 墨迹溢出行盒、裁图做过有界纵向扩展
             "bbox_csspx": [round(box["x"], 1), round(box["y"], 1),
                            round(box["w"], 1), round(box["h"], 1)],
             "png": str(png.relative_to(out_dir)),
