@@ -73,6 +73,7 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
    - 表格行（`| ... |`）内数学段里出现裸 `|`
    - `_{<...}` / `^{<...}` 这种下标里塞了 `<` `>` 字面字符的写法
    - `}_<char>` 高危下标（`_` 未转义）的两种形态：(a) 单段 inline math 同时含 `[` 与 `}_<char>`；(b) 同一行 ≥2 段独立 inline `$...$` 各带一个 `}_<char>`、跨段 emphasis 配对（无需方括号）
+   - 非规范不等号 `\char` / `\not=` / 字面 `≠` / `\unicode{x2260}`——报 `ne-non-canonical`。本仓库的源码规范是**一律写 `\ne`**：GitHub MathJax 直接渲染 `\ne` 没问题；`markdown-to-pdf` 在送进 KaTeX 之前自动把 `\ne`/`\neq` 改写成 `\mathrel{\char"2260}`，绕开 KaTeX 那个会让 WeasyPrint 裂开的 rlap 斜杠叠加，从而拿到一个干净的 ≠ 字形。这条规则**反过来**——它揪的是源码里**不该出现**的几种非规范写法：`\char` 在 MathJax 上不支持（GitHub 渲成红字 `\char"2260`）；`\not=` PDF 改写器不覆盖（KaTeX 的 rlap 照样裂）；字面 `≠` 和 `\unicode{x2260}` 在 KaTeX 里 "No character metrics"（PDF 里直接看不见）。提示统一回 `\ne`。**收进这条 GitHub-render skill 而非塞进 markdown-to-pdf，是因为本仓库需要一个「提交前一次性扫公式坑」的统一入口**。
 5. **非公式 markdown 层**：CLAUDE.md「非公式（markdown 层）的 GitHub 渲染避坑」一节那三条坑，与数学无关、但同样把 GitHub 渲染搞坏，而且本仓库没有别的工具自动跑它们，所以一并折进来（实现对齐 CLAUDE.md 里那几段手动 grep/python 片段，跳过代码块）：
    - **粗体 flanking 失效**：`**bold**` 的闭合 `**` 卡在全角标点 + CJK 之间会漏出字面 `**`。用 markdown-it-py 的 CommonMark 把整行渲成 inline，看 `<code>` 之外是否残留 `**` → 报 `emphasis-flanking`。
    - **裸 `~` 删除线误配对**：同一作用域（表格行收窄到单元格、否则整行）≥2 个裸 `~` → 报 `stray-tilde`；先剔除真正的 `~~删除线~~`，孤立单个 `~`（如 `~16 GB`）放行。
@@ -93,6 +94,7 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
 | 9 表格单元格内裸 `\|` | ✅ | 静态层识别 `\| ... \|` 表格行，扫该行的 `$...$` 内是否含未转义 `\|`，命中报 `pipe-in-table-math` |
 | 10 下标里 `<` / `>` | ✅ | 静态层在每段抽出的 TeX 里搜 `[_^]\s*\{[^}]*[<>]`，命中报 `angle-in-subscript` |
 | 11 `}_<char>` 下标被 emphasis 吃掉 | ✅ | 静态层两路报 `emphasis-eats-subscript`：(a) 单段 inline math 同时含 `[` 与 `}_<char>`；(b) 同一行 ≥2 段独立 inline `$...$` 各带一个 `}_<char>`（跨段配对、无需方括号）。`}\_V` 的修正形态不报 |
+| 非规范不等号 ≠ 写法 | ✅ | 源码规范是 `\ne`（markdown-to-pdf 内部自动改写为 `\mathrel{\char"2260}`，GitHub 直接渲 `\ne`）。这条静态层扫的是源码里不该出现的非规范写法：`\char`（MathJax 不支持，GitHub 红字）、`\not=`（PDF 改写器不覆盖、KaTeX rlap 仍裂）、字面 `≠` 和 `\unicode{x2260}`（KaTeX 无 metrics、PDF 看不见）。命中报 `ne-non-canonical`，提示改写成 `\ne` |
 | 任意 TeX 语法错（`Misplaced &`、`Missing argument for \frac` 等） | ✅ | MathJax 自报 |
 | `\mathcal{L}\_V` 这种 workaround 写法 | ✅ 不报（这是正常写法） | 反转义后 `\mathcal{L}_V`，渲染正常 |
 

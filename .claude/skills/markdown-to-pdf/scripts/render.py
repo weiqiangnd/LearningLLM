@@ -70,6 +70,30 @@ _ANY_MATH_RE = re.compile(
 )
 
 
+# Source TeX uses `\ne` (renders correctly on GitHub via MathJax). KaTeX
+# *parses* `\ne` fine too, but renders it as a slash `\rlap`-overlaid on `=`,
+# which WeasyPrint mis-positions in the PDF — slash leaks, `=` flung off or
+# dropped, in scriptstyle subscripts the trailing `=0` even drops to a new line.
+# Rewriting to `\mathrel{\char"2260}` pulls the U+2260 glyph straight from the
+# font and bypasses the rlap, rendering a clean ≠ in the PDF. MathJax never
+# sees this rewrite (the substitution happens only on the PDF pipeline), so
+# GitHub keeps using `\ne` as written.
+#
+# Scope is intentionally narrow: only the canonical `\ne` / `\neq` forms.
+# Non-canonical writings (`\not=`, literal `≠`, `\unicode{x2260}`, `\char...`)
+# are flagged by check-github-render's `ne-non-canonical` rule and should be
+# fixed in source rather than silently rewritten here. The `(?![A-Za-z])`
+# lookahead keeps `\nearrow` and friends safe.
+_NE_TO_CHAR_RE = re.compile(r"\\neq?(?![A-Za-z])")
+
+
+def _ne_to_char_glyph(tex: str) -> str:
+    """`\\ne` / `\\neq` → `\\mathrel{\\char"2260}` so KaTeX renders ≠ as a
+    single glyph (and WeasyPrint can typeset it) instead of as the rlap'd
+    slash-over-`=` it normally builds."""
+    return _NE_TO_CHAR_RE.sub(r'\\mathrel{\\char"2260}', tex)
+
+
 def _unescape_markdown_in_tex(tex: str) -> str:
     r"""Reverse the markdown-level escapes that are only meaningful before
     markdown parsing, so KaTeX sees real LaTeX.
@@ -92,7 +116,10 @@ def _unescape_markdown_in_tex(tex: str) -> str:
     # \_  -> _   (subscript: \mathbb{E}\_{...} -> \mathbb{E}_{...})
     # \*  -> *   (rare; emphasis escape)
     # \$  -> $   (dollar escape — but `$` inside math is illegal anyway)
-    return (
+    # Then rewrite `\ne` / `\neq` → `\mathrel{\char"2260}` so the PDF gets a
+    # clean ≠ glyph instead of KaTeX's WeasyPrint-breaking rlap. See
+    # `_ne_to_char_glyph` above.
+    return _ne_to_char_glyph(
         tex.replace(r"\_", "_")
            .replace(r"\*", "*")
            .replace(r"\$", "$")

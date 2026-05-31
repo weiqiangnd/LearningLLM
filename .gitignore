@@ -37,3 +37,5 @@ hf_cache/
 
 # check-github-render previews are regeneratable; don't bloat the repo with them
 dist/check-github-render/
+# check-pdf-formula review artifacts (crops / contact sheets / mapping) are regeneratable
+dist/pdf-formula-check/

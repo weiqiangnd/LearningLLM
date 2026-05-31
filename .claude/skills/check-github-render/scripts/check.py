@@ -151,6 +151,24 @@ _BAD_SPACING_HINT = {
     "|": r"`\|` becomes single `|` on GitHub — use `\Vert` for the double-bar ‖",
 }
 
+# Non-canonical ≠ writings. The repo's source-of-truth form is `\ne` (or
+# `\neq`) — markdown-to-pdf rewrites that to `\mathrel{\char"2260}` before
+# KaTeX, while GitHub's MathJax renders `\ne` directly. Every OTHER form
+# fails on at least one engine:
+#   - `\char` / `\char"2260` — KaTeX renders ≠ cleanly, but MathJax 3 has no
+#     `\char` command and emits literal red text `\char"2260` on GitHub.
+#   - `\not=` — KaTeX still uses its rlap implementation (slash leaks, `=`
+#     flung off in WeasyPrint PDF); markdown-to-pdf's `\ne→\char` rewrite
+#     does NOT cover this form, so the PDF stays broken.
+#   - literal `≠` (U+2260) and `\unicode{x2260}` — render fine on MathJax,
+#     but KaTeX reports "No character metrics for '≠' in Main-Regular" and
+#     drops the glyph; the symbol is invisible in the PDF.
+# All three are flagged so authors converge on the single canonical `\ne`,
+# which is the only form that comes out right on both pipelines (one of
+# them via auto-rewrite). Authors should NOT manually write `\char"2260` in
+# source — that's an implementation detail the PDF pipeline owns.
+_NE_NON_CANONICAL_RE = re.compile(r'\\char(?![A-Za-z])|\\not\s*=|\\unicode\s*\{\s*x2260\s*\}|≠')
+
 
 # ---------- markdown-layer checks (rules 1, 2, 9, 10, 11) ----------
 
@@ -328,6 +346,8 @@ def render_via_mathjax(items: list[tuple[str, bool]]) -> list[dict]:
 
 # Recognised `Issue.kind` values:
 #   mathjax-error            — MathJax 3 refused to render the post-unescape TeX.
+#   ne-non-canonical         — `\char` / `\not=` / literal ≠ / `\unicode{x2260}`
+#                              instead of the canonical `\ne` (PDF-side rewrite).
 #   commonmark-eats-escape   — `\,` `\!` `\;` `\>` `\|` stripped by CommonMark.
 #   backslash-rowbreak-eaten — `\\` row break inside math; GitHub unescapes it
 #                              to a single `\`, collapsing matrix/cases rows.
@@ -418,6 +438,36 @@ def check_file(
                         f"to a single `\\`, collapsing matrix/cases/aligned rows "
                         f"onto one line. Use `\\cr` instead (renders correctly in "
                         f"both GitHub's MathJax and the KaTeX PDF pipeline)."
+                    ),
+                )
+            )
+
+    # ---- static layer: non-canonical ≠ writings ----
+    # See `_NE_NON_CANONICAL_RE` above. The repo canon is `\ne` — markdown-to-pdf
+    # auto-rewrites it to `\mathrel{\char"2260}` so KaTeX produces a clean glyph,
+    # while GitHub's MathJax renders `\ne` directly. Anything else (`\char...`,
+    # `\not=`, literal `≠`, `\unicode{x2260}`) fails on one engine: `\char` is
+    # MathJax-unknown (red text on GitHub); `\not=` keeps KaTeX's broken rlap
+    # (the auto-rewrite only catches `\ne`/`\neq`); literal `≠` / `\unicode{...}`
+    # have no KaTeX metrics (invisible in PDF). Push all of them back to `\ne`.
+    for tex, _disp, offset in items:
+        m = _NE_NON_CANONICAL_RE.search(tex)
+        if m:
+            line = _offset_to_line(md_text, offset)
+            issues.append(
+                Issue(
+                    line=line,
+                    kind="ne-non-canonical",
+                    snippet=tex[:80],
+                    message=(
+                        f"non-canonical ≠ form `{m.group(0)}`. The repo's source-"
+                        f"of-truth form is `\\ne` (or `\\neq`) — markdown-to-pdf "
+                        f"auto-rewrites it to `\\mathrel{{\\char\"2260}}` for "
+                        f"KaTeX, while GitHub's MathJax renders `\\ne` directly. "
+                        f"`\\char` is MathJax-unknown (red text on GitHub); "
+                        f"`\\not=` keeps KaTeX's broken rlap; literal `≠` / "
+                        f"`\\unicode{{x2260}}` have no KaTeX metrics (invisible "
+                        f"in PDF). Write `\\ne`."
                     ),
                 )
             )
