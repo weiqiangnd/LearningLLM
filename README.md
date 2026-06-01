@@ -2,13 +2,14 @@
 
 ## 仓库介绍
 
-这是一份大模型（LLM）学习过程中的笔记与代码示例。每一章对应一个 Markdown 文档（理论与逐行代码讲解）和一个 Jupyter Notebook（可直接运行的示例），两者**互为对照**——`.md` 回答「为什么这样做」，`.ipynb` 回答「代码每一行做什么」，公式与代码片段刻意逐字一致。所有示例默认在 **Google Colab** 中运行（免费 T4 GPU 即可起步）。
+这是一份面向 0 基础大模型（LLM）学习者的教程与代码实例。每一章对应一个 Markdown 文档（理论与逐行代码讲解）和一个 Jupyter Notebook（可直接运行的示例），两者**互为对照**——`.md` 回答「为什么这样做」，`.ipynb` 回答「代码每一行做什么」，公式与代码片段保持一致。所有示例默认在 **Google Colab** 中运行（免费 T4 GPU 即可起步）。
 
 仓库特色：
 
 - **`.md` + `.ipynb` 双轨并行**：每章一份概念讲解、一份可直接 Run All 的代码，互为对照、术语一致。
 - **真实模型而非玩具示例**：默认在 Colab 免费 T4（15 GB）上用 4-bit 量化跑通 Qwen3-8B；显存吃紧的进阶章节才升 L4 / A100。
 - **概念不跳步**：读者基线只要求「会 Python + 矩阵乘法」，softmax / KL / MDP 等首次出现都先定义再使用，并配最小可手算的数值例子（2×2 矩阵、长度为 3 的序列）。
+- **数学先直观再严格**：涉及复杂数学的地方，先用例子 / 图把直觉讲清，再给出严格的定义与推导证明——既不让公式吓退初学者，也不牺牲该有的严谨。
 - **形状变换全程标注**：reshape / transpose / broadcasting 每一步都给张量形状，如 `(B, L, D) → (B, L, H, D/H) → (B, H, L, D/H)`。
 - **关键部分配图辅助理解**：架构总览、流水线 / 工作流、关键算法步骤等抽象处都配示意图，与文字、公式互为补充。
 - **预备知识按需回查**：阶段 0 的 P0N 章节与主线 NN 解耦，无需一次读完——主线在首次用到时会用〔预备知识〕标注提醒。
@@ -52,7 +53,7 @@
 |------|---------|------|------|
 | 03 Tokenizer：BPE / BBPE / 词表 / 特殊 token；用 tokenizers 库训一个小 tokenizer | 从「模型只认识整数 id」讲清 tokenizer 在流水线两端的位置，对比 char / word / subword 三种切分粒度的取舍（词表大小 vs 序列长度 vs OOV），用最小可手算的 hug/pug 例子推导 BPE 的训练（统计高频相邻对 → 合并 → 记规则）与编码（按学习顺序套规则、生僻词也能切），讲解 BBPE 如何用「先转 UTF-8 字节 + 256 字节打底」根除 OOV，以及词表大小权衡与特殊 token 不被 BPE 拆开的两条铁律；实战加载 Qwen3 tokenizer 观察中英文 / 代码 / emoji 的切法、纯 Python 手写 BPE 跑通算法、用 tokenizers 库从零训一个 byte-level BPE 验证「永不 OOV + 完美还原」，并量化中英文的 token 压缩率差异。 | [文档](./src/03-Tokenizer.md) · [ipynb](./src/03.ipynb) · [OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/03.ipynb) | ✅ |
 | 04 Embedding 与位置编码：token embedding / word2vec / sinusoidal / learned / RoPE / ALiBi | token embedding 本质是「one-hot 乘矩阵 = 按行查表」，embedding 矩阵与 lm_head 互为转置可共享权重（weight tying）；借 word2vec（分布假说、CBOW / skip-gram + 负采样）讲清 embedding 为何带语义结构、king − man + woman ≈ queen 为何成立，并厘清与 LLM embedding 的异同；论证自注意力对顺序「视而不见」（置换等变）故位置编码是刚需，梳理「改输入（绝对）vs 改注意力（相对）」两条路线，逐个对比 sinusoidal / learned / RoPE / ALiBi 的原理与取舍；实战实现查表与 weight tying、训 word2vec 验证类比、实证置换不变性、画 sinusoidal 热力图、验证 RoPE 相对位置、构造 ALiBi 偏置，并读 Qwen3 config 看真实 rope_theta。 | [文档](./src/04-Embedding与位置编码.md) · [ipynb](./src/04.ipynb) · [OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/04.ipynb) | ✅ |
-| 05 从 RNN 到 attention：seq2seq、Bahdanau / Luong attention（"attention 为什么会出现"） |  |  |  |
+| 05 从 RNN 到 attention：seq2seq、Bahdanau / Luong attention（"attention 为什么会出现"） | 从 RNN 的循环隐藏状态与长程依赖软肋讲起，搭出 seq2seq 的 encoder–decoder 骨架并点出它的信息瓶颈（整句话压进一个定长 context、源句越长越记不住），由此引出 attention 的「打分→softmax→加权求和」三步套路；对比 Bahdanau（加性）与 Luong（乘性点积）两大流派，并铺垫到 self-attention / 第 6 章。实战训一个带 attention 的 GRU seq2seq 做数字串反转，画出反对角线对齐矩阵，并用「准确率随长度变化」的对比实证瓶颈。 | [文档](./src/05-从RNN到attention.md) · [ipynb](./src/05.ipynb) · [OpenInColab](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/05.ipynb) | ✅ |
 | 06 Scaled Dot-Product Attention：Q/K/V、softmax、causal mask |  |  |  |
 | 07 Multi-Head Attention 与 MQA / GQA：分头、拼接、形状变换全过程 |  |  |  |
 | 08 FFN、残差连接、LayerNorm / RMSNorm / SwiGLU |  |  |  |
@@ -63,9 +64,11 @@
 | 12b 论文串读（下）：LLaMA / Qwen 的现代改动逐项拆解（RoPE / RMSNorm / SwiGLU / GQA / MoE） |  |  |  |
 | 13 从零实现 mini-GPT：tiny-shakespeare 上完成训练 → 生成闭环 |  |  |  |
 
-〔预备知识〕04 章首次密集用到张量 shape / broadcasting / autograd——若不熟悉，建议先读 P01。
-〔预备知识〕10 章首次用到极大似然估计、熵 / 交叉熵 / KL 散度——若不熟悉，建议先读 P03。
-〔预备知识〕13 章首次走完「前向 + 反向 + 优化器」完整训练循环——若不熟悉，建议先读 P02 与 P04。
+〔预备知识〕04 章首次**密集**用到张量 shape / broadcasting / autograd——若不熟悉，建议先读 P01。
+
+〔预备知识〕05 章实战首次走完「前向 + 反向 + 优化器」完整训练循环（训一个 seq2seq），**大量**用到优化器与训练三步——若不熟悉，建议先读 P02 与 P04。
+
+〔预备知识〕10 章首次**密集**用到极大似然估计、熵 / 交叉熵（cross-entropy 是自回归语言建模的核心损失）——若不熟悉，建议先读 P03。
 
 ### 阶段 3：推理工程
 
@@ -109,7 +112,9 @@
 | 35 Constitutional AI / RLAIF：用 AI 反馈替代人类标注 |  |  |  |
 | 36 模型蒸馏：logit 蒸馏、SFT 蒸馏、reasoning 蒸馏 |  |  |  |
 
-〔预备知识〕31a 章首次用到 MDP / policy gradient / PPO——若不熟悉，建议先读 P05。
+〔预备知识〕30 章首次**密集**用到「成对偏好上的最大似然」（Bradley-Terry 模型，本质是 sigmoid + log-likelihood）——若不熟悉，建议先读 P03。
+
+〔预备知识〕31a 章**大量**用到 MDP / policy gradient / PPO（整章都建立在 policy gradient 之上），并首次把 **KL 散度**当作训练约束——若不熟悉，建议先读 P05（KL 散度见 P03）。
 
 ### 阶段 6：参数高效微调实战
 
@@ -131,6 +136,8 @@
 | 45 多模态偏好对齐：在 VLM 上做 DPO / RLHF ⚡ |  |  |  |
 | 46 语音多模态：Whisper、端到端语音模型（Qwen-Audio 等） |  |  |  |
 | 47 多模态评测与典型应用（OCR、文档问答、agent for GUI） |  |  |  |
+
+〔预备知识〕41 章的对比学习（CLIP 的 InfoNCE）本质是相似度矩阵上的 softmax / 交叉熵——若不熟悉，建议先读 P03。
 
 ### 阶段 8：应用层
 
