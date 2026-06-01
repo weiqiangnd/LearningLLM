@@ -144,11 +144,33 @@ def prepare_source_html(src_md: Path, stem: str, out_dir: Path, do_render: bool)
 # ──────────────────────────────────────────────────────────────────────────
 # 抽取：源 md 公式（带行号）/ HTML annotation / WeasyPrint 盒模型
 # ──────────────────────────────────────────────────────────────────────────
+def _image_alt_spans(text: str) -> list[tuple[int, int]]:
+    """返回 markdown 图片语法 `![alt](url)` 里 alt 文本的字节区间 [(start,end), …]。
+
+    图片 alt 文本里的 `$…$` 在 PDF 里永远不渲染（alt 只在图片加载失败时作纯文本
+    回退、或给读屏软件），所以这种"幽灵公式"不该参与视觉复核——抽取源公式时按这些
+    区间过滤掉。`extract_katex_boxes` 那侧已天然排除（藏在属性里、没有绘制盒），
+    两侧一起剔除才能让三路计数对齐。
+    """
+    spans = []
+    # 非贪婪匹配 alt（不跨 `]`），再要求紧跟 `(`——markdown 图片的标准形态。
+    for m in re.finditer(r'!\[([^\]]*)\]\(', text):
+        spans.append((m.start(1), m.end(1)))
+    return spans
+
+
 def extract_src_formulas(src_md: Path) -> list[dict]:
     text = src_md.read_text(encoding="utf-8")
     items = extract_math_with_positions(text)  # [(tex, is_display, byte_offset)]
+    alt_spans = _image_alt_spans(text)
+
+    def _in_alt(off: int) -> bool:
+        return any(s <= off < e for s, e in alt_spans)
+
     out = []
     for tex, disp, off in items:
+        if _in_alt(off):     # 图片 alt 文本里的公式不渲染，跳过（见 _image_alt_spans）
+            continue
         out.append({
             "tex": tex.strip(),
             "display": bool(disp),
@@ -187,7 +209,11 @@ def extract_katex_boxes(html_path: Path):
     """
     doc = weasyprint.HTML(filename=str(html_path)).render()
     # 按"首次出现顺序"收集每个 katex 元素的所有盒片段，保住文档序。
-    groups: "OrderedDict[int, list[dict]]" = OrderedDict()
+    # 每组同时记住元素本身，渲染后从它的 MathML <annotation> 子节点回读源 TeX——
+    # 这样 annotation 与盒子天然一一对应（都来自**画出来的** DOM 元素），不会像
+    # 直接扫 HTML 字符串那样把 `<img alt="…$x$…">` 这类**藏在属性里、永不绘制**的
+    # 公式也数进来（alt 文本里的数学在 PDF 里根本不渲染，本就不该参与视觉复核）。
+    groups: "OrderedDict[int, dict]" = OrderedDict()
     for pno, page in enumerate(doc.pages):
         for b in _iter_boxes(page._page_box):
             el = getattr(b, "element", None)
@@ -197,21 +223,37 @@ def extract_katex_boxes(html_path: Path):
             # 只取最外层 .katex（每条公式恰一个元素，annotation 挂在它子树里）；
             # .katex-display / .katex-html / .katex-mathml 都是别的 token，不会命中。
             if "katex" in cls:
-                groups.setdefault(id(el), []).append({
+                g = groups.setdefault(id(el), {"el": el, "frags": []})
+                g["frags"].append({
                     "page": pno,
                     "x": float(b.position_x), "y": float(b.position_y),
                     "w": float(b.width), "h": float(b.height),
                 })
 
     boxes = []
-    for frags in groups.values():
+    for g in groups.values():
+        frags = g["frags"]
         main = max(frags, key=lambda f: f["w"] * f["h"])  # 面积最大的主片段
         main = dict(main)
         main["fragmented"] = len(frags) > 1
+        main["tex_rendered"] = _annotation_of(g["el"])    # KaTeX 实际收到的 TeX
         boxes.append(main)
 
     pdf_bytes = doc.write_pdf()
     return boxes, pdf_bytes
+
+
+# KaTeX 把源 TeX 回显在 MathML 的 <annotation encoding="application/x-tex"> 里；
+# WeasyPrint 解析后该标签带 MathML 命名空间前缀。
+_MATHML_ANNOTATION_TAG = "{http://www.w3.org/1998/Math/MathML}annotation"
+
+
+def _annotation_of(el) -> str:
+    """从一个 .katex 元素的子树里读回它的源 TeX（MathML annotation 节点）。"""
+    for sub in el.iter():
+        if sub.tag == _MATHML_ANNOTATION_TAG:
+            return (sub.text or "").strip()
+    return ""
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -468,11 +510,12 @@ def main(argv: list[str]) -> int:
     # 默认重渲到 out_dir（不动 dist 主文件）；--no-render 时只读复用 dist html
     html_path = prepare_source_html(src_md, stem, out_dir, do_render=not args.no_render)
 
-    # 1) 三路抽取
+    # 1) 三路抽取。annotation 直接取自**画出来的** .katex 盒（其 MathML 子节点回显
+    #    源 TeX），所以 annotation 数恒等于盒数、且天然排除藏在 `<img alt>` 属性里
+    #    永不绘制的"幽灵公式"；源公式那侧同样过滤掉图片 alt 文本里的数学，三路才对齐。
     src_items = extract_src_formulas(src_md)
-    html_text = html_path.read_text(encoding="utf-8")
-    anns = extract_annotations(html_text)
     boxes, pdf_bytes = extract_katex_boxes(html_path)
+    anns = [b.get("tex_rendered", "") for b in boxes]
 
     # 2) 对齐校验
     n = len(src_items)
