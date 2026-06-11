@@ -64,7 +64,46 @@ if command -v apt-get >/dev/null 2>&1; then
     apt-get remove -y fonts-noto-color-emoji >/dev/null 2>&1 || true
   fi
 fi
+
+# Second line of defense: a fontconfig rejectfont rule. The apt remove above
+# has been observed to fail *silently* in sandboxed environments (all output
+# discarded + `|| true`), which once shipped PDFs whose ✅/❌ were invisible.
+# With this rule, even if the package survives or gets reinstalled by other
+# tooling, fontconfig refuses to expose the font, so Pango can never pick it.
+REJECT_CONF=/etc/fonts/conf.d/99-reject-bitmap-emoji.conf
+if [ ! -f "$REJECT_CONF" ]; then
+  mkdir -p "$(dirname "$REJECT_CONF")" 2>/dev/null || true
+  cat > "$REJECT_CONF" 2>/dev/null <<'XML' || true
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<!-- WeasyPrint/Pango cannot draw CBDT/CBLC bitmap glyphs: emoji like U+2705
+     get blank space instead of a visible glyph. Reject the bitmap emoji font
+     at the fontconfig layer so it can never be selected, even if the package
+     is (re)installed by other tooling. Outline emoji come from Symbola. -->
+<fontconfig>
+  <selectfont>
+    <rejectfont>
+      <pattern>
+        <patelt name="family"><string>Noto Color Emoji</string></patelt>
+      </pattern>
+    </rejectfont>
+  </selectfont>
+</fontconfig>
+XML
+fi
+
 # Refresh fontconfig cache.
 fc-cache -f >/dev/null 2>&1 || true
+
+# Verify loudly (no more silent failure): after both defenses, fontconfig
+# must NOT see the bitmap font. render.py re-checks this at runtime too.
+if fc-list 2>/dev/null | grep -qi "noto color emoji"; then
+  echo "[install] ERROR: 'Noto Color Emoji' is still visible to fontconfig." >&2
+  echo "          WeasyPrint cannot draw this bitmap font — ✅/❌ would be" >&2
+  echo "          INVISIBLE in generated PDFs. Remove the package manually" >&2
+  echo "          (apt-get remove fonts-noto-color-emoji) or make" >&2
+  echo "          $REJECT_CONF writable, then re-run install.sh." >&2
+  exit 1
+fi
 
 echo "[install] Done."

@@ -900,6 +900,38 @@ def md_to_dist(md_path: Path, dist_dir: Path) -> dict:
     return {"md": md_out, "html": html_out, "pdf": pdf_out}
 
 
+def assert_emoji_fonts_sane() -> None:
+    """Fail fast if the bitmap 'Noto Color Emoji' font is selectable.
+
+    WeasyPrint/Pango cannot draw CBDT/CBLC bitmap glyphs: the advance width
+    is reserved but nothing is painted, so ✅/❌/⚠ silently vanish from the
+    PDF while text extraction still finds them — this shipped broken PDFs
+    once and is near-impossible to spot downstream. install.sh applies two
+    defenses (apt remove + a fontconfig rejectfont rule); if fc-list still
+    sees the font, neither took effect, so abort instead of rendering
+    invisible emoji."""
+    try:
+        out = subprocess.run(
+            ["fc-list"], capture_output=True, text=True, timeout=30
+        ).stdout
+    except Exception:
+        return  # fc-list unavailable — nothing we can verify here
+    if re.search(r"noto color emoji", out, re.I):
+        sys.exit(
+            "[render] ERROR: bitmap font 'Noto Color Emoji' is visible to "
+            "fontconfig — WeasyPrint cannot draw its glyphs, so emoji like "
+            "✅/❌ would be INVISIBLE in the PDF. Re-run install.sh (it "
+            "removes the package and installs a fontconfig rejectfont rule), "
+            "then retry."
+        )
+    if not re.search(r"symbola", out, re.I):
+        print(
+            "[render] warn: Symbola not installed — ✅/❌ may render as tofu; "
+            "run install.sh.",
+            file=sys.stderr,
+        )
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         description="Render markdown into a {md, html, pdf} triplet under dist/.",
@@ -909,6 +941,8 @@ def main(argv: list[str]) -> int:
         "--dist", default="dist", help="Output directory (default: ./dist relative to CWD)."
     )
     args = parser.parse_args(argv)
+
+    assert_emoji_fonts_sane()
 
     cwd = Path.cwd()
     dist_dir = (cwd / args.dist).resolve()
