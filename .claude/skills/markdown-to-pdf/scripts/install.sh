@@ -51,8 +51,17 @@ if command -v apt-get >/dev/null 2>&1; then
   if ! fc-list | grep -qi "noto.*cjk"; then
     apt-get install -y --no-install-recommends fonts-noto-cjk >/dev/null 2>&1 || true
   fi
-  if ! fc-list | grep -qi "noto color emoji"; then
-    apt-get install -y --no-install-recommends fonts-noto-color-emoji >/dev/null 2>&1 || true
+  # Emoji (✅ ❌ ⚠ …) MUST come from an *outline* font — Symbola.
+  # Noto Color Emoji is CBDT/CBLC bitmap-only; WeasyPrint can't place bitmap
+  # glyphs (they end up microscopic at the page origin → looks like the glyph
+  # vanished, while the advance width still reserves blank space). fontconfig
+  # prefers the "emoji" generic family for emoji-presentation codepoints, so
+  # merely installing Symbola is not enough — Noto Color Emoji must be absent.
+  if ! fc-list | grep -qi "symbola"; then
+    apt-get install -y --no-install-recommends fonts-symbola >/dev/null 2>&1 || true
+  fi
+  if fc-list | grep -qi "noto color emoji"; then
+    apt-get remove -y fonts-noto-color-emoji >/dev/null 2>&1 || true
   fi
 fi
 # Refresh fontconfig cache.
