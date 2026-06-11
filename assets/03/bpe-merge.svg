@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 650">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="610.0" y="40" text-anchor="middle" class="title">BPE 训练：反复「找最高频相邻对 → 合并」，直到词表达到目标大小</text>
+<rect x="60.0" y="95.0" width="300" height="70" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="210" y="126" text-anchor="middle" class="lbl">① 统计相邻对</text>
+<text x="210" y="146" text-anchor="middle" class="small">数所有相邻符号对出现的频次</text>
+<rect x="460.0" y="95.0" width="300" height="70" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="610" y="126" text-anchor="middle" class="lbl">② 选最高频对</text>
+<text x="610" y="146" text-anchor="middle" class="small">频次最大的那一对</text>
+<rect x="860.0" y="95.0" width="300" height="70" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="1010" y="126" text-anchor="middle" class="lbl">③ 合并 + 记录</text>
+<text x="1010" y="146" text-anchor="middle" class="small">拼成新符号，加进词表，记下规则</text>
+<line x1="362.0" y1="130" x2="456.0" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="762.0" y1="130" x2="856.0" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<path d="M 1010,95.0 C 1010,70 210,70 210,95.0" stroke="#ea580c" stroke-width="2" fill="none" stroke-dasharray="6,4" marker-end="url(#aOrange)"/>
+<text x="610.0" y="62" text-anchor="middle" class="small" fill="#ea580c">重复，每轮词表 +1，直到达到目标大小</text>
+<line x1="60" y1="200" x2="1160" y2="200" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="60" y="232" class="lbl">一个最小可手算的例子</text>
+<rect x="60" y="250" width="360" height="180" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="1.5"/>
+<text x="78" y="276" class="lbl">语料（词 × 频次）</text>
+<text x="84" y="303" class="mono">hug × 10</text>
+<text x="84" y="325" class="mono">pug × 5</text>
+<text x="84" y="347" class="mono">pun × 12</text>
+<text x="84" y="369" class="mono">bun × 4</text>
+<text x="84" y="391" class="mono">hugs × 5</text>
+<text x="260" y="303" class="sub">初始按字符拆：</text>
+<text x="260" y="325" class="mono">h u g</text>
+<text x="260" y="347" class="mono">p u n …</text>
+<text x="260" y="378" class="sub">基础词表 (7)：</text>
+<text x="260" y="400" class="mono">b g h n p s u</text>
+<text x="470" y="276" class="lbl">学到的 3 条合并规则（按顺序）</text>
+<rect x="470" y="296" width="330" height="38" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="484" y="320" class="tag" fill="#7c3aed">merge 1</text>
+<text x="560" y="320" class="mono">(u, g) → ug</text>
+<text x="702" y="320" class="small">频次 20，最高</text>
+<rect x="470" y="342" width="330" height="38" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="484" y="366" class="tag" fill="#7c3aed">merge 2</text>
+<text x="560" y="366" class="mono">(u, n) → un</text>
+<text x="702" y="366" class="small">频次 16</text>
+<rect x="470" y="388" width="330" height="38" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="484" y="412" class="tag" fill="#7c3aed">merge 3</text>
+<text x="560" y="412" class="mono">(h, ug) → hug</text>
+<text x="702" y="412" class="small">频次 15</text>
+<text x="470" y="458" class="sub">词表：7 → 10（每条规则 +1 个新符号）</text>
+<rect x="850" y="250" width="310" height="180" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+<text x="868" y="276" class="lbl">编码 "hugs" 时按规则依次套用</text>
+<text x="870" y="308" class="small">初始</text>
+<text x="1020" y="308" class="mono">h · u · g · s</text>
+<text x="870" y="346" class="small">套 merge1 (ug)</text>
+<text x="1020" y="346" class="mono">h · ug · s</text>
+<text x="870" y="384" class="small">套 merge3 (hug)</text>
+<text x="1020" y="384" class="mono">hug · s</text>
+<text x="870" y="420" class="sub" font-weight="600">结果：[hug, s]（2 个 token）</text>
+<rect x="60" y="468" width="1100" height="118" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="80" y="496" class="lbl">几个要点</text>
+<text x="80" y="522" class="sub">• 训练产物 = 一份「词表」+ 一串「有序的合并规则」；vocab_size 越大，合并轮数越多、token 越长。</text>
+<text x="80" y="546" class="sub">• 编码新词时，把它拆成字符后，按训练时学到的「先后顺序」逐条套用合并规则——顺序很关键。</text>
+<text x="80" y="570" class="sub">• 没在语料里出现过的词（如 "bug"）也能切：拆成 [b, ug] 这种已知片段，不会报错。</text>
+</svg>

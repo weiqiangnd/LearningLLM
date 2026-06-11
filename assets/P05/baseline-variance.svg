@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="aGray" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#94a3b8"/>
+    </marker>
+    <marker id="aOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <marker id="aPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+    .title { font-size: 22px; font-weight: 700; fill: #1e293b; }
+    .sub   { font-size: 13px; fill: #475569; }
+    .lbl   { font-size: 14px; font-weight: 600; fill: #1e293b; }
+    .small { font-size: 12px; fill: #475569; }
+    .formula { font-size: 14px; fill: #1e293b; font-style: italic; }
+    .muted { fill: #94a3b8; }
+  </style>
+<text x="480.0" y="38" text-anchor="middle" class="title">Baseline 降方差：期望不变，但散点更窄、梯度更稳</text>
+<text x="270.0" y="78" text-anchor="middle" class="lbl" fill="#2563eb">G_t（直接当权重）</text>
+<rect x="80" y="90" width="380" height="320" fill="#fbfdff" stroke="#94a3b8" stroke-width="1"/>
+<line x1="80" y1="410.0" x2="460" y2="410.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="74" y="414.0" text-anchor="end" class="small">0</text>
+<line x1="80" y1="330.0" x2="460" y2="330.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="74" y="334.0" text-anchor="end" class="small">100</text>
+<line x1="80" y1="250.0" x2="460" y2="250.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="74" y="254.0" text-anchor="end" class="small">200</text>
+<line x1="80" y1="170.0" x2="460" y2="170.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="74" y="174.0" text-anchor="end" class="small">300</text>
+<line x1="80" y1="90.0" x2="460" y2="90.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="74" y="94.0" text-anchor="end" class="small">400</text>
+<line x1="80" y1="282.9389419187786" x2="460" y2="282.9389419187786" stroke="#ea580c" stroke-width="2" stroke-dasharray="6,4"/>
+<text x="454" y="276.9389419187786" text-anchor="end" class="small" fill="#ea580c">mean ≈ 159</text>
+<circle cx="92.0" cy="309.53077486229046" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="104.27586206896552" cy="348.3717533330981" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="116.55172413793103" cy="234.86274990762644" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="128.82758620689657" cy="349.48736433007616" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="141.10344827586206" cy="235.36665322343708" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="153.3793103448276" cy="279.97445119650956" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="165.6551724137931" cy="360.672741132433" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="177.9310344827586" cy="279.4192630244975" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="190.20689655172413" cy="366.6950704856641" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="202.48275862068965" cy="242.49958624062603" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="214.75862068965517" cy="366.8607861758673" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="227.0344827586207" cy="337.2574832888903" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="239.31034482758622" cy="263.46355326617714" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="251.58620689655172" cy="225.76859330488287" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="263.8620689655172" cy="335.08580749353064" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="276.1379310344828" cy="284.2164489663713" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="288.41379310344826" cy="279.83862153268376" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="300.6896551724138" cy="172.59479239451892" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="312.9655172413793" cy="244.50992673457665" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="325.2413793103448" cy="299.10470853112605" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="337.51724137931035" cy="147.00157776789052" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="349.7931034482759" cy="353.8055199098976" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="362.0689655172414" cy="218.590320289572" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="374.3448275862069" cy="281.8929673592198" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="386.62068965517244" cy="315.93088610594896" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="398.8965517241379" cy="314.79901146192145" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="411.17241379310343" cy="263.26144267017514" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="423.44827586206895" cy="183.55186921467325" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="435.7241379310345" cy="321.54633336741813" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<circle cx="448.0" cy="272.207199991757" r="4.5" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<text x="270.0" y="432" text-anchor="middle" class="small">episode index (1..30)</text>
+<text x="90" y="108" class="small" fill="#2563eb">σ ≈ 72</text>
+<text x="730.0" y="78" text-anchor="middle" class="lbl" fill="#059669">G_t − V(s_t)（减去状态相关 baseline）</text>
+<rect x="540" y="90" width="380" height="320" fill="#fbfdff" stroke="#94a3b8" stroke-width="1"/>
+<line x1="540" y1="410.0" x2="920" y2="410.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="534" y="414.0" text-anchor="end" class="small">-200</text>
+<line x1="540" y1="330.0" x2="920" y2="330.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="534" y="334.0" text-anchor="end" class="small">-100</text>
+<line x1="540" y1="250.0" x2="920" y2="250.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="534" y="254.0" text-anchor="end" class="small">0</text>
+<line x1="540" y1="170.0" x2="920" y2="170.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="534" y="174.0" text-anchor="end" class="small">100</text>
+<line x1="540" y1="90.0" x2="920" y2="90.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="534" y="94.0" text-anchor="end" class="small">200</text>
+<line x1="540" y1="250.0" x2="920" y2="250.0" stroke="#ea580c" stroke-width="2" stroke-dasharray="6,4"/>
+<text x="914" y="244.0" text-anchor="end" class="small" fill="#ea580c">mean ≈ 0</text>
+<circle cx="552.0" cy="264.88798994758827" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="564.2758620689655" cy="267.74838150939456" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="576.551724137931" cy="258.25712029991604" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="588.8275862068965" cy="252.55411195692506" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="601.1034482758621" cy="234.8301101192284" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="613.3793103448276" cy="244.0377459143274" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="625.6551724137931" cy="260.736517485572" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="637.9310344827586" cy="272.9658955278969" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="650.2068965517242" cy="262.4941674415969" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="662.4827586206897" cy="220.69788844240233" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="674.7586206896551" cy="269.3907142793881" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="687.0344827586207" cy="244.1257900644142" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="699.3103448275863" cy="239.76354460782005" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="711.5862068965517" cy="285.75383523666676" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="723.8620689655172" cy="248.83661541265693" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="736.1379310344828" cy="218.6501536046303" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="748.4137931034483" cy="298.3447317930463" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="760.6896551724137" cy="257.7182524255761" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="772.9655172413793" cy="252.5473400470164" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="785.2413793103449" cy="269.6142472584883" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="797.5172413793103" cy="238.0626397312179" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="809.7931034482758" cy="251.49471747839095" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="822.0689655172414" cy="285.15175977169736" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="834.344827586207" cy="230.13169891620848" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="846.6206896551724" cy="233.935943444296" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="858.8965517241379" cy="227.29979698222206" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="871.1724137931035" cy="215.42566208337752" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="883.448275862069" cy="241.3061519116398" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="895.7241379310344" cy="247.13742039159715" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<circle cx="908.0" cy="281.18003403355" r="4.5" fill="#dcfce7" stroke="#059669" stroke-width="1.4"/>
+<text x="730.0" y="432" text-anchor="middle" class="small">episode index (1..30)</text>
+<text x="550" y="108" class="small" fill="#059669">σ ≈ 26</text>
+<text x="480.0" y="450" text-anchor="middle" class="formula">E[ ∇log π · (G − b) ] = E[ ∇log π · G ]　（b 不依赖 a → 期望不变）</text>
+<text x="480.0" y="472" text-anchor="middle" class="small">但 Var[ G − b ] 比 Var[ G ] 小很多，梯度估计噪声更低，收敛更稳。最优 b 是 V^π(s)（actor-critic 的来历）。</text>
+</svg>

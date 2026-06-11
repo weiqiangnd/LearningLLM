@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 540" width="880" height="540">
+  <style>
+    text { font-family: Helvetica, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .title { font-size: 18px; font-weight: bold; fill: #1F2937; }
+    .layer-label { font-size: 14px; fill: #374151; }
+    .layer-sub { font-size: 12px; fill: #6B7280; }
+    .node-label { font-size: 17px; font-weight: 600; fill: #1F2937; }
+    .annotation-bold { font-size: 14px; font-weight: bold; fill: #1F2937; }
+    .annotation { font-size: 13px; fill: #374151; }
+    .activation { font-size: 13px; font-weight: bold; fill: #388E3C; }
+    .edge { stroke: #CBD5E1; stroke-width: 1; fill: none; }
+  </style>
+  <rect width="880" height="540" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text class="title" x="440" y="34" text-anchor="middle">2 层 MLP 结构示意（输入 2 维 → 隐藏 4 维 → 输出 1 维）</text>
+
+  <!-- Weight / bias annotations between columns -->
+  <text class="annotation-bold" x="290" y="68" text-anchor="middle">W₁ ∈ ℝ⁴ˣ²,  b₁ ∈ ℝ⁴</text>
+  <text class="annotation"      x="290" y="86" text-anchor="middle">（每条灰线 = W₁ 的一个元素）</text>
+
+  <text class="annotation-bold" x="590" y="68" text-anchor="middle">W₂ ∈ ℝ¹ˣ⁴,  b₂ ∈ ℝ¹</text>
+  <text class="annotation"      x="590" y="86" text-anchor="middle">（每条灰线 = W₂ 的一个元素）</text>
+
+  <!-- Edges: input (x=140) -> hidden (x=440), 2x4 = 8 lines -->
+  <g>
+    <line class="edge" x1="140" y1="220" x2="440" y2="120"/>
+    <line class="edge" x1="140" y1="220" x2="440" y2="240"/>
+    <line class="edge" x1="140" y1="220" x2="440" y2="360"/>
+    <line class="edge" x1="140" y1="220" x2="440" y2="480"/>
+    <line class="edge" x1="140" y1="380" x2="440" y2="120"/>
+    <line class="edge" x1="140" y1="380" x2="440" y2="240"/>
+    <line class="edge" x1="140" y1="380" x2="440" y2="360"/>
+    <line class="edge" x1="140" y1="380" x2="440" y2="480"/>
+  </g>
+
+  <!-- Edges: hidden -> output (x=740, y=300), 4 lines -->
+  <g>
+    <line class="edge" x1="440" y1="120" x2="740" y2="300"/>
+    <line class="edge" x1="440" y1="240" x2="740" y2="300"/>
+    <line class="edge" x1="440" y1="360" x2="740" y2="300"/>
+    <line class="edge" x1="440" y1="480" x2="740" y2="300"/>
+  </g>
+
+  <!-- Input layer nodes -->
+  <g>
+    <circle cx="140" cy="220" r="28" fill="#E3F2FD" stroke="#1976D2" stroke-width="2.5"/>
+    <text class="node-label" x="140" y="226" text-anchor="middle">x₁</text>
+    <circle cx="140" cy="380" r="28" fill="#E3F2FD" stroke="#1976D2" stroke-width="2.5"/>
+    <text class="node-label" x="140" y="386" text-anchor="middle">x₂</text>
+  </g>
+
+  <!-- Hidden layer nodes (with ReLU) -->
+  <g>
+    <circle cx="440" cy="120" r="28" fill="#E8F5E9" stroke="#388E3C" stroke-width="2.5"/>
+    <text class="node-label" x="440" y="126" text-anchor="middle">h₁</text>
+    <circle cx="440" cy="240" r="28" fill="#E8F5E9" stroke="#388E3C" stroke-width="2.5"/>
+    <text class="node-label" x="440" y="246" text-anchor="middle">h₂</text>
+    <circle cx="440" cy="360" r="28" fill="#E8F5E9" stroke="#388E3C" stroke-width="2.5"/>
+    <text class="node-label" x="440" y="366" text-anchor="middle">h₃</text>
+    <circle cx="440" cy="480" r="28" fill="#E8F5E9" stroke="#388E3C" stroke-width="2.5"/>
+    <text class="node-label" x="440" y="486" text-anchor="middle">h₄</text>
+  </g>
+
+  <!-- Output layer node -->
+  <g>
+    <circle cx="740" cy="300" r="32" fill="#FFF3E0" stroke="#F57C00" stroke-width="2.5"/>
+    <text class="node-label" x="740" y="306" text-anchor="middle">y</text>
+  </g>
+
+  <!-- "no activation" note next to output -->
+  <text class="annotation" x="800" y="240" fill="#9CA3AF">最后一层</text>
+  <text class="annotation" x="800" y="258" fill="#9CA3AF">不加激活</text>
+
+  <!-- Layer labels at bottom -->
+  <text class="layer-label" x="140" y="528" text-anchor="middle">输入层 x ∈ ℝ²</text>
+  <text class="layer-label" x="440" y="528" text-anchor="middle">隐藏层 h = ReLU(W₁x + b₁) ∈ ℝ⁴</text>
+  <text class="layer-label" x="740" y="528" text-anchor="middle">输出层 y = W₂h + b₂ ∈ ℝ¹</text>
+</svg>

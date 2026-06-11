@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 970" width="1200" height="970">
+<style>text{font-family:Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;}</style>
+<defs>
+<marker id="ar-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="ar-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="ar-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="ar-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+<marker id="ar-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker>
+<marker id="ar-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker>
+</defs>
+<rect x="0" y="0" width="1200" height="970" fill="#ffffff"/>
+<text x="600.0" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#111827">PyTorch 张量形状操作总览</text>
+<text x="600.0" y="64" text-anchor="middle" font-size="13" fill="#6b7280">每个变换标注 from-shape → to-shape · 颜色按操作语义分组（蓝=重排数据 · 橙=增删 size-1 维 · 紫=Broadcasting · 绿=拼接多张量 · 黄=实战组合）</text>
+<rect x="30" y="85" width="360" height="260" rx="10" ry="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="48" y="112" font-size="15.5" font-weight="700" fill="#1e40af">reshape · view</text>
+<text x="48" y="132" font-size="11.5" fill="#4b5563">改变形状 · 元素总数必须不变 · 不改数据顺序</text>
+<line x1="48" y1="143" x2="372" y2="143" stroke="#2563eb" stroke-width="0.6" opacity="0.5"/>
+<rect x="89.0" y="178" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="125" y="200" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(12,)</text>
+<rect x="259.0" y="178" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="295" y="200" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(3, 4)</text>
+<line x1="170" y1="195" x2="250" y2="195" stroke="#2563eb" stroke-width="1.7" marker-end="url(#ar-blue)"/>
+<rect x="161.1" y="176" width="97.8" height="16" rx="3" fill="#eff6ff" opacity="0.96"/>
+<text x="210.0" y="188" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb" font-family="Menlo,Consolas,monospace">.reshape(3,4)</text>
+<text x="48" y="271" font-size="11.5" fill="#374151">· .reshape(-1, 4) 中的 -1 = 该维由 PyTorch 自动算</text>
+<text x="48" y="287" font-size="11.5" fill="#374151">· view 要求底层 contiguous，否则报错</text>
+<text x="48" y="303" font-size="11.5" fill="#374151">· reshape 在不连续时会偷偷拷贝一份</text>
+<text x="48" y="319" font-size="11.5" fill="#374151">· 新手统一用 reshape 最不容易出错</text>
+<rect x="410" y="85" width="360" height="260" rx="10" ry="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="428" y="112" font-size="15.5" font-weight="700" fill="#1e40af">transpose(dim0, dim1)</text>
+<text x="428" y="132" font-size="11.5" fill="#4b5563">交换两个指定维度（仅两维）</text>
+<line x1="428" y1="143" x2="752" y2="143" stroke="#2563eb" stroke-width="0.6" opacity="0.5"/>
+<rect x="460.2" y="178" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="505" y="200" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(2, 3, 4)</text>
+<rect x="630.2" y="178" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="675" y="200" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(2, 4, 3)</text>
+<line x1="560" y1="195" x2="625" y2="195" stroke="#2563eb" stroke-width="1.7" marker-end="url(#ar-blue)"/>
+<rect x="537.0" y="176" width="111.0" height="16" rx="3" fill="#eff6ff" opacity="0.96"/>
+<text x="592.5" y="188" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb" font-family="Menlo,Consolas,monospace">.transpose(1,2)</text>
+<text x="428" y="271" font-size="11.5" fill="#374151">· 多于两维要重排，请改用 permute</text>
+<text x="428" y="287" font-size="11.5" fill="#374151">· 转置后通常 non-contiguous</text>
+<text x="428" y="303" font-size="11.5" fill="#374151">   后续接 reshape 前需 .contiguous()</text>
+<text x="428" y="319" font-size="11.5" fill="#374151">· Attention 中的 K.transpose(-2, -1)</text>
+<rect x="790" y="85" width="360" height="260" rx="10" ry="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="808" y="112" font-size="15.5" font-weight="700" fill="#1e40af">permute(*dims)</text>
+<text x="808" y="132" font-size="11.5" fill="#4b5563">按指定顺序重排所有维度</text>
+<line x1="808" y1="143" x2="1132" y2="143" stroke="#2563eb" stroke-width="0.6" opacity="0.5"/>
+<rect x="840.2" y="178" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="885" y="200" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(2, 3, 4)</text>
+<rect x="1010.2" y="178" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="1055" y="200" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(4, 2, 3)</text>
+<line x1="940" y1="195" x2="1005" y2="195" stroke="#2563eb" stroke-width="1.7" marker-end="url(#ar-blue)"/>
+<rect x="917.0" y="176" width="111.0" height="16" rx="3" fill="#eff6ff" opacity="0.96"/>
+<text x="972.5" y="188" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb" font-family="Menlo,Consolas,monospace">.permute(2,0,1)</text>
+<text x="808" y="271" font-size="11.5" fill="#374151">· 参数是新顺序下「原维度的下标」</text>
+<text x="808" y="287" font-size="11.5" fill="#374151">   原 dim 2 → 新 dim 0；原 dim 0 → 新 dim 1...</text>
+<text x="808" y="303" font-size="11.5" fill="#374151">· 比 transpose 更灵活，一次重排所有维</text>
+<text x="808" y="319" font-size="11.5" fill="#374151">· 同样导致 non-contiguous</text>
+<rect x="30" y="365" width="360" height="260" rx="10" ry="10" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="48" y="392" font-size="15.5" font-weight="700" fill="#c2410c">unsqueeze(dim)</text>
+<text x="48" y="412" font-size="11.5" fill="#4b5563">在指定位置插入长度 1 的维</text>
+<line x1="48" y1="423" x2="372" y2="423" stroke="#ea580c" stroke-width="0.6" opacity="0.5"/>
+<rect x="89.0" y="440" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="125" y="462" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(3,)</text>
+<rect x="259.0" y="440" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="295" y="462" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(1, 3)</text>
+<line x1="165" y1="457" x2="255" y2="457" stroke="#ea580c" stroke-width="1.7" marker-end="url(#ar-orange)"/>
+<rect x="161.1" y="438" width="97.8" height="16" rx="3" fill="#fff7ed" opacity="0.96"/>
+<text x="210.0" y="450" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c" font-family="Menlo,Consolas,monospace">.unsqueeze(0)</text>
+<rect x="89.0" y="490" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="125" y="512" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(3,)</text>
+<rect x="259.0" y="490" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="295" y="512" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(3, 1)</text>
+<line x1="165" y1="507" x2="255" y2="507" stroke="#ea580c" stroke-width="1.7" marker-end="url(#ar-orange)"/>
+<rect x="157.8" y="488" width="104.39999999999999" height="16" rx="3" fill="#fff7ed" opacity="0.96"/>
+<text x="210.0" y="500" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c" font-family="Menlo,Consolas,monospace">.unsqueeze(-1)</text>
+<text x="48" y="567" font-size="11.5" fill="#374151">· 常用：把 (L,) 单条样本变 (1, L) 喂模型</text>
+<text x="48" y="583" font-size="11.5" fill="#374151">· 给 logits 加掩码前先对齐维度</text>
+<text x="48" y="599" font-size="11.5" fill="#374151">· 等价 None 索引：x[None, :] = unsqueeze(0)</text>
+<rect x="410" y="365" width="360" height="260" rx="10" ry="10" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="428" y="392" font-size="15.5" font-weight="700" fill="#c2410c">squeeze(dim?)</text>
+<text x="428" y="412" font-size="11.5" fill="#4b5563">去掉长度 1 的维 · 不为 1 时不动</text>
+<line x1="428" y1="423" x2="752" y2="423" stroke="#ea580c" stroke-width="0.6" opacity="0.5"/>
+<rect x="460.2" y="440" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="505" y="462" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(1, 3, 1)</text>
+<rect x="639.0" y="440" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="675" y="462" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(3,)</text>
+<line x1="560" y1="457" x2="635" y2="457" stroke="#ea580c" stroke-width="1.7" marker-end="url(#ar-orange)"/>
+<rect x="558.5" y="438" width="78.0" height="16" rx="3" fill="#fff7ed" opacity="0.96"/>
+<text x="597.5" y="450" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c" font-family="Menlo,Consolas,monospace">.squeeze()</text>
+<rect x="460.2" y="490" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="505" y="512" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(1, 3, 1)</text>
+<rect x="630.2" y="490" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.2"/>
+<text x="675" y="512" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(1, 3, 1)</text>
+<line x1="560" y1="507" x2="632" y2="507" stroke="#ea580c" stroke-width="1.7" marker-end="url(#ar-orange)"/>
+<rect x="553.7" y="488" width="84.6" height="16" rx="3" fill="#fff7ed" opacity="0.96"/>
+<text x="596.0" y="500" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c" font-family="Menlo,Consolas,monospace">.squeeze(1)</text>
+<text x="428" y="567" font-size="11.5" fill="#374151">· squeeze(0) → (3, 1) ；只去第 0 维</text>
+<text x="428" y="583" font-size="11.5" fill="#374151">· squeeze(1) 不动（dim 1 长度=3，非 1）</text>
+<text x="428" y="599" font-size="11.5" fill="#374151">· 故意「不为 1 不报错」防 batch=1 时误删 batch 维</text>
+<rect x="790" y="365" width="360" height="260" rx="10" ry="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="808" y="392" font-size="15.5" font-weight="700" fill="#6d28d9">broadcasting</text>
+<text x="808" y="412" font-size="11.5" fill="#4b5563">形状不同也能逐元素运算 · 无内存拷贝</text>
+<line x1="808" y1="423" x2="1132" y2="423" stroke="#7c3aed" stroke-width="0.6" opacity="0.5"/>
+<rect x="822.6" y="428" width="114.80000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="880" y="450" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">A: (2, 3, 4)</text>
+<rect x="835.2" y="468" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="880" y="490" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">B: (3, 4)</text>
+<rect x="1005.2" y="428" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="1050" y="450" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(2, 3, 4)</text>
+<rect x="1005.2" y="468" width="89.60000000000001" height="34" rx="6" ry="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="1050" y="490" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(1, 3, 4)</text>
+<line x1="945" y1="445" x2="995" y2="445" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#ar-purple)"/>
+<rect x="954.1" y="426" width="31.799999999999997" height="16" rx="3" fill="#f5f3ff" opacity="0.96"/>
+<text x="970.0" y="438" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed" font-family="Menlo,Consolas,monospace">右对齐</text>
+<line x1="925" y1="485" x2="995" y2="485" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#ar-purple)"/>
+<rect x="937.5" y="466" width="45.0" height="16" rx="3" fill="#f5f3ff" opacity="0.96"/>
+<text x="960.0" y="478" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed" font-family="Menlo,Consolas,monospace">左侧补 1</text>
+<line x1="1050" y1="503" x2="1050" y2="522" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#ar-purple)"/>
+<rect x="1060" y="503.5" width="71.4" height="16" rx="3" fill="#f5f3ff" opacity="0.96"/>
+<text x="1095.7" y="515.5" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed" font-family="Menlo,Consolas,monospace">逐位 1↔N 扩展</text>
+<rect x="1005.2" y="523" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="1050" y="545" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(2, 3, 4)</text>
+<text x="808" y="583" font-size="11.5" fill="#374151">对齐规则（右→左）：相等 ✓ ｜ 一边为 1 → 拓展 ｜ 缺位 → 补 1</text>
+<text x="808" y="599" font-size="11.5" fill="#374151">注意：矩阵乘 @ 的对齐规则不同，不要混淆</text>
+<rect x="30" y="645" width="360" height="260" rx="10" ry="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="48" y="672" font-size="15.5" font-weight="700" fill="#047857">torch.stack(tensors, dim)</text>
+<text x="48" y="692" font-size="11.5" fill="#4b5563">在新维度上堆叠 · 维数 +1</text>
+<line x1="48" y1="703" x2="372" y2="703" stroke="#059669" stroke-width="0.6" opacity="0.5"/>
+<rect x="80.19999999999999" y="718" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#059669" stroke-width="1.2"/>
+<text x="125" y="740" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">a: (3, 4)</text>
+<rect x="250.2" y="718" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#059669" stroke-width="1.2"/>
+<text x="295" y="740" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">b: (3, 4)</text>
+<line x1="210" y1="753" x2="210" y2="787" stroke="#059669" stroke-width="1.7" marker-end="url(#ar-green)"/>
+<rect x="220" y="761.0" width="130.8" height="16" rx="3" fill="#ecfdf5" opacity="0.96"/>
+<text x="285.4" y="773.0" text-anchor="middle" font-size="11" font-weight="600" fill="#059669" font-family="Menlo,Consolas,monospace">torch.stack(dim=0)</text>
+<rect x="165.2" y="788" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#059669" stroke-width="1.2"/>
+<text x="210" y="810" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(2, 3, 4)</text>
+<text x="48" y="847" font-size="11.5" fill="#374151">· 所有输入 tensor 形状必须完全一致</text>
+<text x="48" y="863" font-size="11.5" fill="#374151">· dim=1 → 把新维插中间 → (3, 2, 4)</text>
+<text x="48" y="879" font-size="11.5" fill="#374151">· 用途：把每个 step 的 hidden 拼成序列</text>
+<rect x="410" y="645" width="360" height="260" rx="10" ry="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="428" y="672" font-size="15.5" font-weight="700" fill="#047857">torch.cat(tensors, dim)</text>
+<text x="428" y="692" font-size="11.5" fill="#4b5563">在已有维度上拼接 · 维数不变</text>
+<line x1="428" y1="703" x2="752" y2="703" stroke="#059669" stroke-width="0.6" opacity="0.5"/>
+<rect x="460.2" y="718" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#059669" stroke-width="1.2"/>
+<text x="505" y="740" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">a: (2, 4)</text>
+<rect x="630.2" y="718" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#059669" stroke-width="1.2"/>
+<text x="675" y="740" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">b: (3, 4)</text>
+<line x1="590" y1="753" x2="590" y2="787" stroke="#059669" stroke-width="1.7" marker-end="url(#ar-green)"/>
+<rect x="600" y="761.0" width="117.6" height="16" rx="3" fill="#ecfdf5" opacity="0.96"/>
+<text x="658.8" y="773.0" text-anchor="middle" font-size="11" font-weight="600" fill="#059669" font-family="Menlo,Consolas,monospace">torch.cat(dim=0)</text>
+<rect x="554.0" y="788" width="72" height="34" rx="6" ry="6" fill="#ffffff" stroke="#059669" stroke-width="1.2"/>
+<text x="590" y="810" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(5, 4)</text>
+<text x="428" y="847" font-size="11.5" fill="#374151">· 拼接维以外的所有维度形状必须一致</text>
+<text x="428" y="863" font-size="11.5" fill="#374151">· KV cache 增长：past_kv 沿 seq 维 torch.cat 新 token</text>
+<text x="428" y="879" font-size="11.5" fill="#374151">· 与 torch.stack 的关键区别：cat 不增加维度数</text>
+<rect x="790" y="645" width="360" height="260" rx="10" ry="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="808" y="672" font-size="15.5" font-weight="700" fill="#92400e">⭐ 实战 · multi-head attention 形状链</text>
+<text x="808" y="692" font-size="11.5" fill="#4b5563">组合 reshape + transpose 的最常见模式</text>
+<line x1="808" y1="703" x2="1132" y2="703" stroke="#d97706" stroke-width="0.6" opacity="0.5"/>
+<rect x="925.2" y="716" width="89.60000000000001" height="34" rx="6" ry="6" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
+<text x="970" y="738" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(B, L, D)</text>
+<rect x="904.2" y="763" width="131.60000000000002" height="34" rx="6" ry="6" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
+<text x="970" y="785" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(B, L, H, D/H)</text>
+<rect x="904.2" y="810" width="131.60000000000002" height="34" rx="6" ry="6" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
+<text x="970" y="832" text-anchor="middle" font-size="13" font-family="Menlo,Consolas,monospace" fill="#111827">(B, H, L, D/H)</text>
+<line x1="970" y1="751" x2="970" y2="762" stroke="#d97706" stroke-width="1.7" marker-end="url(#ar-amber)"/>
+<rect x="980" y="747.5" width="137.39999999999998" height="16" rx="3" fill="#fffbeb" opacity="0.96"/>
+<text x="1048.7" y="759.5" text-anchor="middle" font-size="11" font-weight="600" fill="#d97706" font-family="Menlo,Consolas,monospace">.reshape(B,L,H,D/H)</text>
+<line x1="970" y1="798" x2="970" y2="809" stroke="#d97706" stroke-width="1.7" marker-end="url(#ar-amber)"/>
+<rect x="980" y="794.5" width="117.6" height="16" rx="3" fill="#fffbeb" opacity="0.96"/>
+<text x="1038.8" y="806.5" text-anchor="middle" font-size="11" font-weight="600" fill="#d97706" font-family="Menlo,Consolas,monospace">.transpose(1, 2)</text>
+<text x="808" y="863" font-size="11.5" fill="#374151">把 hidden 维 D 拆成 H 个头，再把头维提到前</text>
+<text x="808" y="879" font-size="11.5" fill="#374151">等价：.permute(0, 2, 1, 3)</text>
+<text x="600.0" y="925" text-anchor="middle" font-size="11.5" fill="#6b7280">速记口诀：reshape 改观察方式（数据不动）｜transpose / permute 换轴｜squeeze / unsqueeze 加减 1 维｜broadcasting 自动对齐｜torch.stack 增维 / torch.cat 同维拼</text>
+</svg>

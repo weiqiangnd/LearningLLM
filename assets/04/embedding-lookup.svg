@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 560">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .monos  { font-size: 12px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="620.0" y="40" text-anchor="middle" class="title">Token Embedding：查表的本质 —— one-hot × 矩阵 E = 抽出对应那一行</text>
+<rect x="45.0" y="145.0" width="150" height="60" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="120" y="171" text-anchor="middle" class="lbl">token id</text>
+<text x="120" y="191" text-anchor="middle" class="small">t = 2</text>
+<line x1="196" y1="175" x2="286" y2="175" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<text x="316.0" y="83" text-anchor="middle" class="sub">one-hot (V=5)</text>
+<rect x="300" y="95" width="32" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6"/>
+<text x="316.0" y="116" text-anchor="middle" class="monos">0</text>
+<text x="288" y="116" text-anchor="end" class="monos" fill="#334155">id 0</text>
+<rect x="300" y="127" width="32" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6"/>
+<text x="316.0" y="148" text-anchor="middle" class="monos">0</text>
+<text x="288" y="148" text-anchor="end" class="monos" fill="#334155">id 1</text>
+<rect x="300" y="159" width="32" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="316.0" y="180" text-anchor="middle" class="monos">1</text>
+<text x="288" y="180" text-anchor="end" class="monos" fill="#334155">id 2</text>
+<rect x="300" y="191" width="32" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6"/>
+<text x="316.0" y="212" text-anchor="middle" class="monos">0</text>
+<text x="288" y="212" text-anchor="end" class="monos" fill="#334155">id 3</text>
+<rect x="300" y="223" width="32" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6"/>
+<text x="316.0" y="244" text-anchor="middle" class="monos">0</text>
+<text x="288" y="244" text-anchor="end" class="monos" fill="#334155">id 4</text>
+<text x="366" y="180" text-anchor="middle" class="title">×</text>
+<text x="482.0" y="83" text-anchor="middle" class="sub">embedding 矩阵 E   [V=5, d=4]</text>
+<rect x="402" y="95" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="422" y="116" text-anchor="middle" class="monos">.11</text>
+<rect x="442" y="95" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="462" y="116" text-anchor="middle" class="monos">-.3</text>
+<rect x="482" y="95" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="502" y="116" text-anchor="middle" class="monos">.02</text>
+<rect x="522" y="95" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="542" y="116" text-anchor="middle" class="monos">.5</text>
+<rect x="402" y="127" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="422" y="148" text-anchor="middle" class="monos">-.2</text>
+<rect x="442" y="127" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="462" y="148" text-anchor="middle" class="monos">.4</text>
+<rect x="482" y="127" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="502" y="148" text-anchor="middle" class="monos">.1</text>
+<rect x="522" y="127" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="542" y="148" text-anchor="middle" class="monos">-.1</text>
+<rect x="402" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="422" y="180" text-anchor="middle" class="monos">.9</text>
+<rect x="442" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="462" y="180" text-anchor="middle" class="monos">-.6</text>
+<rect x="482" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="502" y="180" text-anchor="middle" class="monos">.3</text>
+<rect x="522" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="542" y="180" text-anchor="middle" class="monos">.7</text>
+<rect x="402" y="191" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="422" y="212" text-anchor="middle" class="monos">.0</text>
+<rect x="442" y="191" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="462" y="212" text-anchor="middle" class="monos">.2</text>
+<rect x="482" y="191" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="502" y="212" text-anchor="middle" class="monos">-.4</text>
+<rect x="522" y="191" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="542" y="212" text-anchor="middle" class="monos">.3</text>
+<rect x="402" y="223" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="422" y="244" text-anchor="middle" class="monos">-.5</text>
+<rect x="442" y="223" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="462" y="244" text-anchor="middle" class="monos">.1</text>
+<rect x="482" y="223" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="502" y="244" text-anchor="middle" class="monos">.6</text>
+<rect x="522" y="223" width="40" height="32" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="542" y="244" text-anchor="middle" class="monos">-.2</text>
+<text x="576" y="180" class="small" fill="#ea580c">← 第 2 行</text>
+<text x="658" y="180" text-anchor="middle" class="title">=</text>
+<text x="772" y="83" text-anchor="middle" class="sub">embedding 向量 e_t   [d=4]</text>
+<rect x="692" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="712" y="180" text-anchor="middle" class="monos">.9</text>
+<rect x="732" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="752" y="180" text-anchor="middle" class="monos">-.6</text>
+<rect x="772" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="792" y="180" text-anchor="middle" class="monos">.3</text>
+<rect x="812" y="159" width="40" height="32" fill="#ffedd5" stroke="#ea580c" stroke-width="1.8"/>
+<text x="832" y="180" text-anchor="middle" class="monos">.7</text>
+<text x="772" y="215" text-anchor="middle" class="small" fill="#ea580c">就是 E 的第 2 行</text>
+<rect x="60" y="360" width="1120" height="50" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="620.0" y="391" text-anchor="middle" class="lbl" fill="#2563eb">one-hot 乘矩阵 = 抽出对应行 → 实现上直接「按行号索引（查表）」即可，不必真做大矩阵乘法</text>
+<rect x="60" y="445" width="1120" height="92" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="80" y="473" class="lbl">weight tying（权重共享）</text>
+<text x="80" y="499" class="sub">输入端 embedding 矩阵 E 形状 [V, d]；输出端 lm_head 形状 [d, V] —— 二者互为转置。</text>
+<text x="80" y="521" class="sub">很多模型令 W_out = E^T，让「id→向量」与「向量→词表分数」共享同一套语义，省一份参数。</text>
+</svg>

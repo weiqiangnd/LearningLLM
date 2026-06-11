@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 560">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .monos  { font-size: 12px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="590.0" y="40" text-anchor="middle" class="title">自注意力看不见顺序：打乱输入，token a 的注意力分数集合不变</text>
+<text x="60" y="106" class="lbl">原始顺序 (a, b, c)</text>
+<rect x="90" y="124" width="62" height="52" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="121" y="157" text-anchor="middle" class="lbl">a</text>
+<rect x="185" y="124" width="62" height="52" rx="10" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="216" y="157" text-anchor="middle" class="lbl">b</text>
+<rect x="280" y="124" width="62" height="52" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="311" y="157" text-anchor="middle" class="lbl">c</text>
+<text x="370" y="142" class="sub">token a 算出的分数集合：</text>
+<rect x="370" y="154" width="360" height="34" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="386" y="176" class="mono">{ a·a , a·b , a·c }</text>
+<text x="60" y="256" class="lbl">打乱顺序 (c, b, a)</text>
+<rect x="90" y="274" width="62" height="52" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="121" y="307" text-anchor="middle" class="lbl">c</text>
+<rect x="185" y="274" width="62" height="52" rx="10" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="216" y="307" text-anchor="middle" class="lbl">b</text>
+<rect x="280" y="274" width="62" height="52" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="311" y="307" text-anchor="middle" class="lbl">a</text>
+<text x="370" y="292" class="sub">token a 算出的分数集合：</text>
+<rect x="370" y="304" width="360" height="34" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="386" y="326" class="mono">{ a·a , a·c , a·b }</text>
+<text x="765" y="249.0" text-anchor="middle" class="title" fill="#059669">=</text>
+<text x="820" y="231.0" class="lbl" fill="#059669">同一个集合</text>
+<text x="820" y="255.0" class="small">只是排列变了，</text>
+<text x="820" y="275.0" class="small">softmax 聚合结果一样</text>
+<rect x="60" y="420" width="1060" height="64" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="590.0" y="447" text-anchor="middle" class="lbl" fill="#ea580c">注意力分数 = 向量点积，只看「是哪两个向量」，不看「排第几位」</text>
+<text x="590.0" y="470" text-anchor="middle" class="sub">⇒ 自注意力把序列当成无序集合（置换等变）→ 必须额外注入位置编码</text>
+<text x="590.0" y="538" text-anchor="middle" class="cap">embedding 查表丢了顺序、点积算分又不看位置 —— 对 attention 而言「狗咬人」和「人咬狗」没区别，所以位置编码是刚需。</text>
+</svg>

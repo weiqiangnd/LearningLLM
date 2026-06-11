@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 470">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .monos  { font-size: 12px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="740.0" y="40" text-anchor="middle" class="title">lm_head 在流水线的哪一步：隐藏向量 h（每位置 d 维）→ 词表分数 logits</text>
+<rect x="50.0" y="175.0" width="130" height="80" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="115" y="211" text-anchor="middle" class="lbl">input_ids</text>
+<text x="115" y="232" text-anchor="middle" class="small">[B, L]</text>
+<rect x="247.5" y="175.0" width="185" height="80" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="340" y="211" text-anchor="middle" class="lbl">token embedding</text>
+<text x="340" y="232" text-anchor="middle" class="small">查表(+位置)→[B,L,d]</text>
+<rect x="490.0" y="175.0" width="170" height="80" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="575" y="211" text-anchor="middle" class="lbl">Transformer × N</text>
+<text x="575" y="232" text-anchor="middle" class="small">注意力 + FFN 堆叠</text>
+<rect x="730.0" y="175.0" width="180" height="80" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="3"/>
+<text x="820" y="211" text-anchor="middle" class="lbl">隐藏向量 h</text>
+<text x="820" y="232" text-anchor="middle" class="small">[B, L, d]</text>
+<rect x="977.5" y="175.0" width="195" height="80" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+<text x="1075" y="211" text-anchor="middle" class="lbl">lm_head（线性）</text>
+<text x="1075" y="232" text-anchor="middle" class="small">[d, V] · 本节主角</text>
+<rect x="1250.0" y="175.0" width="160" height="80" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="1330" y="211" text-anchor="middle" class="lbl">logits</text>
+<text x="1330" y="232" text-anchor="middle" class="small">[B, L, V]</text>
+<line x1="182.0" y1="215" x2="243.5" y2="215" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="434.5" y1="215" x2="486.0" y2="215" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="662.0" y1="215" x2="726.0" y2="215" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="912.0" y1="215" x2="973.5" y2="215" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="1174.5" y1="215" x2="1246.0" y2="215" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="1330" y="285.0" text-anchor="middle" class="small" fill="#ea580c">→ softmax / 采样</text>
+<text x="1330" y="305.0" text-anchor="middle" class="small" fill="#ea580c">→ 下一个 token</text>
+<path d="M 340,175.0 C 340,100 1075,100 1075,175.0" stroke="#7c3aed" stroke-width="2" fill="none" stroke-dasharray="6,4" marker-end="url(#aPurple)"/>
+<text x="707.5" y="92" text-anchor="middle" class="small" fill="#7c3aed">weight tying：lm_head 权重 = embedding 矩阵的转置 E^T（可共享一份）</text>
+<rect x="60" y="320" width="1360" height="118" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="80" y="348" class="lbl" fill="#0d9488">h 是什么？</text>
+<text x="80" y="372" class="sub">最后一层 Transformer 输出的、每个位置一个的隐藏向量，维度 d（和 embedding 同维）。长度 L 的序列就有 L 个 h。</text>
+<text x="80" y="402" class="lbl" fill="#7c3aed">这一步发生在哪？</text>
+<text x="80" y="426" class="sub">就在最后：lm_head 把每个 h（d 维）线性映射成词表上的 V 个分数 logits——本节的 weight tying 说的就是它的权重可与输入 embedding 共享。</text>
+</svg>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 540">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="560.0" y="40" text-anchor="middle" class="title">Byte-level BPE（BBPE）：先转 UTF-8 字节，从根上消灭 OOV</text>
+<rect x="60" y="76" width="1000" height="120" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,4"/>
+<text x="80" y="100" class="lbl" fill="#dc2626">字符级 BPE：词表里没有的字 → UNK（信息丢失）</text>
+<rect x="100.0" y="122.0" width="130" height="56" rx="11" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+<text x="165" y="146" text-anchor="middle" class="lbl">中</text>
+<text x="165" y="166" text-anchor="middle" class="small">（假设训练没见过）</text>
+<line x1="232" y1="150" x2="322" y2="150" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)"/>
+<rect x="340.0" y="122.0" width="150" height="56" rx="11" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+<text x="415" y="146" text-anchor="middle" class="lbl">查字符词表</text>
+<text x="415" y="166" text-anchor="middle" class="small">找不到这个字</text>
+<line x1="492" y1="150" x2="582" y2="150" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)"/>
+<rect x="600.0" y="122.0" width="120" height="56" rx="11" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="660" y="146" text-anchor="middle" class="lbl">[UNK]</text>
+<text x="660" y="166" text-anchor="middle" class="small">未知符号</text>
+<line x1="722" y1="150" x2="812" y2="150" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)"/>
+<rect x="835.0" y="122.0" width="150" height="56" rx="11" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+<text x="910" y="146" text-anchor="middle" class="lbl">decode 还原</text>
+<text x="910" y="166" text-anchor="middle" class="small">→ �  还原失败</text>
+<rect x="300" y="249" width="520" height="52" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="560" y="273" text-anchor="middle" class="lbl" fill="#ea580c">基础词表 = 全部 256 个字节</text>
+<text x="560" y="292" text-anchor="middle" class="small">任何 Unicode 字符都能拆成字节，且字节只有 256 种 → 永远不会 OOV</text>
+<rect x="60" y="356" width="1000" height="120" rx="12" fill="#dcfce7" stroke="#059669" stroke-width="1.5" stroke-dasharray="5,4"/>
+<text x="80" y="380" class="lbl" fill="#059669">字节级 BPE：先 UTF-8 编码成字节，每个字节都在 256 基础词表里</text>
+<rect x="100.0" y="402.0" width="130" height="56" rx="11" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+<text x="165" y="426" text-anchor="middle" class="lbl">中</text>
+<text x="165" y="446" text-anchor="middle" class="small">同一个字</text>
+<line x1="232" y1="430" x2="322" y2="430" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="340.0" y="402.0" width="160" height="56" rx="11" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+<text x="420" y="426" text-anchor="middle" class="lbl">UTF-8 编码</text>
+<text x="420" y="446" text-anchor="middle" class="small">E4 B8 AD（3 字节）</text>
+<line x1="502" y1="430" x2="592" y2="430" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="605.0" y="402.0" width="150" height="56" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="680" y="426" text-anchor="middle" class="lbl">字节 token</text>
+<text x="680" y="446" text-anchor="middle" class="small">(可再被合并)</text>
+<line x1="757" y1="430" x2="847" y2="430" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="870.0" y="402.0" width="140" height="56" rx="11" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+<text x="940" y="426" text-anchor="middle" class="lbl">decode 还原</text>
+<text x="940" y="446" text-anchor="middle" class="small">→ 中  ✓</text>
+<text x="560.0" y="510" text-anchor="middle" class="cap">GPT-2、Qwen、Llama 等都用 byte-level BPE：多语言 / emoji / 生僻字一律先转字节再合并，根除 UNK。代价是没被合并的字符要占多个 token（一个汉字最多 3 个）。</text>
+</svg>

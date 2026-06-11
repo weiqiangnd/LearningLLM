@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="aGray" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#94a3b8"/>
+    </marker>
+    <marker id="aOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <marker id="aPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+    .title { font-size: 22px; font-weight: 700; fill: #1e293b; }
+    .sub   { font-size: 13px; fill: #475569; }
+    .lbl   { font-size: 14px; font-weight: 600; fill: #1e293b; }
+    .small { font-size: 12px; fill: #475569; }
+    .formula { font-size: 14px; fill: #1e293b; font-style: italic; }
+    .muted { fill: #94a3b8; }
+  </style>
+<rect x="50.0" y="190.0" width="120" height="80" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="110" y="226" text-anchor="middle" class="lbl">参数 θ</text>
+<text x="110" y="248" text-anchor="middle" class="small">策略网络 π_θ 的权重</text>
+<rect x="220.0" y="190.0" width="140" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="290" y="226" text-anchor="middle" class="lbl">① 采样 N 条 rollout</text>
+<text x="290" y="248" text-anchor="middle" class="small">用 π_θ 与环境交互</text>
+<rect x="405.0" y="190.0" width="150" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="480" y="226" text-anchor="middle" class="lbl">② 算每步 G_t</text>
+<text x="480" y="248" text-anchor="middle" class="small">G_t = r_t + γG_{t+1}</text>
+<rect x="595.0" y="190.0" width="170" height="80" rx="10" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="680" y="226" text-anchor="middle" class="lbl">③ 算 ∇log π · G_t</text>
+<text x="680" y="248" text-anchor="middle" class="small">对每条轨迹每一步</text>
+<rect x="820.0" y="190.0" width="140" height="80" rx="10" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="890" y="226" text-anchor="middle" class="lbl">④ N 条平均</text>
+<text x="890" y="248" text-anchor="middle" class="small">得 ∇_θ J̃（MC 估计）</text>
+<rect x="1020.0" y="190.0" width="120" height="80" rx="10" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="1080" y="226" text-anchor="middle" class="lbl">⑤ θ ← θ + η·∇J̃</text>
+<text x="1080" y="248" text-anchor="middle" class="small">梯度上升一步</text>
+<line x1="170.0" y1="230" x2="216.0" y2="230" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="360.0" y1="230" x2="401.0" y2="230" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="555.0" y1="230" x2="591.0" y2="230" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="765.0" y1="230" x2="816.0" y2="230" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="960.0" y1="230" x2="1016.0" y2="230" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<path d="M 1080,190.0 C 1080,110 110,110 110,190.0" stroke="#ea580c" stroke-width="2" fill="none" stroke-dasharray="6,4" marker-end="url(#aOrange)"/>
+<text x="595.0" y="100" text-anchor="middle" class="small" fill="#ea580c">更新后的 θ 回到下一轮 rollout</text>
+<rect x="80" y="350" width="1040" height="120" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,3"/>
+<text x="100" y="374" class="lbl">理论 ↔ 工程的对应</text>
+<text x="100" y="398" class="small">• 理论目标：∇_θ J(θ) = 𝔼_{τ~π_θ}[ Σ_t ∇log π_θ(a_t|s_t) · G_t ]　——一个对 trajectory 分布的期望，没法直接算。</text>
+<text x="100" y="420" class="small">• 蒙特卡洛估计（步骤 ①②③④）：从 π_θ 采 N 条 trajectory，平均括号里的量，得到无偏估计 ∇_θ J̃。</text>
+<text x="100" y="442" class="small">• 梯度上升（步骤 ⑤）：θ ← θ + η · ∇_θ J̃。注意是 +，因为要"最大化" J；PyTorch 里把 loss 写成 −J 后照常 .backward()。</text>
+</svg>

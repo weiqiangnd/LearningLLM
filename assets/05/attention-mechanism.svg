@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .monos  { font-size: 12px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="640.0" y="42" text-anchor="middle" class="title">Attention：解码每一步「回看」编码器全部隐藏态，动态算一个 cₜ</text>
+<text x="150" y="86" text-anchor="middle" class="lbl" fill="#2563eb">编码器隐藏态</text>
+<rect x="96.0" y="94.0" width="108" height="52" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="116" text-anchor="middle" class="lbl">h₁</text>
+<text x="150" y="136" text-anchor="middle" class="small">源位置 1</text>
+<rect x="96.0" y="186.0" width="108" height="52" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="208" text-anchor="middle" class="lbl">h₂</text>
+<text x="150" y="228" text-anchor="middle" class="small">源位置 2</text>
+<rect x="96.0" y="278.0" width="108" height="52" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="300" text-anchor="middle" class="lbl">h₃</text>
+<text x="150" y="320" text-anchor="middle" class="small">源位置 3</text>
+<rect x="96.0" y="370.0" width="108" height="52" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="392" text-anchor="middle" class="lbl">h₄</text>
+<text x="150" y="412" text-anchor="middle" class="small">源位置 4</text>
+<rect x="346.0" y="481.0" width="188" height="58" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="440" y="506" text-anchor="middle" class="lbl">sₜ₋₁</text>
+<text x="440" y="526" text-anchor="middle" class="small">解码器上一步隐藏 = query</text>
+<text x="440" y="470" text-anchor="middle" class="small" fill="#334155">「我现在想生成什么」</text>
+<text x="440" y="86" text-anchor="middle" class="lbl" fill="#ea580c">① 打分 eₜⱼ</text>
+<text x="440" y="106" text-anchor="middle" class="small">align(sₜ₋₁, hⱼ)</text>
+<rect x="394.0" y="97.0" width="92" height="46" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="440" y="125" text-anchor="middle" class="mono">0.4</text>
+<line x1="204" y1="120" x2="394" y2="120" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="394.0" y="189.0" width="92" height="46" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="440" y="217" text-anchor="middle" class="mono">2.1</text>
+<line x1="204" y1="212" x2="394" y2="212" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="394.0" y="281.0" width="92" height="46" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="440" y="309" text-anchor="middle" class="mono">0.7</text>
+<line x1="204" y1="304" x2="394" y2="304" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="394.0" y="373.0" width="92" height="46" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="440" y="401" text-anchor="middle" class="mono">-0.3</text>
+<line x1="204" y1="396" x2="394" y2="396" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<path d="M 440 481 L 440 423" fill="none" stroke="#059669" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aGreen)"/>
+<text x="454" y="453.0" class="small" fill="#059669">query 和每个 hⱼ 配对打分</text>
+<text x="660" y="86" text-anchor="middle" class="lbl" fill="#7c3aed">② softmax</text>
+<text x="660" y="106" text-anchor="middle" class="small">αₜⱼ（和为 1）</text>
+<line x1="486" y1="120" x2="590" y2="120" stroke="#ea580c" stroke-width="2" marker-end="url(#aOrange)"/>
+<rect x="590" y="107" width="26.0" height="26" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="624.0" y="125" class="monos" fill="#7c3aed">0.12</text>
+<line x1="486" y1="212" x2="590" y2="212" stroke="#ea580c" stroke-width="2" marker-end="url(#aOrange)"/>
+<rect x="590" y="199" width="107.0" height="26" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="705.0" y="217" class="monos" fill="#7c3aed">0.66</text>
+<line x1="486" y1="304" x2="590" y2="304" stroke="#ea580c" stroke-width="2" marker-end="url(#aOrange)"/>
+<rect x="590" y="291" width="32.0" height="26" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="630.0" y="309" class="monos" fill="#7c3aed">0.16</text>
+<line x1="486" y1="396" x2="590" y2="396" stroke="#ea580c" stroke-width="2" marker-end="url(#aOrange)"/>
+<rect x="590" y="383" width="17.0" height="26" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="615.0" y="401" class="monos" fill="#7c3aed">0.06</text>
+<text x="980" y="86" text-anchor="middle" class="lbl" fill="#dc2626">③ 加权求和</text>
+<text x="980" y="106" text-anchor="middle" class="small">cₜ = Σ αₜⱼ hⱼ</text>
+<line x1="755" y1="120" x2="922" y2="258.0" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<line x1="755" y1="212" x2="922" y2="258.0" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<line x1="755" y1="304" x2="922" y2="258.0" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<line x1="755" y1="396" x2="922" y2="258.0" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<rect x="922.0" y="226.0" width="116" height="64" rx="11" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="980" y="254.0" text-anchor="middle" class="lbl">cₜ</text>
+<text x="980" y="274.0" text-anchor="middle" class="small">上下文向量</text>
+<rect x="905.0" y="380.0" width="150" height="56" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="980" y="404.0" text-anchor="middle" class="lbl">yₜ</text>
+<text x="980" y="424.0" text-anchor="middle" class="small">本步输出 token</text>
+<line x1="980" y1="290.0" x2="980" y2="380.0" stroke="#dc2626" stroke-width="2.2" marker-end="url(#aRed)"/>
+<text x="1066" y="353.0" text-anchor="middle" class="small" fill="#334155">cₜ 与 sₜ₋₁</text>
+<text x="1066" y="371.0" text-anchor="middle" class="small" fill="#334155">一起生成 yₜ</text>
+<rect x="60" y="548" width="1160" height="46" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="640.0" y="577" text-anchor="middle" class="lbl" fill="#2563eb">关键：cₜ 每一步都不一样 —— 该看源句哪里，由当前 query 和各 hⱼ 的匹配度（注意力权重）动态决定</text>
+</svg>

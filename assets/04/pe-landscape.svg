@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 23px; font-weight: 700; fill: #1e293b; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #1e293b; }
+    .sub    { font-size: 13px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .monos  { font-size: 12px; font-family: 'SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #1e293b; }
+    .small  { font-size: 12.5px; fill: #334155; }
+    .cap    { font-size: 13.5px; fill: #334155; }
+    .tag    { font-size: 12px; font-weight: 600; }
+  </style>
+<text x="640.0" y="40" text-anchor="middle" class="title">四种位置编码：注入的位置不同 —— 改输入（绝对）vs 改注意力（相对）</text>
+<rect x="65.0" y="98.0" width="150" height="64" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="140" y="126" text-anchor="middle" class="lbl">input_ids</text>
+<text x="140" y="146" text-anchor="middle" class="small">[B, L]</text>
+<rect x="280.0" y="98.0" width="160" height="64" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="360" y="126" text-anchor="middle" class="lbl">token embedding</text>
+<text x="360" y="146" text-anchor="middle" class="small">查表 → [B, L, d]</text>
+<rect x="520.0" y="98.0" width="180" height="64" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="610" y="126" text-anchor="middle" class="lbl">+ 位置（路线 A）</text>
+<text x="610" y="146" text-anchor="middle" class="small">加到输入向量上</text>
+<rect x="795.0" y="98.0" width="190" height="64" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="890" y="126" text-anchor="middle" class="lbl">自注意力（路线 B）</text>
+<text x="890" y="146" text-anchor="middle" class="small">算分时注入相对位置</text>
+<rect x="1065.0" y="98.0" width="150" height="64" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1140" y="126" text-anchor="middle" class="lbl">logits</text>
+<text x="1140" y="146" text-anchor="middle" class="small">→ 下一个 token</text>
+<line x1="217.0" y1="130" x2="276.0" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="442.0" y1="130" x2="516.0" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="702.0" y1="130" x2="791.0" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="987.0" y1="130" x2="1061.0" y2="130" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="60" y1="205" x2="1220" y2="205" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="340.0" y="245" text-anchor="middle" class="lbl" fill="#ea580c">路线 A：加到输入 embedding（绝对位置）</text>
+<rect x="60" y="262" width="560" height="150" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<rect x="76" y="278" width="118" height="24" rx="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.4"/>
+<text x="135" y="295" text-anchor="middle" class="tag" fill="#ea580c">sinusoidal</text>
+<text x="210" y="296" class="lbl">正弦位置编码</text>
+<text x="76" y="324" class="small">公式算 · 不占参数　（绝对）</text>
+<text x="76" y="348" class="sub">• 固定 sin/cos 公式给每个位置算向量</text>
+<text x="76" y="370" class="sub">• 可外推但效果一般；原始 Transformer 用</text>
+<rect x="60" y="430" width="560" height="150" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<rect x="76" y="446" width="118" height="24" rx="6" fill="#ffffff" stroke="#ea580c" stroke-width="1.4"/>
+<text x="135" y="463" text-anchor="middle" class="tag" fill="#ea580c">learned</text>
+<text x="210" y="464" class="lbl">可学习位置编码</text>
+<text x="76" y="492" class="small">一张位置表 · 占参数　（绝对）</text>
+<text x="76" y="516" class="sub">• 再来一张 nn.Embedding 学位置向量</text>
+<text x="76" y="538" class="sub">• 灵活但上下文长度被限死为 max_len；GPT-2/BERT 用</text>
+<text x="940.0" y="245" text-anchor="middle" class="lbl" fill="#2563eb">路线 B：改注意力算分（相对位置）</text>
+<rect x="660" y="262" width="560" height="150" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<rect x="676" y="278" width="118" height="24" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.4"/>
+<text x="735" y="295" text-anchor="middle" class="tag" fill="#2563eb">RoPE</text>
+<text x="810" y="296" class="lbl">旋转位置编码</text>
+<text x="676" y="324" class="small">旋转 q/k · 不占参数　（相对）</text>
+<text x="676" y="348" class="sub">• 按位置旋转 q/k，点积只依赖相对距离</text>
+<text x="676" y="370" class="sub">• 外推友好，当下主流：Llama/Qwen/Mistral</text>
+<rect x="660" y="430" width="560" height="150" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<rect x="676" y="446" width="118" height="24" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.4"/>
+<text x="735" y="463" text-anchor="middle" class="tag" fill="#2563eb">ALiBi</text>
+<text x="810" y="464" class="lbl">线性偏置注意力</text>
+<text x="676" y="492" class="small">加偏置 · 不占参数　（相对）</text>
+<text x="676" y="516" class="sub">• 给分数按距离减线性惩罚（每头一斜率）</text>
+<text x="676" y="538" class="sub">• 外推极好但先验偏强；BLOOM/MPT 用</text>
+</svg>
