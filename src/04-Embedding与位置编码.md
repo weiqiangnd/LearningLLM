@@ -677,7 +677,7 @@ print("数值范围:", float(pe.min()), "~", float(pe.max()))  # 落在 [-1, 1]
 # 画热力图：横轴 = 维度，纵轴 = 位置；能看到沿维度方向频率渐变的条纹
 plt.figure(figsize=(7, 5))
 plt.imshow(pe.numpy(), aspect="auto", cmap="RdBu")
-plt.xlabel("embedding dimension")        # matplotlib 标签一律用英文，避免豆腐块
+plt.xlabel("embedding dimension")        # matplotlib 标签一律用英文，避免乱码
 plt.ylabel("position")
 plt.title("Sinusoidal Positional Encoding")
 plt.colorbar(label="value")

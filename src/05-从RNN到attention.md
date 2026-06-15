@@ -349,6 +349,12 @@ Luong 还提了一组正交的概念，顺带一提：
 
 > 下面给出本章全部可运行代码（**Cell 0 ~ Cell 10**），逐个 cell 讲解；你既可以照着这里一段段读，也可以从本章顶部的 Open in Colab 直链（这些 cell 的可运行副本）直接 Run All。全程 CPU、约 2–4 分钟。
 
+在逐个 cell 拆解之前，先看一张「全局地图」：下面这张图把 **Cell 3~8 的核心方法**各自干了什么、输入/输出是哪些张量（标了形状）、有哪些关键变量，以及整条流水线怎么从 `make_batch` 的数据一路串到 `train` 的反向更新，浓缩在了一起。读下面的代码时可以对照着看——先认清「数据从哪来、流到哪去」，再钻进每个 cell 的细节就不容易迷路：
+
+![实战代码流水线：Cell 3–8 的核心方法、输入/输出张量形状与组装关系](../assets/05/code-pipeline.png)
+
+几条对照图读代码的线索：**Cell 3** 造数据（`src`/`src_len` 喂编码器，`tgt_in` 给解码器做 teacher forcing 的输入，`tgt_out` 给 `train` 当损失目标）；**Cell 7** 的 `Seq2Seq.forward` 是「总装车间」，里面先调 **Cell 4** 的 `Encoder` 把源序列读成 `H` 与初始隐藏 `s₀`，再进入 `for t` 循环逐步解码——每一步 **Cell 6** 的 `Decoder.step` 内部调用 **Cell 5** 的 `BahdanauAttention` 拿到 `context`，更新出 `sₜ`、吐出 `logitsₜ`，`sₜ` 再回流当下一步的 `sₜ₋₁`；循环跑完堆成 `logits [B,T,V]` 交给 **Cell 7** 的 `train` 算交叉熵、反向更新整个 `Seq2Seq` 的参数；**Cell 8** 则是入口，用 `use_attention=True/False` 建两个模型各训 1500 步做对比。
+
 ### 8.1 任务、数据与环境
 
 **Cell 0** 是常规的环境自检，照例打印 PyTorch 版本与 CUDA 可用性——但本章用不到 GPU，CPU 即可：
@@ -681,7 +687,7 @@ print("模型预测     :", (pred[:L]).sub(DIGIT0).tolist())
 
 plt.figure(figsize=(5, 4))
 plt.imshow(A, cmap="viridis", aspect="auto")
-plt.xlabel("source position j")            # matplotlib 标签一律英文，避免豆腐块
+plt.xlabel("source position j")            # matplotlib 标签一律英文，避免乱码
 plt.ylabel("decoder step t")
 plt.title("Bahdanau Attention Alignment (reverse task)")
 plt.colorbar(label="attention weight")
