@@ -75,7 +75,7 @@ $$
 \mathbf{h}_t = \tanh(W_{hh}\thinspace \mathbf{h}_{t-1} + W_{xh}\thinspace \mathbf{x}_t + \mathbf{b})
 $$
 
-其中 $\mathbf{h}\_t \in \mathbb{R}^{d_h}$ 是 $d_h$ 维隐藏状态， $\mathbf{x}\_t \in \mathbb{R}^{d_x}$ 是 $d_x$ 维当前输入向量； $W_{hh} \in \mathbb{R}^{d_h \times d_h}$ 把旧隐藏映射到新隐藏、 $W_{xh} \in \mathbb{R}^{d_h \times d_x}$ 把输入映射到隐藏， $\mathbf{b} \in \mathbb{R}^{d_h}$ 是偏置； $\tanh$ 是逐元素的非线性激活（把数值压到 $[\thinspace {-1},\ 1\thinspace ]$ ，防止反复相乘后爆炸）。初始记忆 $h_0$ 一般置零。
+其中 $\mathbf{h}\_t \in \mathbb{R}^{d_h}$ 是 $d_h$ 维隐藏状态， $\mathbf{x}\_t \in \mathbb{R}^{d_x}$ 是 $d_x$ 维当前输入向量； $W_{hh} \in \mathbb{R}^{d_h \times d_h}$ 把旧隐藏映射到新隐藏、 $W_{xh} \in \mathbb{R}^{d_h \times d_x}$ 把输入映射到隐藏， $\mathbf{b} \in \mathbb{R}^{d_h}$ 是偏置； $\tanh$ 是逐元素的非线性激活（把数值压到 $({-1},\ 1)$ ，防止反复相乘后爆炸）。初始记忆 $h_0$ 一般置零。
 
 这里有两个要点，请务必记住，它们是后面所有讨论的地基：
 
@@ -679,7 +679,7 @@ pred = logits.argmax(-1)[0]                 # [T]
 
 src_digits = (src[0] - DIGIT0).tolist()     # 还原成 0..9 便于看
 L = src_len.item()
-A = attn[0, :L, :L].numpy()                  # [T, S] 只取有效部分
+A = attn[0, :L, :L].numpy()                  # [L, L] 只取有效部分
 
 print("源序列(数字):", src_digits[:L])
 print("目标(逆序)  :", (tgt_out[0, :L]).sub(DIGIT0).tolist())
