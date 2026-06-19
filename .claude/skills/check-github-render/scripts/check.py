@@ -319,6 +319,44 @@ def markdown_layer_issues(md_text: str, lines: list[str]) -> list[Issue]:
                     "(`**输出层**（lm_head）`, not `**输出层（lm_head）**`).",
                 ))
 
+        # Rule D: emphasis eating inline math (complements the static `}_<char>`
+        # rules 11a/b in check_file). Those only model `}_`-type openers pairing
+        # with other `}_` baits, so they miss the case where the *closing* `_`
+        # is right-flanking but NOT preceded by `}` — e.g. `$\text{head}_h$ 个 …
+        # $d_{\text{model}}$`, where `}_h` opens emphasis and the `_` in `d_{`
+        # (preceded by a letter, followed by `{`) closes it, swallowing both
+        # spans (GitHub renders `head<em>h$ … $d</em>{model}`, subscripts gone).
+        #
+        # Detection: an *accidental* emphasis is one whose `_`/`*` delimiters
+        # live INSIDE the math. GitHub extracts each `$…$` atomically, so masking
+        # the math spans first reproduces GitHub's "intended" rendering. We
+        # render the line twice — as-is and with every `$…$` replaced by a neutral
+        # placeholder — and flag only when the real render grows EXTRA emphasis
+        # tags. That distinguishes the bug from the very common, perfectly fine
+        # `**bold text with $math$ inside**` (whose emphasis comes from the
+        # literal `**`, present in both renders). Restricted to lines with ≥2
+        # inline spans — the cross-span regime where this actually breaks; single
+        # spans GitHub protects atomically (and scenario (a) is caught by 11a).
+        if _COMMONMARK is not None and "$" in no_code and \
+                ("_" in no_code or "*" in no_code) and \
+                len(re.findall(r"(?<!\$)\$(?!\$)", no_code)) >= 4:
+            masked = re.sub(r"\$\$[^$]*\$\$", lambda m: "M" * len(m.group(0)), line)
+            masked = re.sub(r"\$[^$\n]+?\$", lambda m: "M" * len(m.group(0)), masked)
+
+            def _emph_tags(s: str) -> int:
+                html = re.sub(r"<code>.*?</code>", "",
+                              _COMMONMARK.renderInline(s))
+                return len(re.findall(r"<(?:em|strong)>", html))
+
+            if _emph_tags(line) > _emph_tags(masked):
+                issues.append(Issue(
+                    idx, "emphasis-eats-math", line.strip()[:80],
+                    "`_`/`*` inside inline math paired into emphasis across a "
+                    "`$…$` boundary and swallowed a math span (GitHub renders it "
+                    "as <em>…$…$…</em>; subscripts vanish). Escape the opening `_` "
+                    r"(e.g. `$\text{head}\_h$`) or move the math into a `$$` block.",
+                ))
+
     return issues
 
 
@@ -370,6 +408,10 @@ def render_via_mathjax(items: list[tuple[str, bool]]) -> list[dict]:
 #   pipe-in-table-math       — literal `|` inside math on a GFM table row.
 #   angle-in-subscript       — `<` / `>` inside `_{...}` / `^{...}`.
 #   emphasis-eats-subscript  — `}_<letter>` inside inline math with `[`.
+#   emphasis-eats-math       — emphasis (`_`/`*`) paired across/into inline math
+#                              and swallowed a whole `$…$` span (render-based;
+#                              catches the right-flanking-closer blind spot the
+#                              static `}_` heuristics miss, e.g. `$…}_h$ … $d_{…}$`).
 #   emphasis-flanking        — `**bold**` closing `**` wedged between full-width
 #                              punctuation and CJK; leaks literal `**`.
 #   stray-tilde              — ≥2 bare `~` in one scope; GFM strikes the middle.
