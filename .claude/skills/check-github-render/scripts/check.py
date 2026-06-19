@@ -169,6 +169,20 @@ _BAD_SPACING_HINT = {
 # source — that's an implementation detail the PDF pipeline owns.
 _NE_NON_CANONICAL_RE = re.compile(r'\\char(?![A-Za-z])|\\not\s*=|\\unicode\s*\{\s*x2260\s*\}|≠')
 
+# Multi-row LaTeX environments / explicit row breaks that render UNRELIABLY
+# when placed inside an *inline* `$...$` span on github.com. GitHub renders
+# inline math in text/inline style, where a `pmatrix` / `cases` / `aligned`
+# (or a bare `\cr` / `\\` row break) often collapses, overlaps, or simply
+# fails to lay out as a stacked matrix — even though the SAME TeX renders
+# fine inside a `$$...$$` display block. (Server-side contact-sheet rendering
+# masks this because it forces display style.) The fix is always: move the
+# multi-row math into its own `$$` block. Detected only on inline spans.
+_INLINE_MULTIROW_RE = re.compile(
+    r"\\begin\{(?:[pbvB]?matrix|cases|aligned|align|gathered|array|split)\}"
+    r"|\\cr(?![A-Za-z])"
+    r"|(?<!\\)\\\\(?!\\)"
+)
+
 
 # ---------- markdown-layer checks (rules 1, 2, 9, 10, 11) ----------
 
@@ -438,6 +452,31 @@ def check_file(
                         f"to a single `\\`, collapsing matrix/cases/aligned rows "
                         f"onto one line. Use `\\cr` instead (renders correctly in "
                         f"both GitHub's MathJax and the KaTeX PDF pipeline)."
+                    ),
+                )
+            )
+
+    # ---- static layer: multi-row matrix/cases inside INLINE `$...$` ----
+    # A `pmatrix` / `cases` / `aligned` (or a `\cr` / `\\` row break) inside an
+    # inline `$...$` span renders unreliably on github.com (inline/text style
+    # collapses or overlaps the rows), while the same TeX in a `$$` display
+    # block is fine. Flag inline spans only; display blocks are exempt.
+    for tex, disp, offset in items:
+        if disp:
+            continue
+        m = _INLINE_MULTIROW_RE.search(tex)
+        if m:
+            line = _offset_to_line(md_text, offset)
+            issues.append(
+                Issue(
+                    line=line,
+                    kind="multirow-in-inline-math",
+                    snippet=tex[:80],
+                    message=(
+                        f"multi-row math (`{m.group(0)}`) inside an inline `$...$` "
+                        f"span — renders unreliably on github.com (inline style "
+                        f"collapses/overlaps the rows). Move it into its own "
+                        f"`$$...$$` display block (own line, blank lines around)."
                     ),
                 )
             )

@@ -68,6 +68,7 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
 4. **静态层补一脚**：MathJax 3 看不到下面这些"在 markdown 解析阶段就坏了"的形态——它们到 MathJax 时要么已经被还原成裸标点（`\,` → `,`、`\|` → `|`），要么整个数学段根本没被识别（CJK 紧贴、表格列分隔吃 `|` 等），MathJax 自然无法报错。脚本对源 md 直接 grep 这些模式补报：
    - `\,` `\!` `\;` `\>` `\|` 这五个 CommonMark 会无声吃掉的反斜杠转义
    - `\\` 行分隔符（matrix / cases / aligned 的换行）—— GitHub 把 `$$` 内的 `\\` 反转义成单个 `\`，整块塌成一行（实测 `pmatrix` 回来只剩一个 `<mtr>`、两行被并进相邻单元格）。报 `backslash-rowbreak-eaten`，提示改用 `\cr`（`\\\\` 能救 GitHub 但会让 KaTeX/PDF 多出一空行；`\cr` 两边都对）
+   - **多行环境放进了行内 `$...$`**（`pmatrix` / `cases` / `aligned` / `array`，或裸 `\cr` / `\\` 行分隔符）——GitHub 行内数学是 inline/text style，多行矩阵在里头会塌行、错位或干脆不堆叠；**同样的 TeX 放进 `$$` 块级就正常**。报 `multirow-in-inline-math`，提示挪进独占一行的 `$$` 块。**只查行内 `$...$`，`$$` 块级豁免**。注意服务端 contact-sheet 强制 display style 渲染，**看不出**这个坑（页面上是对的、GitHub 上却塌），所以专门加这条静态规则补。
    - `$$...$$` 块级公式没独占一行 / 缺前后空行
    - CJK 字符或全角标点紧贴 `$`（如 `中文$x$中文`、`$y$。`）——CJK 集合除了汉字 / 全角标点，**也含 General Punctuation 区里当中文标点用的破折号 `——`、省略号 `…`、弯引号 `“” ‘’`**（`$\exp(x)$——把` 这种照样报），但**不含**当范围号用的 en dash `–`。
    - 表格行（`| ... |`）内数学段里出现裸 `|`
@@ -95,6 +96,7 @@ github.com 把 md 里的数学公式渲染出来，要经过两道处理：
 | 10 下标里 `<` / `>` | ✅ | 静态层在每段抽出的 TeX 里搜 `[_^]\s*\{[^}]*[<>]`，命中报 `angle-in-subscript` |
 | 11 `}_<char>` 下标被 emphasis 吃掉 | ✅ | 静态层两路报 `emphasis-eats-subscript`：(a) 单段 inline math 同时含 `[` 与 `}_<char>`；(b) 同一行 ≥2 段独立 inline `$...$` 各带一个 `}_<char>`（跨段配对、无需方括号）。`}\_V` 的修正形态不报 |
 | 非规范不等号 ≠ 写法 | ✅ | 源码规范是 `\ne`（markdown-to-pdf 内部自动改写为 `\mathrel{\char"2260}`，GitHub 直接渲 `\ne`）。这条静态层扫的是源码里不该出现的非规范写法：`\char`（MathJax 不支持，GitHub 红字）、`\not=`（PDF 改写器不覆盖、KaTeX rlap 仍裂）、字面 `≠` 和 `\unicode{x2260}`（KaTeX 无 metrics、PDF 看不见）。命中报 `ne-non-canonical`，提示改写成 `\ne` |
+| 多行矩阵 / cases 放进行内 `$...$` | ✅ | 静态层扫行内 `$...$` 内是否含 `\begin{pmatrix\|cases\|aligned\|array}` 或裸 `\cr` / `\\`，命中报 `multirow-in-inline-math`，提示挪进 `$$` 块。GitHub 行内 inline style 下多行矩阵会塌行 / 错位，而服务端 contact-sheet 强制 display style **看不出**这个坑，故专设静态规则；`$$` 块级豁免 |
 | 任意 TeX 语法错（`Misplaced &`、`Missing argument for \frac` 等） | ✅ | MathJax 自报 |
 | `\mathcal{L}\_V` 这种 workaround 写法 | ✅ 不报（这是正常写法） | 反转义后 `\mathcal{L}_V`，渲染正常 |
 
