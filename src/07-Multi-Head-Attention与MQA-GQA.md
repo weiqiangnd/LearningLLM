@@ -6,7 +6,7 @@
 
 - **为什么要分头？** 一个头只能学一种「关注模式」，多头让模型在多个**子空间**里同时关注不同的关系（语法、指代、远近……）——而且代价几乎是免费的。
 - **分头怎么落到形状变换上？** 这是本章的主线：输入从 `[B, L, d_model]` 出发，经历 **reshape → transpose → 各头独立做 attention → transpose → reshape → 输出投影**，最后又变回 `[B, L, d_model]`。这一连串 `[B, L, d_model] → [B, L, H, d_k] → [B, H, L, d_k] → …` 的形状变换，必须每一步都标注清楚。
-- **MQA / GQA 又是什么？** 当模型要做**自回归推理**时，多头注意力的 K / V 会被缓存下来（KV cache），头越多缓存越大。**MQA**（多查询注意力）让所有 query 头共享一份 K / V，**GQA**（分组查询注意力）则是分组共享——这是 LLaMA、Qwen 这些现代大模型的标配，本章会把三者的形状差异画清楚。
+- **MQA / GQA 又是什么？** 当模型要做**自回归推理**时，多头注意力的 K / V 会被缓存下来（KV cache），它常常是长上下文推理的显存与带宽瓶颈，而能砍它的关键就是减少 **K / V 的头数**。**MQA**（多查询注意力）让所有 query 头共享一份 K / V，**GQA**（分组查询注意力）则是分组共享——这是 LLaMA、Qwen 这些现代大模型的标配，本章会把三者的形状差异画清楚。
 
 实战部分我们**全程 CPU、纯 PyTorch**：先复现第 6 章的单头函数，再从零搭一个 `MultiHeadAttention` 模块、和 PyTorch 官方的 `nn.MultiheadAttention` 对齐验证，可视化「不同头学到不同的注意力模式」，接着把它改造成 **GQA**，最后读一份真实的 **Qwen3-8B config**，看它的 32 个 query 头是怎么配 8 个 KV 头的。
 
@@ -273,7 +273,7 @@ $$
 
 计算量同理。开销主要在 $Q K^\top$ 和 $A V$ 这两块矩阵乘上。单看 $Q K^\top$ ：单头（ $d_k = d_{\text{model}}$ ）要 $L^2 d_{\text{model}}$ 次乘加； $H$ 个头每个是 $L^2 d_k$ ，加起来 $H \cdot L^2 d_k = L^2 (H d_k) = L^2 d_{\text{model}}$ ——**完全相等**。多头把同样的计算量「分给」了 $H$ 个子空间，没有额外开销：QKVO 四个投影的计算量两者也一模一样（各 $O(L\thinspace d_{\text{model}}^2)$ ，和上面参数量那张表对得上， $W_O$ 在单头基线里同样存在、并非多头独有）。
 
-这里要和第 6 章撇清一个容易混的点：**本节说的「单头 / 大头」专指 $H = 1$** ——一个头独占整个 $d_{\text{model}}$ （代入 $d_k = d_{\text{model}}/H$ 就是 $d_k = d_{\text{model}}$ ），是为了和「切成 $H$ 份」做等预算对比才设的临时基准。它跟第 6 章的「一个头」不是一回事：第 6 章的单头其实是未来多头里的**某一个**头，维度是 $d_k = d_{\text{model}}/H$ （那一章只是把 $H$ 按下不表、没写死这个关系）。两处都叫「单头」，但 $d_k$ 含义不同，别串了。
+这里要和第 6 章区分一个容易混的点：**本节说的「单头 / 大头」专指 $H = 1$** ——一个头独占整个 $d_{\text{model}}$ （代入 $d_k = d_{\text{model}}/H$ 就是 $d_k = d_{\text{model}}$ ），是为了和「切成 $H$ 份」做等预算对比才设的临时基准。它跟第 6 章的「一个头」不是一回事：第 6 章的单头其实是未来多头里的**某一个**头，维度是 $d_k = d_{\text{model}}/H$ （那一章只是把 $H$ 按下不表、没写死这个关系）。两处都叫「单头」，但 $d_k$ 含义不同，别串了。
 
 > 这就是多头设计最漂亮的地方：**几乎免费地**把「一种关注模式」升级成「 $H$ 种关注模式」——参数量和计算量都和一个大头持平，换来的却是表达能力的实质飞跃。
 
@@ -304,9 +304,9 @@ $$
 \text{KV cache} \approx 2 \times L_{\text{layers}} \times H \times L_{\text{seq}} \times d_k \times (\text{每个数的字节数})
 $$
 
-那个 $2$ 是 K 和 V 各一份（这条算的是**单条序列**的占用，并发 $B$ 条请求时再整体乘以 $B$ ）。注意里头有个 $H$ ——**头越多，缓存越大**。对长上下文（ $L_{\text{seq}}$ 几万）、深层模型（几十层）来说，KV cache 动辄几个 GB，往往比模型权重还吃显存。更要命的是，自回归解码每生成一个 token 都要把整个 KV cache 从显存**读一遍**，所以瓶颈常常不是算力而是**显存带宽**——cache 越大、读得越慢，生成就越卡。
+那个 $2$ 是 K 和 V 各一份（这条算的是**单条序列**的占用，并发 $B$ 条请求时再整体乘以 $B$ ）。注意里头那个 $H \times d_k$ ：标准 MHA 下 $d_k = d_{\text{model}}/H$ ，二者乘起来正好是 $d_{\text{model}}$ ——也就是说**KV cache 的大小由 $d_{\text{model}}$ 定死，和你把它切成几个头无关**（多切头、 $d_k$ 就同比例变小，总量不变，这跟第 4 节「QKV 参数量与 $H$ 无关」是同一回事）。真正撑大 cache 的是层数 $L_{\text{layers}}$ 、序列长度 $L_{\text{seq}}$ 和模型宽度 $d_{\text{model}}$ 。对长上下文（ $L_{\text{seq}}$ 几万）、深层模型（几十层）来说，KV cache 动辄几个 GB，往往比模型权重还吃显存。更要命的是，自回归解码每生成一个 token 都要把整个 KV cache 从显存**读一遍**，所以瓶颈常常不是算力而是**显存带宽**——cache 越大、读得越慢，生成就越卡。
 
-那能不能砍掉 KV cache 里的 $H$ ？这正是 MQA / GQA 的出发点：**让多个 query 头共享 K / V，从而少存几份 K / V**。注意被砍的是 **K / V 的头数**，query 头数 $H$ 不动（不然表达能力就掉了）。
+那 cache 还能怎么砍？既然 $d_{\text{model}}$ 、层数、序列长都不好动，唯一的空间是：让公式里的 $H$ （在标准 MHA 下它既是 query 头数、也是 **K / V 的头数**）只对 K / V 这边变小。这正是 MQA / GQA 的出发点：**让多个 query 头共享 K / V，从而少存几份 K / V**。注意被砍的是 **K / V 的头数**，query 头数 $H$ 不动（不然表达能力就掉了）。
 
 ### 5.2 MQA：所有 query 头共享一份 K / V
 
@@ -320,7 +320,7 @@ $$
 
 注意右边的 $K, V$ 没有下标 $h$ ——全场就这一份。这样 KV cache 里的 $H$ 直接变成 1，**缓存缩小到原来的 $1 / H$**。对 32 头的模型就是省 32 倍 KV cache，推理速度（受显存带宽限制那部分）大幅提升——不过这个「32 倍」是 MQA 这种极端共享才有的数字，实际大模型更常用下节那个折中方案。
 
-代价是**表达能力下降**：K / V 不再有「多视角」，所有 query 头被迫在同一套 key/value 上找信息，模型质量通常会掉一点。MQA 出现得早（2019），省得狠但伤质量，所以后来有了折中方案。
+代价是**表达能力下降**：K / V 不再有「多视角」，所有 query 头被迫在同一套 key/value 上找信息，模型质量通常会掉一点。MQA 出现得早（2019），显存省得最狠，但对质量的损伤也最明显，所以后来有了折中方案。
 
 ### 5.3 GQA：分组共享，MHA 与 MQA 的折中
 
@@ -328,11 +328,11 @@ $$
 
 - $G = H$ ：每个 query 头独享一份 K / V —— 退化成 **MHA**；
 - $G = 1$ ：所有 query 头共享一份 K / V —— 退化成 **MQA**；
-- $1 < G < H$ ：折中，KV cache 缩小到 $G / H$ 。
+- $1 < G < H$ ：折中，KV cache 缩小到 $\frac{G}{H}$ 。
 
-记号上常把 K / V 的头数（也就是组数 $G$ ）叫 `num_key_value_heads`，query 头数 $H$ 叫 `num_attention_heads`。每个 KV 头被它那一组的 $H / G$ 个 query 头共用。计算时，把每份 K / V **复制（repeat）** $H / G$ 遍，「凑齐」 $H$ 份后就和普通 MHA 一样算了——所以 GQA 不改 attention 本身，只是 K / V 在喂进去之前被复制扩展了一下。
+记号上常把 K / V 的头数（也就是组数 $G$ ）叫 `num_key_value_heads`，query 头数 $H$ 叫 `num_attention_heads`。每个 KV 头被它那一组的 $\frac{H}{G}$ 个 query 头共用。计算时，把每份 K / V **复制（repeat）** $\frac{H}{G}$ 遍，「凑齐」 $H$ 份后就和普通 MHA 一样算了——所以 GQA 不改 attention 本身，只是 K / V 在喂进去之前被复制扩展了一下。
 
-GQA 几乎是现在大模型的**默认选择**：LLaMA-2 70B、LLaMA-3 全系、Qwen2 / Qwen3 等都用它。典型配置是 $H = 32$ 个 query 头配 $G = 8$ 个 KV 头（每 4 个 query 头共享一份 K / V），KV cache 直接砍到 $1/4$ ，质量却几乎和满血 MHA 持平——省显存和保质量之间一个很甜的点。
+GQA 几乎是现在大模型的**默认选择**：LLaMA-2 70B、LLaMA-3 全系、Qwen2 / Qwen3 等都用它。典型配置是 $H = 32$ 个 query 头配 $G = 8$ 个 KV 头（每 4 个 query 头共享一份 K / V），KV cache 直接砍到 $1/4$ ，质量却几乎和满血 MHA 持平——省显存和保质量之间一个很划算的平衡点。
 
 ### 5.4 三者对比与形状变化
 
@@ -489,7 +489,7 @@ class MultiHeadAttention(nn.Module):
     def merge_heads(self, x):
         # [B, H, L, d_k] --transpose--> [B, L, H, d_k] --reshape--> [B, L, d_model]
         B, H, L, d_k = x.shape
-        x = x.transpose(1, 2).contiguous()         # 换回 [B, L, H, d_k]（contiguous 后才能 reshape）
+        x = x.transpose(1, 2).contiguous()         # 换回 [B, L, H, d_k]；transpose 后内存不连续，先 contiguous 重排成连续块（reshape 本身也会在不连续时自动 copy，这里显式写出更直观）
         return x.reshape(B, L, H * d_k)            # 拼接：H × d_k 合回 d_model
 
     def forward(self, X, causal=False, verbose=False):
@@ -585,11 +585,11 @@ fig.colorbar(im, ax=axes, fraction=0.02, label="attention weight")
 fig.suptitle("Different heads, different attention patterns (causal)")
 plt.show()
 print("→ 4 个头都是下三角（causal），但每个头把注意力压在不同的 key 上：")
-print("  这是随机初始化、还没训练的头，可彼此的分布已经明显不一样——")
+print("  这是随机初始化、还没训练的头，但彼此的分布已经明显不一样——")
 print("  这就是多头的价值：同一序列被多套独立的注意力分布同时审视。")
 ```
 
-**预期现象**：4 张热力图都是下三角（causal mask 生效），但**亮格分布各不相同**——4 个头各自把权重压在不同的 key 上，没有哪两张图样是一样的。注意这是**随机初始化、未经训练**的头，所以别指望它们已经长出「专盯对角线」「回看开头」这种干净的语义模式；这里要看的只是一点：哪怕权重是随机的， $H$ 个头也已经是 $H$ 套**互相独立**的注意力分布了。这就把第 4.2 节「多头 = 多个独立注意力分布」从文字变成了可见的图。
+**预期现象**：4 张热力图都是下三角（causal mask 生效），但**亮格分布各不相同**——4 个头各自把权重压在不同的 key 上，没有哪两张图是一样的。注意这是**随机初始化、未经训练**的头，所以别指望它们已经长出「专盯对角线」「回看开头」这种干净的语义模式；这里要看的只是一点：哪怕权重是随机的， $H$ 个头也已经是 $H$ 套**互相独立**的注意力分布了。这就把第 4.2 节「多头 = 多个独立注意力分布」从文字变成了可见的图。
 
 ### 7.6 从 MHA 到 GQA：query 头分组共享 K / V
 
@@ -604,6 +604,7 @@ class GroupedQueryAttention(nn.Module):
     num_kv_heads == num_heads -> MHA；num_kv_heads == 1 -> MQA。"""
     def __init__(self, d_model, num_heads, num_kv_heads):
         super().__init__()
+        assert d_model % num_heads == 0, "d_model 必须能被 num_heads 整除"
         assert num_heads % num_kv_heads == 0, "query 头数须能被 KV 头数整除"
         self.H, self.G = num_heads, num_kv_heads
         self.d_k = d_model // num_heads
