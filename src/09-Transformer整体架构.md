@@ -564,7 +564,7 @@ class DecoderBlock(nn.Module):
 
 这段代码就是把前几章的结论落成可运行的零件，几个细节对照着看：
 
-- `RMSNorm` / `SwiGLU` 和第 8 章实战完全一致；`CausalGQA` 把第 7 章的「切头 → RoPE → `repeat_interleave` 凑齐 K/V → 缩放点积 → 因果掩码 → 合头 → 输出投影 $W_O$ 」一条龙走完，全程标注了形状。
+- `RMSNorm` / `SwiGLU` 和第 8 章实战完全一致；`CausalGQA` 把第 7 章的「切头 → RoPE → `repeat_interleave` 凑齐 K/V → 缩放点积 → 因果掩码 → 合头 → 输出投影 $W_O$ 」从头到尾走了一遍，全程标注了形状。
 - `DecoderBlock.forward` 把第 5 节那两个公式直接写成了代码：`pre_ln=True` 走 `x + Sublayer(Norm(x))`，`False` 走 `Norm(x + Sublayer(x))`——一个 `if/else`，就是 Pre-LN 和 Post-LN 的全部区别。
 
 ### 7.3 拼成一个完整的 Decoder-only 模型
@@ -711,7 +711,7 @@ from transformers import AutoConfig
 cfg = AutoConfig.from_pretrained("Qwen/Qwen3-8B")
 V, d = cfg.vocab_size, cfg.hidden_size
 H, G = cfg.num_attention_heads, cfg.num_key_value_heads
-hd = getattr(cfg, "head_dim", d // H)
+hd = getattr(cfg, "head_dim", d // H)   # Qwen3 显式给出 head_dim；它不一定等于 d/H（如 Qwen3-4B 就不等）
 d_ff, n_layers = cfg.intermediate_size, cfg.num_hidden_layers
 tie = cfg.tie_word_embeddings
 
