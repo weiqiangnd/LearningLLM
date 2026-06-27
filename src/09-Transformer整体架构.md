@@ -639,7 +639,7 @@ print("lm_head 参数:", count(model.lm_head))
 print("整模型  参数:", count(model))
 ```
 
-**预期现象**：从 `after embed` 到 `after final_norm`，形状一直是 `(2, 8, 64)` 雷打不动——这就是对「形状守恒」的验证；只有 `input_ids`（`(2, 8)`）和 `logits`（`(2, 8, 100)`）两端不同。参数上你会看到 `1 block` 里 `ffn` 比 `attn` 大不少（FFN 占大头，约占一层 3/4——和第 8 章「FFN 是 block 里的参数大头」一致，GQA 下注意力更窄、占比还更高些）。这套结构和数法，放大到 Qwen3-8B 就是第 2.3 节那张参数账。
+**预期现象**：从 `after embed` 到 `after final_norm`，形状一直是 `(2, 8, 64)`——这就是对「形状守恒」的验证；只有 `input_ids`（`(2, 8)`）和 `logits`（`(2, 8, 100)`）两端不同。参数上你会看到 `1 block` 里 `ffn` 比 `attn` 大不少（FFN 占大头，约占一层 3/4——和第 8 章「FFN 是 block 里的参数大头」一致，GQA 下注意力更窄、占比还更高些）。这套结构和数法，放大到 Qwen3-8B 就是第 2.3 节那张参数账。
 
 ### 7.5 Pre-LN vs Post-LN：深层训练稳定性验证
 
