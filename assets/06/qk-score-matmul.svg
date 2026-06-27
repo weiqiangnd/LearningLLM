@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 490">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 15px; font-family: 'Noto Sans Mono CJK SC','SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #374151; }
+    .monob  { font-size: 17px; font-weight: 700; font-family: 'Noto Sans Mono CJK SC','SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC','SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="820.0" y="44" text-anchor="middle" class="title">点积打分：S = QKᵀ 一次矩阵乘，算出全部 L×L 个匹配分（例：L=3, d_k=2）</text>
+<text x="576" y="153.0" text-anchor="middle" class="lbl" fill="#2563eb">Q  [L=3, d_k=2]</text>
+<rect x="518" y="183.0" width="54" height="54" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.7"/>
+<text x="545.0" y="215.0" text-anchor="middle" class="mono">1</text>
+<rect x="576" y="183.0" width="54" height="54" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.7"/>
+<text x="603.0" y="215.0" text-anchor="middle" class="mono">0</text>
+<rect x="518" y="241.0" width="54" height="54" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.7"/>
+<text x="545.0" y="273.0" text-anchor="middle" class="mono">0</text>
+<rect x="576" y="241.0" width="54" height="54" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.7"/>
+<text x="603.0" y="273.0" text-anchor="middle" class="mono">1</text>
+<rect x="518" y="299.0" width="54" height="54" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.7"/>
+<text x="545.0" y="331.0" text-anchor="middle" class="mono">1</text>
+<rect x="576" y="299.0" width="54" height="54" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.7"/>
+<text x="603.0" y="331.0" text-anchor="middle" class="mono">1</text>
+<text x="506" y="215.0" text-anchor="end" class="monos" fill="#334155">q₁</text>
+<text x="506" y="273.0" text-anchor="end" class="monos" fill="#334155">q₂</text>
+<text x="506" y="331.0" text-anchor="end" class="monos" fill="#334155">q₃</text>
+<text x="676" y="278" text-anchor="middle" class="monob" fill="#334155">×</text>
+<text x="805.0" y="182" text-anchor="middle" class="lbl" fill="#ea580c">Kᵀ  [d_k=2, L=3]</text>
+<rect x="718" y="212" width="54" height="54" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.7"/>
+<text x="745.0" y="244.0" text-anchor="middle" class="mono">1</text>
+<rect x="776" y="212" width="54" height="54" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.7"/>
+<text x="803.0" y="244.0" text-anchor="middle" class="mono">1</text>
+<rect x="834" y="212" width="54" height="54" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.7"/>
+<text x="861.0" y="244.0" text-anchor="middle" class="mono">0</text>
+<rect x="718" y="270" width="54" height="54" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.7"/>
+<text x="745.0" y="302.0" text-anchor="middle" class="mono">0</text>
+<rect x="776" y="270" width="54" height="54" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.7"/>
+<text x="803.0" y="302.0" text-anchor="middle" class="mono">1</text>
+<rect x="834" y="270" width="54" height="54" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.7"/>
+<text x="861.0" y="302.0" text-anchor="middle" class="mono">1</text>
+<text x="745.0" y="350" text-anchor="middle" class="monos" fill="#334155">k₁</text>
+<text x="803.0" y="350" text-anchor="middle" class="monos" fill="#334155">k₂</text>
+<text x="861.0" y="350" text-anchor="middle" class="monos" fill="#334155">k₃</text>
+<text x="934" y="278" text-anchor="middle" class="monob" fill="#334155">=</text>
+<text x="1063.0" y="153.0" text-anchor="middle" class="lbl" fill="#7c3aed">S = QKᵀ  [L=3, L=3]</text>
+<rect x="976" y="183.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1003.0" y="215.0" text-anchor="middle" class="mono">1</text>
+<rect x="1034" y="183.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1061.0" y="215.0" text-anchor="middle" class="mono">1</text>
+<rect x="1092" y="183.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1119.0" y="215.0" text-anchor="middle" class="mono">0</text>
+<rect x="976" y="241.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1003.0" y="273.0" text-anchor="middle" class="mono">0</text>
+<rect x="1034" y="241.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1061.0" y="273.0" text-anchor="middle" class="mono">1</text>
+<rect x="1092" y="241.0" width="54" height="54" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.7"/>
+<text x="1119.0" y="273.0" text-anchor="middle" class="mono">1</text>
+<rect x="976" y="299.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1003.0" y="331.0" text-anchor="middle" class="mono">1</text>
+<rect x="1034" y="299.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1061.0" y="331.0" text-anchor="middle" class="mono">2</text>
+<rect x="1092" y="299.0" width="54" height="54" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="1119.0" y="331.0" text-anchor="middle" class="mono">1</text>
+<text x="964" y="215.0" text-anchor="end" class="monos" fill="#334155">q₁</text>
+<text x="964" y="273.0" text-anchor="end" class="monos" fill="#334155">q₂</text>
+<text x="964" y="331.0" text-anchor="end" class="monos" fill="#334155">q₃</text>
+<text x="1003.0" y="177.0" text-anchor="middle" class="monos" fill="#334155">k₁</text>
+<text x="1061.0" y="177.0" text-anchor="middle" class="monos" fill="#334155">k₂</text>
+<text x="1119.0" y="177.0" text-anchor="middle" class="monos" fill="#334155">k₃</text>
+<rect x="520.0" y="380" width="600" height="50" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="820.0" y="412" text-anchor="middle" class="mono">高亮格 S₂₃ = q₂ · k₃ = (0, 1) · (0, 1) = 0×0 + 1×1 = 1</text>
+<text x="820.0" y="458" text-anchor="middle" class="cap">S 的第 i 行 j 列 = Q 第 i 行（qᵢ）与 Kᵀ 第 j 列（kⱼ）的点积 —— 一个矩阵乘把 L×L 个点积全算完。</text>
+</svg>

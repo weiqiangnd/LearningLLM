@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 500">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="aGray" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#94a3b8"/>
+    </marker>
+    <marker id="aOrange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <marker id="aPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+    .title { font-size: 24px; font-weight: 700; fill: #374151; }
+    .sub   { font-size: 14px; fill: #334155; }
+    .lbl   { font-size: 16px; font-weight: 600; fill: #374151; }
+    .small { font-size: 13px; fill: #334155; }
+    .formula { font-size: 15px; fill: #374151; font-style: italic; }
+    .muted { fill: #94a3b8; }
+  </style>
+<marker id="aGreen" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 9 3, 0 6" fill="#059669"/></marker><marker id="aRed" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 9 3, 0 6" fill="#dc2626"/></marker>
+<text x="380.0" y="38" text-anchor="middle" class="title">优势 A(s,a) = Q(s,a) − V(s)：按 π 加权后均值为 0</text>
+<rect x="110" y="90" width="560" height="320" fill="#fbfdff" stroke="#94a3b8" stroke-width="1"/>
+<line x1="110" y1="410.0" x2="670" y2="410.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="102" y="414.0" text-anchor="end" class="small">0</text>
+<line x1="110" y1="346.0" x2="670" y2="346.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="102" y="350.0" text-anchor="end" class="small">2</text>
+<line x1="110" y1="282.0" x2="670" y2="282.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="102" y="286.0" text-anchor="end" class="small">4</text>
+<line x1="110" y1="218.0" x2="670" y2="218.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="102" y="222.0" text-anchor="end" class="small">6</text>
+<line x1="110" y1="154.0" x2="670" y2="154.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="102" y="158.0" text-anchor="end" class="small">8</text>
+<line x1="110" y1="90.0" x2="670" y2="90.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="102" y="94.0" text-anchor="end" class="small">10</text>
+<rect x="145.0" y="154.0" width="70" height="256.0" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" rx="3"/>
+<text x="180.0" y="146.0" text-anchor="middle" class="small">Q=8.0</text>
+<line x1="223.0" y1="211.6" x2="223.0" y2="156.0" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)" />
+<text x="237.0" y="186.8" class="small" fill="#059669">A=+1.8</text>
+<text x="180.0" y="432" text-anchor="middle" class="lbl">a₁</text>
+<text x="180.0" y="450" text-anchor="middle" class="small">π=0.40</text>
+<rect x="285.0" y="202.0" width="70" height="208.0" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" rx="3"/>
+<text x="320.0" y="194.0" text-anchor="middle" class="small">Q=6.5</text>
+<line x1="363.0" y1="211.6" x2="363.0" y2="204.0" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)" />
+<text x="377.0" y="210.8" class="small" fill="#059669">A=+0.3</text>
+<text x="320.0" y="432" text-anchor="middle" class="lbl">a₂</text>
+<text x="320.0" y="450" text-anchor="middle" class="small">π=0.30</text>
+<rect x="425.0" y="282.0" width="70" height="128.0" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" rx="3"/>
+<text x="460.0" y="274.0" text-anchor="middle" class="small">Q=4.0</text>
+<line x1="503.0" y1="211.6" x2="503.0" y2="280.0" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)" />
+<text x="517.0" y="250.8" class="small" fill="#dc2626">A=-2.2</text>
+<text x="460.0" y="432" text-anchor="middle" class="lbl">a₃</text>
+<text x="460.0" y="450" text-anchor="middle" class="small">π=0.20</text>
+<rect x="565.0" y="330.0" width="70" height="80.0" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" rx="3"/>
+<text x="600.0" y="322.0" text-anchor="middle" class="small">Q=2.5</text>
+<line x1="643.0" y1="211.6" x2="643.0" y2="328.0" stroke="#dc2626" stroke-width="2" marker-end="url(#aRed)" />
+<text x="657.0" y="274.8" class="small" fill="#dc2626">A=-3.7</text>
+<text x="600.0" y="432" text-anchor="middle" class="lbl">a₄</text>
+<text x="600.0" y="450" text-anchor="middle" class="small">π=0.10</text>
+<line x1="110" y1="211.6" x2="670" y2="211.6" stroke="#ea580c" stroke-width="2" stroke-dasharray="6,4"/>
+<text x="676" y="215.6" class="small" fill="#ea580c">V(s)=6.2</text>
+<text x="380.0" y="465" text-anchor="middle" class="formula">Σ π(a|s)·A(s,a) = 0.40·(+1.8) + 0.30·(+0.3) + 0.20·(−2.2) + 0.10·(−3.7) = 0</text>
+<text x="380.0" y="485" text-anchor="middle" class="small">高于平均的动作（绿）与低于平均的动作（红）按概率加权正好抵消</text>
+</svg>

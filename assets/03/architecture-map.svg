@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 992">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="600.0" y="40" text-anchor="middle" class="title">阶段 2 全景：一个 LLM 从文本到下一个 token 的完整流水线</text>
+<text x="600.0" y="64" text-anchor="middle" class="sub" font-size="14">左侧是流水线（自下而上：文本从底部进入、下一个 token 从顶部产出），右侧逐条列出阶段 2 每一章的分工</text>
+<rect x="175" y="356" width="330" height="292" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="6,4"/>
+<path d="M 172,360 Q 162,360 162,369 L 162,493.0 Q 162,502.0 152,502.0 Q 162,502.0 162,511.0 L 162,635 Q 162,644 172,644" fill="none" stroke="#334155" stroke-width="2"/>
+<text x="143" y="497" text-anchor="end" class="title" font-size="19">N×</text>
+<text x="143" y="519" text-anchor="end" class="small">解码器层</text>
+<line x1="340" y1="905" x2="340" y2="882" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="826" x2="340" y2="804" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="748" x2="340" y2="717" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="683" x2="340" y2="633" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="563" x2="340" y2="550" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="506" x2="340" y2="488" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="432" x2="340" y2="414" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="370" x2="340" y2="329" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="275" x2="340" y2="259" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="205" x2="340" y2="189" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="340" y1="135" x2="340" y2="111" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<line x1="300" y1="700" x2="321" y2="700" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="190.0" y="73.0" width="300" height="38" rx="11" fill="#eef1f4" stroke="#7c8896" stroke-width="1.8"/>
+<text x="340" y="97" text-anchor="middle" class="lbl">采样 → 下一个 token</text>
+<rect x="502.0" y="80" width="128" height="24" rx="7" fill="#ffffff" stroke="#7c8896" stroke-width="1.4"/>
+<text x="566.0" y="97" text-anchor="middle" class="tag" fill="#374151">第 2 · 10 章</text>
+<rect x="190.0" y="135.0" width="300" height="54" rx="11" fill="#cdebd0" stroke="#2f9d52" stroke-width="1.8"/>
+<text x="340" y="159" text-anchor="middle" class="lbl">Softmax</text>
+<text x="340" y="178" text-anchor="middle" class="small">logits → 概率分布</text>
+<rect x="502.0" y="150" width="84" height="24" rx="7" fill="#ffffff" stroke="#2f9d52" stroke-width="1.4"/>
+<text x="544.0" y="167" text-anchor="middle" class="tag" fill="#374151">第 10 章</text>
+<rect x="190.0" y="205.0" width="300" height="54" rx="11" fill="#cfe0fb" stroke="#2f6fd0" stroke-width="1.8"/>
+<text x="340" y="229" text-anchor="middle" class="lbl">Linear（lm_head）</text>
+<text x="340" y="248" text-anchor="middle" class="small">隐藏向量 → 词表 logits</text>
+<rect x="502.0" y="220" width="73" height="24" rx="7" fill="#ffffff" stroke="#2f6fd0" stroke-width="1.4"/>
+<text x="538.5" y="237" text-anchor="middle" class="tag" fill="#374151">第 4 章</text>
+<rect x="190.0" y="275.0" width="300" height="54" rx="11" fill="#fdeeb3" stroke="#b8920a" stroke-width="1.8"/>
+<text x="340" y="299" text-anchor="middle" class="lbl">Final Norm</text>
+<text x="340" y="318" text-anchor="middle" class="small">末层归一化（RMSNorm）</text>
+<rect x="502.0" y="290" width="73" height="24" rx="7" fill="#ffffff" stroke="#b8920a" stroke-width="1.4"/>
+<text x="538.5" y="307" text-anchor="middle" class="tag" fill="#374151">第 8 章</text>
+<rect x="190.0" y="370.0" width="300" height="44" rx="11" fill="#fdeeb3" stroke="#b8920a" stroke-width="1.8"/>
+<text x="340" y="397" text-anchor="middle" class="lbl">Add &amp; Norm</text>
+<rect x="502.0" y="380" width="73" height="24" rx="7" fill="#ffffff" stroke="#b8920a" stroke-width="1.4"/>
+<text x="538.5" y="397" text-anchor="middle" class="tag" fill="#374151">第 8 章</text>
+<rect x="190.0" y="432.0" width="300" height="56" rx="11" fill="#cfe0fb" stroke="#2f6fd0" stroke-width="1.8"/>
+<text x="340" y="457" text-anchor="middle" class="lbl">Feed Forward（FFN）</text>
+<text x="340" y="476" text-anchor="middle" class="small">SwiGLU / GeLU</text>
+<rect x="502.0" y="448" width="73" height="24" rx="7" fill="#ffffff" stroke="#2f6fd0" stroke-width="1.4"/>
+<text x="538.5" y="465" text-anchor="middle" class="tag" fill="#374151">第 8 章</text>
+<rect x="190.0" y="506.0" width="300" height="44" rx="11" fill="#fdeeb3" stroke="#b8920a" stroke-width="1.8"/>
+<text x="340" y="533" text-anchor="middle" class="lbl">Add &amp; Norm</text>
+<rect x="502.0" y="516" width="73" height="24" rx="7" fill="#ffffff" stroke="#b8920a" stroke-width="1.4"/>
+<text x="538.5" y="533" text-anchor="middle" class="tag" fill="#374151">第 8 章</text>
+<rect x="190.0" y="563.0" width="300" height="70" rx="11" fill="#fbe1c4" stroke="#d9760f" stroke-width="1.8"/>
+<text x="340" y="588" text-anchor="middle" class="lbl">Masked Multi-Head Self-Attention</text>
+<text x="340" y="607" text-anchor="middle" class="small">Q / K / V · 缩放点积 · 因果掩码</text>
+<text x="340" y="625" text-anchor="middle" class="small">多头拼接 · MQA / GQA</text>
+<rect x="502.0" y="586" width="117" height="24" rx="7" fill="#ffffff" stroke="#d9760f" stroke-width="1.4"/>
+<text x="560.5" y="603" text-anchor="middle" class="tag" fill="#374151">第 6 · 7 章</text>
+<rect x="190.0" y="748.0" width="300" height="56" rx="11" fill="#f8d3e4" stroke="#c43f86" stroke-width="1.8"/>
+<text x="340" y="773" text-anchor="middle" class="lbl">Token Embedding</text>
+<text x="340" y="792" text-anchor="middle" class="small">id → 稠密向量（查表 / weight tying）</text>
+<rect x="502.0" y="764" width="73" height="24" rx="7" fill="#ffffff" stroke="#c43f86" stroke-width="1.4"/>
+<text x="538.5" y="781" text-anchor="middle" class="tag" fill="#374151">第 4 章</text>
+<rect x="190.0" y="826.0" width="300" height="56" rx="11" fill="#cdeaf0" stroke="#1f93b0" stroke-width="1.8"/>
+<text x="340" y="851" text-anchor="middle" class="lbl">Tokenizer</text>
+<text x="340" y="870" text-anchor="middle" class="small">文本 ↔ id（BPE / BBPE / 词表）</text>
+<rect x="502.0" y="842" width="73" height="24" rx="7" fill="#ffffff" stroke="#1f93b0" stroke-width="1.4"/>
+<text x="538.5" y="859" text-anchor="middle" class="tag" fill="#374151">第 3 章</text>
+<rect x="190.0" y="905.0" width="300" height="38" rx="11" fill="#eef1f4" stroke="#7c8896" stroke-width="1.8"/>
+<text x="340" y="929" text-anchor="middle" class="lbl">输入文本 Input Text</text>
+<circle cx="340" cy="700" r="17" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+<text x="340" y="707" text-anchor="middle" class="title" font-size="22">+</text>
+<rect x="108" y="671" width="192" height="58" rx="11" fill="#e7dcfb" stroke="#7a4fd0" stroke-width="1.8"/>
+<text x="204.0" y="695" text-anchor="middle" class="lbl">Positional Encoding</text>
+<text x="204.0" y="714" text-anchor="middle" class="small">位置编码 · RoPE / ALiBi</text>
+<rect x="44" y="689.0" width="58" height="22" rx="7" fill="#ffffff" stroke="#7a4fd0" stroke-width="1.4"/>
+<text x="73" y="705.0" text-anchor="middle" class="tag" fill="#374151">第 4 章</text>
+<line x1="618" y1="96" x2="618" y2="900" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,5"/>
+<text x="650" y="120" class="title" font-size="18">阶段 2 各章分工</text>
+<text x="650" y="142" class="sub">第 3–13 章——左图每个组件框右侧的章节角标，对应下面这一条：</text>
+<rect x="650" y="171" width="4" height="40" rx="2" fill="#1f93b0"/>
+<text x="666" y="186" class="lbl">第 3 章 · Tokenizer</text>
+<text x="666" y="206" class="sub">文本 ↔ id：BPE / BBPE、词表、特殊 token</text>
+<rect x="650" y="235" width="4" height="40" rx="2" fill="#c43f86"/>
+<text x="666" y="250" class="lbl">第 4 章 · Embedding 与位置编码</text>
+<text x="666" y="270" class="sub">id → 向量、weight tying；RoPE / 正弦 / ALiBi</text>
+<rect x="650" y="299" width="4" height="40" rx="2" fill="#64748b"/>
+<text x="666" y="314" class="lbl">第 5 章 · 从 RNN 到 attention</text>
+<text x="666" y="334" class="sub">讲清注意力「为什么会出现」</text>
+<rect x="650" y="363" width="4" height="40" rx="2" fill="#d9760f"/>
+<text x="666" y="378" class="lbl">第 6 章 · Scaled Dot-Product Attention</text>
+<text x="666" y="398" class="sub">Q / K / V、softmax、因果掩码</text>
+<rect x="650" y="427" width="4" height="40" rx="2" fill="#d9760f"/>
+<text x="666" y="442" class="lbl">第 7 章 · Multi-Head Attention 与 MQA / GQA</text>
+<text x="666" y="462" class="sub">分头、拼接、形状变换全过程</text>
+<rect x="650" y="491" width="4" height="40" rx="2" fill="#2f6fd0"/>
+<text x="666" y="506" class="lbl">第 8 章 · FFN、残差连接、归一化</text>
+<text x="666" y="526" class="sub">LayerNorm / RMSNorm / SwiGLU</text>
+<rect x="650" y="555" width="4" height="40" rx="2" fill="#64748b"/>
+<text x="666" y="570" class="lbl">第 9 章 · Transformer 整体架构</text>
+<text x="666" y="590" class="sub">Decoder-only vs Encoder-Decoder、Pre / Post-LN</text>
+<rect x="650" y="619" width="4" height="40" rx="2" fill="#2f9d52"/>
+<text x="666" y="634" class="lbl">第 10 章 · 自回归语言建模目标</text>
+<text x="666" y="654" class="sub">交叉熵 loss、teacher forcing 与采样的关系</text>
+<rect x="650" y="683" width="4" height="40" rx="2" fill="#64748b"/>
+<text x="666" y="698" class="lbl">第 11 章 · 论文精读</text>
+<text x="666" y="718" class="sub">Attention Is All You Need 逐节解读</text>
+<rect x="650" y="747" width="4" height="40" rx="2" fill="#64748b"/>
+<text x="666" y="762" class="lbl">第 12 章 · 论文串读</text>
+<text x="666" y="782" class="sub">GPT / LLaMA / Qwen 系列的关键改动</text>
+<rect x="650" y="811" width="4" height="40" rx="2" fill="#64748b"/>
+<text x="666" y="826" class="lbl">第 13 章 · 从零实现 mini-GPT</text>
+<text x="666" y="846" class="sub">把以上所有组件拼起来，训练 → 生成闭环</text>
+</svg>
