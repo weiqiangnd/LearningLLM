@@ -370,7 +370,7 @@ $$
 
 **Post-LN 的问题就在于，它把一个 Norm 压在了这条高速公路上。** 残差每往上走一层，就要穿过一次 Norm；反传时，梯度每往下走一层，就要乘一次这个 Norm 的雅可比（导数矩阵）。于是「直通」被打了折扣——梯度不再是干净地 $\times 1$ 往下传，而是被一连串 Norm 的雅可比连乘修饰。层一深（几十层），这串连乘会让**不同层的梯度幅度严重不均衡**：靠近输出的层梯度大、靠近输入的层梯度被反复缩放得忽大忽小。结果就是 Post-LN 深层网络在**训练初期极不稳定**——稍微大一点的学习率就发散。
 
-这也解释了 Post-LN 为什么**严重依赖 learning rate warmup**（warmup：lr 先用很小的值起步、再慢慢升到目标值，见 P04）：初期梯度尺度乱、Adam 的二阶矩估计还没校准，必须用 warmup 小步慢走、等数值稳下来，否则一上来步子一迈大，训练就发散了。原版 Transformer 论文里那套小心翼翼的 warmup schedule，很大程度就是在伺候 Post-LN 的这个毛病。
+这也解释了 Post-LN 为什么**严重依赖 learning rate warmup**（warmup：lr 先用很小的值起步、再慢慢升到目标值，见 P04）：初期梯度尺度乱、Adam 的二阶矩估计还没校准，必须用 warmup 小步慢走、等数值稳下来，否则一上来步子一迈大，训练就发散了。原版 Transformer 论文里那套小心翼翼的 warmup schedule，很大程度就是为了应对 Post-LN 的这个毛病。
 
 ### 5.3 Pre-LN 为什么稳：一条干净的残差高速公路
 
@@ -693,7 +693,7 @@ plt.legend(); plt.grid(True, alpha=0.3); plt.tight_layout(); plt.show()
 - **Post-LN（无 warmup）**：loss **几乎卡在 ≈4.2 原地不动**——同样的深度、同样的 lr，它就是学不动。这就是第 5.2 节说的「深层 Post-LN 初期不稳、必须小步起步」的直接后果。
 - **Post-LN（+ warmup 30）**：前 30 步小步预热时 loss 不怎么动，**预热结束后开始下降**，最终也收敛到 ≈0.3——**warmup 把 Post-LN 救回来了**。
 
-三条曲线放一起，就把第 5 节的结论全坐实了：**Pre-LN 省心（不挑 warmup 就稳）；Post-LN 难训（不加 warmup 几乎学不动）；warmup 是伺候 Post-LN 的必需品。** 这也正是现代大模型默认 Pre-LN 的实验依据。
+三条曲线放一起，就把第 5 节的结论全部印证了：**Pre-LN 省心（不挑 warmup 就稳）；Post-LN 难训（不加 warmup 几乎学不动）；warmup 是稳住 Post-LN 的必需品。** 这也正是现代大模型默认 Pre-LN 的实验依据。
 
 > 这是个**迷你规模**的演示，旨在让你「亲眼看见」趋势，不是严谨的架构 benchmark。真实大模型上 Post-LN 的不稳更隐蔽、也有 DeepNorm 这类专门的补救（第 5.4 节），但「深层 + 无 warmup 时 Post-LN 明显更难训」这个定性结论是稳的。
 
@@ -757,7 +757,7 @@ print(f"TOTAL             : {total / 1e9:.2f} B   <- 这就是 Qwen3-8B 的 ~8B"
 | **Prefix-LM / UL2** | 介于单双向之间的中间路线（前缀双向、续写因果）；没撼动 decoder-only 的主流地位 |
 | **Post-LN** | $\text{Norm}(x + \text{Sublayer}(x))$ ，原版排布；Norm 压在残差通路上 → 深层梯度不均、难训、依赖 warmup |
 | **Pre-LN** | $x + \text{Sublayer}(\text{Norm}(x))$ ，现代默认；残差通路干净直通 → 梯度稳、深层训得动（GPT-2 起 / LLaMA / Qwen） |
-| **warmup 的角色** | lr 先小后大；是伺候 Post-LN 初期不稳的必需品，Pre-LN 下可短可免 |
+| **warmup 的角色** | lr 先小后大；是应对 Post-LN 初期不稳的必需品，Pre-LN 下可短可免 |
 | **DeepNorm / Sandwich-LN** | 想同时拿 Post-LN 的质量和稳定性的折中方案 |
 | **残差流（residual stream）** | 把模型看成一条贯穿所有层的总线：子层只「读流 → 算增量 Δ → 加回」，统一解释了形状守恒、梯度直通、Pre-LN 干净 |
 | **放大（scaling）** | 形状守恒让「造多大的模型」退化成调超参：加宽 $d_{\text{model}}$ + 加深层数 $N$ + 加头数 $H$ ；是 scaling law 的工程前提 |
