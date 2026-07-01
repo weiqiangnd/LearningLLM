@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1410 450">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="705.0" y="40" text-anchor="middle" class="title">Tokenizer 在 LLM 流水线中的位置：文本世界 ↔ id 世界的翻译官</text>
+<rect x="410.5" y="158" width="831.5" height="168" rx="14" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,4"/>
+<text x="826.25" y="178" text-anchor="middle" class="sub" font-weight="600">模型内部：从头到尾只有数字（id / 向量 / logits），看不见一个汉字或字母</text>
+<rect x="32.5" y="197.0" width="125" height="86" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="95" y="236" text-anchor="middle" class="lbl">输入文本</text>
+<text x="95" y="256" text-anchor="middle" class="small">你好，世界</text>
+<rect x="210.0" y="197.0" width="150" height="86" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="285" y="236" text-anchor="middle" class="lbl">Tokenizer</text>
+<text x="285" y="256" text-anchor="middle" class="small">切分→查表→id</text>
+<rect x="422.5" y="197.0" width="155" height="86" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="500" y="236" text-anchor="middle" class="lbl">token ids</text>
+<text x="500" y="256" text-anchor="middle" class="small">[108386, 99489…]</text>
+<rect x="637.5" y="197.0" width="155" height="86" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="715" y="236" text-anchor="middle" class="lbl">Embedding</text>
+<text x="715" y="256" text-anchor="middle" class="small">id→向量(查表)</text>
+<rect x="847.5" y="197.0" width="165" height="86" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="930" y="236" text-anchor="middle" class="lbl">Transformer × N</text>
+<text x="930" y="256" text-anchor="middle" class="small">注意力 + FFN 堆叠</text>
+<rect x="1070.0" y="197.0" width="160" height="86" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1150" y="236" text-anchor="middle" class="lbl">logits → 采样</text>
+<text x="1150" y="256" text-anchor="middle" class="small">得到下一个 id</text>
+<rect x="1285.0" y="197.0" width="120" height="86" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="1345" y="236" text-anchor="middle" class="lbl">Tokenizer</text>
+<text x="1345" y="256" text-anchor="middle" class="small">id→文本</text>
+<line x1="159.5" y1="240" x2="206.0" y2="240" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="362.0" y1="240" x2="418.5" y2="240" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="579.5" y1="240" x2="633.5" y2="240" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="794.5" y1="240" x2="843.5" y2="240" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="1014.5" y1="240" x2="1066.0" y2="240" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="1232.0" y1="240" x2="1281.0" y2="240" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="391.25" y="182" text-anchor="middle" class="small" fill="#ea580c">encode</text>
+<text x="1257.5" y="190" text-anchor="middle" class="small" fill="#ea580c">decode</text>
+<path d="M 1150,197.0 C 1150,132 715,132 715,189.0" stroke="#7c3aed" stroke-width="2" fill="none" stroke-dasharray="6,4" marker-end="url(#aPurple)"/>
+<text x="932.5" y="124" text-anchor="middle" class="small" fill="#7c3aed">自回归：新 id 拼回输入末尾，再算下一个（详见第 2 章）</text>
+<text x="705.0" y="410" text-anchor="middle" class="cap">模型看不懂文字、只认识整数 id；tokenizer 是两端唯一的翻译工序（橙色）——本章只讲这道工序，中间的 Embedding / Transformer 留给后续章节。</text>
+</svg>
