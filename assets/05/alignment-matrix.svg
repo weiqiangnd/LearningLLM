@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 682">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="470.0" y="44" text-anchor="middle" class="title">对齐矩阵示例：英 → 法翻译里 attention「看」哪个源词</text>
+<text x="470.0" y="70" text-anchor="middle" class="sub">取自 Bahdanau 2014 论文 Fig.3 的片段 “… the European Economic Area …” → “… la zone économique européenne …”</text>
+<text x="452.0" y="120" text-anchor="middle" class="lbl" fill="#2563eb">源句（英语原文）→ 列 j</text>
+<text x="150" y="330.0" text-anchor="middle" class="lbl" fill="#059669" transform="rotate(-90 150 330.0)">译文（法语，逐词生成）→ 行 t</text>
+<text x="338.0" y="166" text-anchor="start" class="mono" transform="rotate(-38 338.0 166)">the</text>
+<text x="414.0" y="166" text-anchor="start" class="mono" transform="rotate(-38 414.0 166)">European</text>
+<text x="490.0" y="166" text-anchor="start" class="mono" transform="rotate(-38 490.0 166)">Economic</text>
+<text x="566.0" y="166" text-anchor="start" class="mono" transform="rotate(-38 566.0 166)">Area</text>
+<text x="288" y="221.0" text-anchor="end" class="mono">la</text>
+<text x="288" y="297.0" text-anchor="end" class="mono">zone</text>
+<text x="288" y="373.0" text-anchor="end" class="mono">économique</text>
+<text x="288" y="449.0" text-anchor="end" class="mono">européenne</text>
+<rect x="300" y="178" width="76" height="76" fill="#2563eb" fill-opacity="0.906" stroke="#ffffff" stroke-width="3"/>
+<text x="338.0" y="221.0" text-anchor="middle" class="monos" fill="#ffffff">0.90</text>
+<rect x="376" y="178" width="76" height="76" fill="#2563eb" fill-opacity="0.088" stroke="#ffffff" stroke-width="3"/>
+<rect x="452" y="178" width="76" height="76" fill="#2563eb" fill-opacity="0.088" stroke="#ffffff" stroke-width="3"/>
+<rect x="528" y="178" width="76" height="76" fill="#2563eb" fill-opacity="0.098" stroke="#ffffff" stroke-width="3"/>
+<rect x="300" y="254" width="76" height="76" fill="#2563eb" fill-opacity="0.107" stroke="#ffffff" stroke-width="3"/>
+<rect x="376" y="254" width="76" height="76" fill="#2563eb" fill-opacity="0.107" stroke="#ffffff" stroke-width="3"/>
+<rect x="452" y="254" width="76" height="76" fill="#2563eb" fill-opacity="0.107" stroke="#ffffff" stroke-width="3"/>
+<rect x="528" y="254" width="76" height="76" fill="#2563eb" fill-opacity="0.859" stroke="#ffffff" stroke-width="3"/>
+<text x="566.0" y="297.0" text-anchor="middle" class="monos" fill="#ffffff">0.85</text>
+<rect x="300" y="330" width="76" height="76" fill="#2563eb" fill-opacity="0.079" stroke="#ffffff" stroke-width="3"/>
+<rect x="376" y="330" width="76" height="76" fill="#2563eb" fill-opacity="0.135" stroke="#ffffff" stroke-width="3"/>
+<rect x="452" y="330" width="76" height="76" fill="#2563eb" fill-opacity="0.887" stroke="#ffffff" stroke-width="3"/>
+<text x="490.0" y="373.0" text-anchor="middle" class="monos" fill="#ffffff">0.88</text>
+<rect x="528" y="330" width="76" height="76" fill="#2563eb" fill-opacity="0.079" stroke="#ffffff" stroke-width="3"/>
+<rect x="300" y="406" width="76" height="76" fill="#2563eb" fill-opacity="0.079" stroke="#ffffff" stroke-width="3"/>
+<rect x="376" y="406" width="76" height="76" fill="#2563eb" fill-opacity="0.925" stroke="#ffffff" stroke-width="3"/>
+<text x="414.0" y="449.0" text-anchor="middle" class="monos" fill="#ffffff">0.92</text>
+<rect x="452" y="406" width="76" height="76" fill="#2563eb" fill-opacity="0.098" stroke="#ffffff" stroke-width="3"/>
+<rect x="528" y="406" width="76" height="76" fill="#2563eb" fill-opacity="0.079" stroke="#ffffff" stroke-width="3"/>
+<rect x="376" y="254" width="228" height="228" rx="6" fill="none" stroke="#ea580c" stroke-width="2.6" stroke-dasharray="7,5"/>
+<text x="618" y="360.0" class="lbl" fill="#ea580c">反对角线</text>
+<text x="618" y="380.0" class="small" fill="#334155">形-名语序</text>
+<text x="618" y="398.0" class="small" fill="#334155">英法相反</text>
+<defs><linearGradient id="alnGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2563eb" stop-opacity="0.06"/><stop offset="1" stop-color="#2563eb" stop-opacity="1"/></linearGradient></defs>
+<rect x="300" y="524" width="304" height="16" rx="3" fill="url(#alnGrad)" stroke="#334155" stroke-width="0.8"/>
+<text x="300" y="558" text-anchor="start" class="small">α≈0（几乎不看）</text>
+<text x="604" y="558" text-anchor="end" class="small">α≈1（强对齐）</text>
+<text x="452.0" y="518" text-anchor="middle" class="small" fill="#334155">格子颜色 = 注意力权重 αₜⱼ（每一行是一个 softmax 分布、横向和为 1）</text>
+<rect x="48" y="580" width="844" height="70" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="470.0" y="608" text-anchor="middle" class="lbl" fill="#ea580c">“la” 顺位对齐 “the” —— 对角线起步正常；</text>
+<text x="470.0" y="632" text-anchor="middle" class="lbl" fill="#ea580c">但 “European Economic Area” → “zone économique européenne” 形-名语序翻转，对角线在此「拐弯」成反对角线</text>
+</svg>

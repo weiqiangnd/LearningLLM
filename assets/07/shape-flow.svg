@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2340 480">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 15px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 17px; font-weight: 700; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14.5px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="1170.0" y="46" text-anchor="middle" class="title">多头注意力形状变换全过程：reshape / transpose 切头 → attention → transpose / reshape 合头</text>
+<rect x="65.0" y="157.0" width="200" height="96" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="165" y="201" text-anchor="middle" class="mono">[B, L, d_model]</text>
+<text x="165" y="221" text-anchor="middle" class="small">输入</text>
+<rect x="384.0" y="157.0" width="232" height="96" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="500" y="201" text-anchor="middle" class="mono">[B, L, H, d_k]</text>
+<text x="500" y="221" text-anchor="middle" class="small">劈开 d_model = H×d_k</text>
+<rect x="739.0" y="157.0" width="232" height="96" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="855" y="201" text-anchor="middle" class="mono">[B, H, L, d_k]</text>
+<text x="855" y="221" text-anchor="middle" class="small">头维提前 → 可并行</text>
+<rect x="1094.0" y="157.0" width="232" height="96" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="1210" y="201" text-anchor="middle" class="mono">[B, H, L, d_k]</text>
+<text x="1210" y="221" text-anchor="middle" class="small">各头 attention（形状不变）</text>
+<rect x="1449.0" y="157.0" width="232" height="96" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="1565" y="201" text-anchor="middle" class="mono">[B, L, H, d_k]</text>
+<text x="1565" y="221" text-anchor="middle" class="small">头维换回</text>
+<rect x="1784.0" y="157.0" width="232" height="96" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1900" y="201" text-anchor="middle" class="mono">[B, L, d_model]</text>
+<text x="1900" y="221" text-anchor="middle" class="small">H×d_k 合回 d_model</text>
+<rect x="2075.0" y="157.0" width="200" height="96" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="2175" y="201" text-anchor="middle" class="mono">[B, L, d_model]</text>
+<text x="2175" y="221" text-anchor="middle" class="small">输出（同形）</text>
+<line x1="265.0" y1="205" x2="384.0" y2="205" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="324.5" y="187" text-anchor="middle" class="monos" fill="#334155">reshape</text>
+<line x1="616.0" y1="205" x2="739.0" y2="205" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="677.5" y="187" text-anchor="middle" class="monos" fill="#334155">transpose(1,2)</text>
+<line x1="971.0" y1="205" x2="1094.0" y2="205" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<text x="1032.5" y="171" text-anchor="middle" class="monos" fill="#334155">scaled dot-</text>
+<text x="1032.5" y="187" text-anchor="middle" class="monos" fill="#334155">product attn</text>
+<line x1="1326.0" y1="205" x2="1449.0" y2="205" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="1387.5" y="187" text-anchor="middle" class="monos" fill="#334155">transpose(1,2)</text>
+<line x1="1681.0" y1="205" x2="1784.0" y2="205" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="1732.5" y="171" text-anchor="middle" class="monos" fill="#334155">reshape</text>
+<text x="1732.5" y="187" text-anchor="middle" class="monos" fill="#334155">+ contiguous</text>
+<line x1="2016.0" y1="205" x2="2075.0" y2="205" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="2045.5" y="187" text-anchor="middle" class="monos" fill="#334155">W_O</text>
+<path d="M 65 279.0 L 65 291.0 L 971.0 291.0 L 971.0 279.0" fill="none" stroke="#7c3aed" stroke-width="1.8"/>
+<text x="518.0" y="311.0" text-anchor="middle" class="sub" fill="#7c3aed">切头 split_heads（不改数据，只搬运）</text>
+<path d="M 1449.0 279.0 L 1449.0 291.0 L 2016.0 291.0 L 2016.0 279.0" fill="none" stroke="#0d9488" stroke-width="1.8"/>
+<text x="1732.5" y="311.0" text-anchor="middle" class="sub" fill="#0d9488">合头 merge_heads（Concat）</text>
+<text x="1210" y="311.0" text-anchor="middle" class="sub" fill="#059669">每个头各算各的</text>
+<text x="1170.0" y="450" text-anchor="middle" class="cap">reshape / transpose 只搬运不计算；唯一改变数据的是各头内部的 attention 与最后的 W_O。transpose 后需 .contiguous() 才能 reshape。</text>
+</svg>

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 624">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="640.0" y="40" text-anchor="middle" class="title">时机之差：attention 算在 RNN 单元「之前」(Bahdanau) 还是「之后」(Luong)</text>
+<rect x="56" y="92" width="556" height="456" rx="14" fill="#f8fafc" stroke="#ea580c" stroke-width="2"/>
+<text x="334.0" y="124" text-anchor="middle" class="lbl" fill="#ea580c">Bahdanau（加性，2014）</text>
+<text x="334.0" y="148" text-anchor="middle" class="sub">attention 在 RNN 单元【之前】</text>
+<rect x="209.0" y="165.0" width="250" height="40" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="334.0" y="190" text-anchor="middle" class="lbl">上一步状态  yₜ₋₁ , sₜ₋₁</text>
+<line x1="334.0" y1="205" x2="334.0" y2="233.0" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="209.0" y="233.0" width="250" height="74" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="334.0" y="258" text-anchor="middle" class="lbl">① Attention</text>
+<text x="334.0" y="278" text-anchor="middle" class="small">query = sₜ₋₁ → 算 cₜ</text>
+<rect x="209.0" y="335.0" width="250" height="74" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="334.0" y="360" text-anchor="middle" class="lbl">② RNN 单元</text>
+<text x="334.0" y="380" text-anchor="middle" class="small">输入 [yₜ₋₁ ; cₜ]</text>
+<text x="334.0" y="398" text-anchor="middle" class="small">更新出 sₜ</text>
+<rect x="209.0" y="437.0" width="250" height="74" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="334.0" y="462" text-anchor="middle" class="lbl">③ 预测 yₜ</text>
+<text x="334.0" y="482" text-anchor="middle" class="small">由 sₜ（+cₜ）投影</text>
+<line x1="334.0" y1="307.0" x2="334.0" y2="335.0" stroke="#ea580c" stroke-width="2.2" marker-end="url(#aOrange)"/>
+<text x="348.0" y="326.0" class="mono" fill="#ea580c">cₜ</text>
+<line x1="334.0" y1="409.0" x2="334.0" y2="437.0" stroke="#2563eb" stroke-width="2.2" marker-end="url(#aBlue)"/>
+<text x="348.0" y="428.0" class="mono" fill="#2563eb">sₜ</text>
+<rect x="82.0" y="218.0" width="96" height="104" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="130" y="248" text-anchor="middle" class="lbl" fill="#0d9488">H</text>
+<text x="130" y="268" text-anchor="middle" class="small">编码器</text>
+<text x="130" y="286" text-anchor="middle" class="small">全部</text>
+<text x="130" y="304" text-anchor="middle" class="small">隐藏态</text>
+<line x1="178.0" y1="270" x2="209.0" y2="270" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aTeal)"/>
+<rect x="668" y="92" width="556" height="456" rx="14" fill="#f8fafc" stroke="#2563eb" stroke-width="2"/>
+<text x="946.0" y="124" text-anchor="middle" class="lbl" fill="#2563eb">Luong（乘性，2015）</text>
+<text x="946.0" y="148" text-anchor="middle" class="sub">attention 在 RNN 单元【之后】</text>
+<rect x="821.0" y="165.0" width="250" height="40" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="946.0" y="190" text-anchor="middle" class="lbl">上一步状态  yₜ₋₁ , sₜ₋₁</text>
+<line x1="946.0" y1="205" x2="946.0" y2="233.0" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="821.0" y="233.0" width="250" height="74" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="946.0" y="258" text-anchor="middle" class="lbl">① RNN 单元</text>
+<text x="946.0" y="278" text-anchor="middle" class="small">输入 yₜ₋₁ ，由 sₜ₋₁</text>
+<text x="946.0" y="296" text-anchor="middle" class="small">更新出 sₜ</text>
+<rect x="821.0" y="335.0" width="250" height="74" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="946.0" y="360" text-anchor="middle" class="lbl">② Attention</text>
+<text x="946.0" y="380" text-anchor="middle" class="small">query = sₜ → 算 cₜ</text>
+<rect x="821.0" y="437.0" width="250" height="74" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="946.0" y="462" text-anchor="middle" class="lbl">③ 预测 yₜ</text>
+<text x="946.0" y="482" text-anchor="middle" class="small">由 [sₜ ; cₜ] 投影</text>
+<line x1="946.0" y1="307.0" x2="946.0" y2="335.0" stroke="#2563eb" stroke-width="2.2" marker-end="url(#aBlue)"/>
+<text x="960.0" y="326.0" class="mono" fill="#2563eb">sₜ</text>
+<line x1="946.0" y1="409.0" x2="946.0" y2="437.0" stroke="#ea580c" stroke-width="2.2" marker-end="url(#aOrange)"/>
+<text x="960.0" y="428.0" class="mono" fill="#ea580c">cₜ</text>
+<rect x="1112.0" y="320.0" width="96" height="104" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="1160" y="350" text-anchor="middle" class="lbl" fill="#0d9488">H</text>
+<text x="1160" y="370" text-anchor="middle" class="small">编码器</text>
+<text x="1160" y="388" text-anchor="middle" class="small">全部</text>
+<text x="1160" y="406" text-anchor="middle" class="small">隐藏态</text>
+<line x1="1112.0" y1="372" x2="1071.0" y2="372" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aTeal)"/>
+<rect x="56" y="562" width="1168" height="46" rx="11" fill="#f3f4f6" stroke="#334155" stroke-width="1.6"/>
+<text x="640.0" y="591" text-anchor="middle" class="lbl" fill="#374151">三步套路（打分 → softmax → 加权求和）完全相同 —— 只差 attention 摆在 RNN 单元前/后，query 相应地取 sₜ₋₁ / sₜ</text>
+</svg>

@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 600">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aSlate" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#334155"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 25px; font-weight: 700; fill: #374151; }
+    .h2     { font-size: 18px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 14px; font-weight: 600; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 15px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 700; }
+  </style>
+<text x="860.0" y="44" text-anchor="middle" class="title">语言模型演变时间线：从 n-gram 一步步走到 Transformer，再到大模型</text>
+<text x="860.0" y="72" text-anchor="middle" class="cap">每一步都在补上一步的短板——Transformer（2017）是这条线的集大成者，也是本章的主角</text>
+<line x1="80" y1="320" x2="1648" y2="320" stroke="#94a3b8" stroke-width="3" marker-end="url(#aGray)"/>
+<text x="1656" y="325" text-anchor="start" class="small">时间</text>
+<line x1="152" y1="276" x2="152" y2="312" stroke="#7c8896" stroke-width="2"/>
+<rect x="49.0" y="148" width="206" height="128" rx="12" fill="#eef0f3" stroke="#7c8896" stroke-width="2"/>
+<text x="152" y="176" text-anchor="middle" class="lbl" fill="#7c8896">1990s 前后</text>
+<text x="152" y="203" text-anchor="middle" class="lbl">n-gram 统计 LM</text>
+<text x="152" y="227" text-anchor="middle" class="small">数频次估概率、只看前几个词</text>
+<text x="152" y="249" text-anchor="middle" class="small">数据稀疏、几乎不懂语义</text>
+<circle cx="152" cy="320" r="8" fill="#7c8896" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="354" y1="328" x2="354" y2="364" stroke="#059669" stroke-width="2"/>
+<rect x="251.0" y="364" width="206" height="128" rx="12" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="354" y="392" text-anchor="middle" class="lbl" fill="#059669">2003</text>
+<text x="354" y="419" text-anchor="middle" class="lbl">神经语言模型</text>
+<text x="354" y="443" text-anchor="middle" class="small">神经网络 + 词向量替代查表</text>
+<text x="354" y="465" text-anchor="middle" class="small">语义相近的词共享统计强度</text>
+<circle cx="354" cy="320" r="8" fill="#059669" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="556" y1="276" x2="556" y2="312" stroke="#059669" stroke-width="2"/>
+<rect x="453.0" y="148" width="206" height="128" rx="12" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="556" y="176" text-anchor="middle" class="lbl" fill="#059669">2013</text>
+<text x="556" y="203" text-anchor="middle" class="lbl">word2vec</text>
+<text x="556" y="227" text-anchor="middle" class="small">词向量学得又快又好（第 4 章）</text>
+<text x="556" y="249" text-anchor="middle" class="small">但它是静态的、不随上下文变</text>
+<circle cx="556" cy="320" r="8" fill="#059669" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="758" y1="328" x2="758" y2="364" stroke="#ea580c" stroke-width="2"/>
+<rect x="655.0" y="364" width="206" height="128" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="758" y="392" text-anchor="middle" class="lbl" fill="#ea580c">2014–2015</text>
+<text x="758" y="419" text-anchor="middle" class="lbl">RNN seq2seq + attention</text>
+<text x="758" y="443" text-anchor="middle" class="small">循环网络把历史编进状态（第 5 章）</text>
+<text x="758" y="465" text-anchor="middle" class="small">attention 打破定长瓶颈</text>
+<circle cx="758" cy="320" r="8" fill="#ea580c" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="960" y1="276" x2="960" y2="309" stroke="#dc2626" stroke-width="2"/>
+<rect x="916.0" y="108" width="88" height="28" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="960" y="127" text-anchor="middle" class="tag" fill="#dc2626">本章主角</text>
+<rect x="857.0" y="148" width="206" height="128" rx="12" fill="#fce7f3" stroke="#dc2626" stroke-width="3"/>
+<text x="960" y="176" text-anchor="middle" class="lbl" fill="#dc2626">2017</text>
+<text x="960" y="203" text-anchor="middle" class="lbl">Transformer  ★</text>
+<text x="960" y="227" text-anchor="middle" class="small">扔掉 RNN、纯 self-attention</text>
+<text x="960" y="249" text-anchor="middle" class="small">并行 + 任意两 token 长程直连</text>
+<circle cx="960" cy="320" r="11" fill="#dc2626" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="1162" y1="328" x2="1162" y2="364" stroke="#2563eb" stroke-width="2"/>
+<rect x="1059.0" y="364" width="206" height="128" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="1162" y="392" text-anchor="middle" class="lbl" fill="#2563eb">2018</text>
+<text x="1162" y="419" text-anchor="middle" class="lbl">GPT / BERT</text>
+<text x="1162" y="443" text-anchor="middle" class="small">Transformer + 大规模预训练</text>
+<text x="1162" y="465" text-anchor="middle" class="small">开启 decoder / encoder 两条路线</text>
+<circle cx="1162" cy="320" r="8" fill="#2563eb" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="1364" y1="276" x2="1364" y2="312" stroke="#2563eb" stroke-width="2"/>
+<rect x="1261.0" y="148" width="206" height="128" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="1364" y="176" text-anchor="middle" class="lbl" fill="#2563eb">2020</text>
+<text x="1364" y="203" text-anchor="middle" class="lbl">GPT-3</text>
+<text x="1364" y="227" text-anchor="middle" class="small">175B 参数、纯 decoder-only</text>
+<text x="1364" y="249" text-anchor="middle" class="small">in-context learning 涌现</text>
+<circle cx="1364" cy="320" r="8" fill="#2563eb" stroke="#ffffff" stroke-width="2.5"/>
+<line x1="1566" y1="328" x2="1566" y2="364" stroke="#7c3aed" stroke-width="2"/>
+<rect x="1463.0" y="364" width="206" height="128" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1566" y="392" text-anchor="middle" class="lbl" fill="#7c3aed">2023+</text>
+<text x="1566" y="419" text-anchor="middle" class="lbl">LLaMA / Qwen …</text>
+<text x="1566" y="443" text-anchor="middle" class="small">开源大模型成为主流</text>
+<text x="1566" y="465" text-anchor="middle" class="small">现代配方的集大成者（正是本章）</text>
+<circle cx="1566" cy="320" r="8" fill="#7c3aed" stroke="#ffffff" stroke-width="2.5"/>
+<text x="860.0" y="574" text-anchor="middle" class="cap">一条主线：n-gram 不懂语义 → 词向量给语义 → RNN 上下文化 → attention 破瓶颈 → Transformer 并行 + 长程直连 → 预训练 + 规模</text>
+</svg>

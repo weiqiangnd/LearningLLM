@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="640.0" y="42" text-anchor="middle" class="title">seq2seq 的瓶颈：整句话被压进一个定长向量 c —— 句子越长越记不住</text>
+<text x="395" y="78" text-anchor="middle" class="lbl" fill="#2563eb">编码器 Encoder：RNN 顺序读源序列</text>
+<rect x="142.0" y="92.0" width="86" height="36" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="185" y="115" text-anchor="middle" class="mono">x₁</text>
+<line x1="185" y1="128" x2="185" y2="170" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="139.0" y="171.0" width="92" height="58" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="185" y="196" text-anchor="middle" class="lbl">RNN</text>
+<text x="185" y="216" text-anchor="middle" class="small">h₁</text>
+<line x1="231.0" y1="200" x2="279.0" y2="200" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="282.0" y="92.0" width="86" height="36" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="325" y="115" text-anchor="middle" class="mono">x₂</text>
+<line x1="325" y1="128" x2="325" y2="170" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="279.0" y="171.0" width="92" height="58" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="325" y="196" text-anchor="middle" class="lbl">RNN</text>
+<text x="325" y="216" text-anchor="middle" class="small">h₂</text>
+<line x1="371.0" y1="200" x2="419.0" y2="200" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="422.0" y="92.0" width="86" height="36" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="465" y="115" text-anchor="middle" class="mono">x₃</text>
+<line x1="465" y1="128" x2="465" y2="170" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="419.0" y="171.0" width="92" height="58" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="465" y="196" text-anchor="middle" class="lbl">RNN</text>
+<text x="465" y="216" text-anchor="middle" class="small">h₃</text>
+<line x1="511.0" y1="200" x2="559.0" y2="200" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="562.0" y="92.0" width="86" height="36" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="605" y="115" text-anchor="middle" class="mono">x₄</text>
+<line x1="605" y1="128" x2="605" y2="170" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<rect x="559.0" y="171.0" width="92" height="58" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="605" y="196" text-anchor="middle" class="lbl">RNN</text>
+<text x="605" y="216" text-anchor="middle" class="small">h₄</text>
+<text x="133.0" y="205" text-anchor="end" class="small">h₀</text>
+<line x1="651.0" y1="200" x2="690" y2="200" stroke="#dc2626" stroke-width="2.6" marker-end="url(#aRed)"/>
+<rect x="695" y="122" width="130" height="156" rx="13" fill="#fee2e2" stroke="#dc2626" stroke-width="2.6"/>
+<text x="760" y="156" text-anchor="middle" class="lbl" fill="#dc2626">context</text>
+<text x="760" y="180" text-anchor="middle" class="mono" fill="#dc2626">c = h₄</text>
+<rect x="738" y="202" width="44" height="14" fill="#ffffff" stroke="#dc2626" stroke-width="1.2"/>
+<rect x="738" y="219" width="44" height="14" fill="#ffffff" stroke="#dc2626" stroke-width="1.2"/>
+<rect x="738" y="236" width="44" height="14" fill="#ffffff" stroke="#dc2626" stroke-width="1.2"/>
+<rect x="738" y="253" width="44" height="14" fill="#ffffff" stroke="#dc2626" stroke-width="1.2"/>
+<text x="760" y="292" text-anchor="middle" class="small" fill="#dc2626">定长！</text>
+<text x="395" y="372" text-anchor="middle" class="lbl" fill="#059669">解码器 Decoder：只拿着这一个 c 往外吐</text>
+<rect x="139.0" y="453.0" width="92" height="58" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="185" y="478" text-anchor="middle" class="lbl">RNN</text>
+<text x="185" y="498" text-anchor="middle" class="small">s₁</text>
+<line x1="185" y1="453.0" x2="185" y2="423.0" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="142.0" y="388.0" width="86" height="34" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="185" y="410.0" text-anchor="middle" class="mono">y₁</text>
+<line x1="231.0" y1="482" x2="279.0" y2="482" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="279.0" y="453.0" width="92" height="58" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="325" y="478" text-anchor="middle" class="lbl">RNN</text>
+<text x="325" y="498" text-anchor="middle" class="small">s₂</text>
+<line x1="325" y1="453.0" x2="325" y2="423.0" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="282.0" y="388.0" width="86" height="34" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="325" y="410.0" text-anchor="middle" class="mono">y₂</text>
+<line x1="371.0" y1="482" x2="419.0" y2="482" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="419.0" y="453.0" width="92" height="58" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="465" y="478" text-anchor="middle" class="lbl">RNN</text>
+<text x="465" y="498" text-anchor="middle" class="small">s₃</text>
+<line x1="465" y1="453.0" x2="465" y2="423.0" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="422.0" y="388.0" width="86" height="34" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="465" y="410.0" text-anchor="middle" class="mono">y₃</text>
+<line x1="511.0" y1="482" x2="559.0" y2="482" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="559.0" y="453.0" width="92" height="58" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="605" y="478" text-anchor="middle" class="lbl">RNN</text>
+<text x="605" y="498" text-anchor="middle" class="small">s₄</text>
+<line x1="605" y1="453.0" x2="605" y2="423.0" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="562.0" y="388.0" width="86" height="34" rx="11" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="605" y="410.0" text-anchor="middle" class="mono">y₄</text>
+<path d="M 760 278 C 520 315, 200 315, 110 360 C 110 430, 110 482, 139.0 482" fill="none" stroke="#dc2626" stroke-width="2.4" marker-end="url(#aRed)"/>
+<text x="125" y="350" class="small" fill="#dc2626">c 是 decoder 唯一的「源信息」</text>
+<rect x="60" y="540" width="1160" height="52" rx="11" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8"/>
+<text x="640.0" y="572" text-anchor="middle" class="lbl" fill="#dc2626">瓶颈：无论源句多长，全部信息都得挤进这一个固定大小的 c —— 长句的开头很容易被「冲掉」</text>
+<text x="880" y="170" class="small">同一套 RNN 权重</text>
+<text x="880" y="190" class="small">在每一步反复使用</text>
+</svg>
