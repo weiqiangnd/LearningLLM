@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 540">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="680.0" y="40" text-anchor="middle" class="title">三种切分粒度：为什么 LLM 选「子词」</text>
+<rect x="60" y="60" width="1240" height="116" rx="12" fill="#fbfdff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="74" y="92" width="190" height="52" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="169.0" y="115" text-anchor="middle" class="lbl">按字符 char</text>
+<text x="169.0" y="135" text-anchor="middle" class="small">拆到单个字符</text>
+<rect x="284" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="297.5" y="107" text-anchor="middle" class="mono">t</text>
+<rect x="318" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="331.5" y="107" text-anchor="middle" class="mono">o</text>
+<rect x="352" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="365.5" y="107" text-anchor="middle" class="mono">k</text>
+<rect x="386" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="399.5" y="107" text-anchor="middle" class="mono">e</text>
+<rect x="420" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="433.5" y="107" text-anchor="middle" class="mono">n</text>
+<rect x="454" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="467.5" y="107" text-anchor="middle" class="mono">i</text>
+<rect x="488" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="501.5" y="107" text-anchor="middle" class="mono">z</text>
+<rect x="522" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="535.5" y="107" text-anchor="middle" class="mono">a</text>
+<rect x="556" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="569.5" y="107" text-anchor="middle" class="mono">t</text>
+<rect x="590" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="603.5" y="107" text-anchor="middle" class="mono">i</text>
+<rect x="624" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="637.5" y="107" text-anchor="middle" class="mono">o</text>
+<rect x="658" y="87.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="671.5" y="107" text-anchor="middle" class="mono">n</text>
+<rect x="284" y="125.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="297.5" y="145" text-anchor="middle" class="mono">机</text>
+<rect x="318" y="125.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="331.5" y="145" text-anchor="middle" class="mono">器</text>
+<rect x="352" y="125.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="365.5" y="145" text-anchor="middle" class="mono">学</text>
+<rect x="386" y="125.0" width="27" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="399.5" y="145" text-anchor="middle" class="mono">习</text>
+<text x="860" y="88" text-anchor="end" class="small" fill="#2563eb">12 + 4 个 token</text>
+<text x="880" y="116" class="sub">词表极小（几十～几千）；</text>
+<text x="880" y="138" class="sub">但序列超长、单个 token 几乎没有语义</text>
+<rect x="60" y="204" width="1240" height="116" rx="12" fill="#fbfdff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="74" y="236" width="190" height="52" rx="9" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="169.0" y="259" text-anchor="middle" class="lbl">按词 word</text>
+<text x="169.0" y="279" text-anchor="middle" class="small">整词一个 token</text>
+<rect x="284" y="231.0" width="148" height="30" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="358.0" y="251" text-anchor="middle" class="mono">tokenization</text>
+<rect x="284" y="269.0" width="60" height="30" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="314.0" y="289" text-anchor="middle" class="mono">机器学习</text>
+<text x="860" y="232" text-anchor="end" class="small" fill="#dc2626">1 + 1 个 token</text>
+<text x="880" y="260" class="sub">序列最短；</text>
+<text x="880" y="282" class="sub">但词表爆炸（百万级），没见过的词直接变 UNK（OOV）</text>
+<rect x="60" y="348" width="1240" height="116" rx="12" fill="#fbfdff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="74" y="380" width="190" height="52" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="169.0" y="403" text-anchor="middle" class="lbl">子词 subword（BPE）</text>
+<text x="169.0" y="423" text-anchor="middle" class="small">高频片段成块</text>
+<rect x="284" y="375.0" width="71" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<text x="319.5" y="395" text-anchor="middle" class="mono">token</text>
+<rect x="362" y="375.0" width="93" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<text x="408.5" y="395" text-anchor="middle" class="mono">ization</text>
+<rect x="284" y="413.0" width="38" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<text x="303.0" y="433" text-anchor="middle" class="mono">机器</text>
+<rect x="329" y="413.0" width="38" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<text x="348.0" y="433" text-anchor="middle" class="mono">学习</text>
+<text x="860" y="376" text-anchor="end" class="small" fill="#059669">2 + 2 个 token</text>
+<text x="880" y="404" class="sub">折中：词表可控（几万）、几乎无 OOV、</text>
+<text x="880" y="426" class="sub">常见词整体成 token —— LLM 的主流选择</text>
+<text x="680.0" y="500" text-anchor="middle" class="cap">同一段「tokenization / 机器学习」在三种粒度下的切法：char 丢语义、word 易 OOV，subword 在词表大小与序列长度之间取平衡。</text>
+</svg>
