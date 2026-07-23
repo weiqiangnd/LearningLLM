@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 678" font-family="Noto Sans CJK SC, PingFang SC, Helvetica, Arial, sans-serif">
+  <!-- fixed white background: keeps the PNG consistent on GitHub light/dark themes -->
+  <rect x="0" y="0" width="1240" height="678" fill="#ffffff"/>
+  <style>
+    .title   { font-size: 26px; font-weight: 600; fill: #374151; }
+    .subtitle{ font-size: 15px; fill: #374151; }
+    .phase   { font-size: 15px; font-weight: 600; fill: #334155; letter-spacing: .5px; }
+    .model   { font-size: 19px; font-weight: 600; fill: #374151; }
+    .year    { font-size: 14px; fill: #374151; }
+    .delta   { font-size: 14px; fill: #374151; }
+    .deltab  { font-size: 14px; font-weight: 600; fill: #334155; }
+    .cap     { font-size: 15px; fill: #374151; }
+    .lgd     { font-size: 14px; fill: #374151; }
+  </style>
+
+  <!-- title -->
+  <text x="40" y="42" class="title">大模型架构演进：GPT 系列立骨架，LLaMA / Qwen 换零件</text>
+  <text x="40" y="68" class="subtitle">骨架自 2017 年就没变过（decoder-only），变的全是 block 内部每个零件的型号</text>
+
+  <!-- ===== Phase bands ===== -->
+  <rect x="40" y="92" width="772" height="44" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="60" y="119" class="phase">第一条线 · 先立路线（原版 → GPT-1 / 2 / 3，2017–2020）</text>
+
+  <rect x="828" y="92" width="372" height="44" rx="8" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+  <text x="848" y="119" class="phase">第二条线 · 再换零件（LLaMA / Qwen，2023– ）</text>
+
+  <!-- ===== central timeline arrow ===== -->
+  <defs>
+    <marker id="arw" markerWidth="12" markerHeight="12" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L9,4 L0,8 Z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <line x1="70" y1="176" x2="1180" y2="176" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#arw)"/>
+
+  <!-- tick dots at card centers: 142 334 526 718 910 1102 -->
+  <circle cx="142"  cy="176" r="6" fill="#64748b"/>
+  <circle cx="334"  cy="176" r="6" fill="#2563eb"/>
+  <circle cx="526"  cy="176" r="6" fill="#2563eb"/>
+  <circle cx="718"  cy="176" r="6" fill="#2563eb"/>
+  <circle cx="910"  cy="176" r="6" fill="#7c3aed"/>
+  <circle cx="1102" cy="176" r="6" fill="#7c3aed"/>
+
+  <!-- ================= Model cards (all 180 x 150, gap 12) ================= -->
+  <!-- 原版 Transformer  (x=52, center=142) -->
+  <g>
+    <rect x="52" y="212" width="180" height="150" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="142" y="237" text-anchor="middle" class="model" font-size="15px">原版 Transformer</text>
+    <text x="142" y="260" text-anchor="middle" class="year">2017 · 原始论文</text>
+    <line x1="68" y1="272" x2="216" y2="272" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="66" y="294" class="delta">encoder-decoder 两栈</text>
+    <text x="66" y="314" class="delta">Post-LN · LayerNorm</text>
+    <text x="66" y="334" class="delta">ReLU · sinusoidal</text>
+    <text x="66" y="354" class="delta">MHA · 为翻译而设计</text>
+  </g>
+
+  <!-- GPT-1  (x=244, center=334) -->
+  <g>
+    <rect x="244" y="212" width="180" height="150" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="334" y="238" text-anchor="middle" class="model">GPT-1</text>
+    <text x="334" y="260" text-anchor="middle" class="year">2018 · 117M</text>
+    <line x1="260" y1="272" x2="408" y2="272" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="258" y="294" class="deltab">砍成 decoder-only</text>
+    <text x="258" y="314" class="delta">预训练 + 微调</text>
+    <text x="258" y="334" class="delta">两阶段范式</text>
+    <text x="258" y="354" class="delta">learned 绝对位置</text>
+  </g>
+
+  <!-- GPT-2  (x=436, center=526) -->
+  <g>
+    <rect x="436" y="212" width="180" height="150" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="526" y="238" text-anchor="middle" class="model">GPT-2</text>
+    <text x="526" y="260" text-anchor="middle" class="year">2019 · 1.5B</text>
+    <line x1="452" y1="272" x2="600" y2="272" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="450" y="294" class="deltab">定型 Pre-LN</text>
+    <text x="450" y="314" class="delta">规模大幅提升</text>
+    <text x="450" y="334" class="delta">WebText 40GB</text>
+    <text x="450" y="354" class="deltab">zero-shot 登场</text>
+  </g>
+
+  <!-- GPT-3  (x=628, center=718) -->
+  <g>
+    <rect x="628" y="212" width="180" height="150" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="718" y="238" text-anchor="middle" class="model">GPT-3</text>
+    <text x="718" y="260" text-anchor="middle" class="year">2020 · 175B</text>
+    <line x1="644" y1="272" x2="792" y2="272" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="642" y="294" class="delta">再放大 100 倍</text>
+    <text x="642" y="314" class="deltab">in-context learning</text>
+    <text x="642" y="334" class="delta">few-shot 涌现</text>
+    <text x="642" y="354" class="delta">确立 decoder-only</text>
+  </g>
+
+  <!-- LLaMA  (x=820, center=910) -->
+  <g>
+    <rect x="820" y="212" width="180" height="150" rx="10" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="910" y="238" text-anchor="middle" class="model">LLaMA</text>
+    <text x="910" y="260" text-anchor="middle" class="year">2023 · Meta 开源</text>
+    <line x1="836" y1="272" x2="984" y2="272" stroke="#ddd6fe" stroke-width="1"/>
+    <text x="834" y="294" class="deltab">RMSNorm · SwiGLU</text>
+    <text x="834" y="314" class="deltab">RoPE · 去 bias</text>
+    <text x="834" y="334" class="deltab">GQA（LLaMA-2 大模型）</text>
+    <text x="834" y="354" class="delta">一口气换现代零件</text>
+  </g>
+
+  <!-- Qwen3  (x=1012, center=1102) -->
+  <g>
+    <rect x="1012" y="212" width="180" height="150" rx="10" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="1102" y="238" text-anchor="middle" class="model">Qwen3</text>
+    <text x="1102" y="260" text-anchor="middle" class="year">2025 · 阿里开源</text>
+    <line x1="1028" y1="272" x2="1176" y2="272" stroke="#ddd6fe" stroke-width="1"/>
+    <text x="1026" y="294" class="delta">继承上述现代零件</text>
+    <text x="1026" y="314" class="deltab">再补 QK-norm</text>
+    <text x="1026" y="334" class="deltab">可选 MoE</text>
+    <text x="1026" y="354" class="delta">8B：32 Q 头 / 8 KV 头</text>
+  </g>
+
+  <!-- ================= Fixed skeleton strip (bottom) ================= -->
+  <text x="40" y="416" class="phase">骨架八年未变（decoder-only）：</text>
+  <g>
+    <rect x="40" y="432" width="1160" height="66" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="197" y="470" class="cap">input_ids → Embedding →</text>
+    <rect x="423" y="446" width="340" height="38" rx="7" fill="#eef2ff" stroke="#818cf8" stroke-width="1.5"/>
+    <text x="593" y="470" text-anchor="middle" class="cap">N × Decoder Block（Attention + FFN）</text>
+    <text x="783" y="470" class="cap">→ Final Norm → lm_head → logits</text>
+  </g>
+  <text x="70" y="524" class="cap">变的只是 Block 内部零件的型号：Norm 用哪种、FFN 激活用哪种、位置编码用哪种、注意力削不削 KV 头、FFN 换不换成 MoE。</text>
+
+  <!-- ================= Legend ================= -->
+  <text x="40" y="568" class="phase">图例</text>
+  <rect x="40" y="582" width="20" height="20" rx="4" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="70" y="597" class="lgd">GPT 系列 · 关键词是「骨架 + 规模」，架构基本冻结、参数量三代涨约 1500 倍</text>
+  <rect x="40" y="610" width="20" height="20" rx="4" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="70" y="625" class="lgd">LLaMA / Qwen · 关键词是「换零件」，骨架不动、把内部零件逐个换成更好的版本</text>
+  <text x="40" y="653" class="deltab">加粗字</text>
+  <text x="96" y="653" class="lgd">= 该零件 / 能力在这一代「首次换上 / 首次涌现」。</text>
+</svg>
