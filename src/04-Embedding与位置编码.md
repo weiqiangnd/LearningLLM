@@ -194,7 +194,7 @@ $$
 1. **语义相近的词，向量也相近**。`cat` 的最近邻是 `dog`、`cats`、`pet` 这类，余弦相似度很高——这正是分布假说的直接结果。
 2. **某些方向编码了可解释的语义关系**。最有名的就是 `king - man + woman ≈ queen`。怎么理解？把它挪一下变成 `king - man ≈ queen - woman`：等式两边都是「从男性版本指向女性版本」的那个**差向量**——也就是说，向量空间里存在一个大致稳定的「性别」方向。于是从 `king` 出发，减掉「男」、加上「女」，就落到了 `queen` 附近。类似地还有 `paris - france + italy ≈ rome`（首都关系）、`walking - walk + swim ≈ swimming`（时态关系）——这些是在大规模语料 / 成熟词向量上反复验证过的经典例子（小语料只能学出近似版本，见实战）。
 
-这就回答了 1.1 节的悬念：embedding「带语义结构」不是玄学，而是**从「预测上下文」这个任务里自然涌现的**——没有谁手动规定「性别方向」，是数据 + 目标函数自己学出来的。实战 Cell 5 会在我们自己训的词向量上，把 `king - man + woman` 算出来，看 `queen` 是不是真的排在最前面。
+这就回答了 1.1 节的悬念：embedding「带语义结构」不是玄学，而是**从「预测上下文」这个任务里自然涌现的**——没有谁手动规定「性别方向」，是数据 + 目标函数自己学出来的。实战 Cell 5 会在我们自己训的词向量上，把 `king - man + woman` 算出来，看它的最近邻是不是真的落在 `queen` 那一族词上。
 
 ### 2.4 和 LLM embedding 的关键异同
 
@@ -541,10 +541,15 @@ print("→ 绑定后，输入查表和输出打分共用一套向量语义，省
 import time
 import gensim.downloader as api
 from gensim.models import Word2Vec
+from gensim.models.word2vec import Text8Corpus
 from gensim.models.callbacks import CallbackAny2Vec
 
 print("下载 text8 语料（约 30 MB 压缩包，首次运行需联网）...")
-corpus = api.load("text8")          # 返回一个可迭代的句子语料
+# 用 return_path=True 只取下载后的文件路径，再自己包一层 Text8Corpus。若直接写
+# api.load("text8")，它会去 import 语料自带的加载脚本，而那个脚本里的
+# `from smart_open import smart_open` 在 smart_open 2.0 后已失效，必然 ImportError。
+corpus_path = api.load("text8", return_path=True)
+corpus = Text8Corpus(corpus_path)   # 可迭代（且可重复迭代）的句子语料
 
 EPOCHS = 5                           # 训练轮数，抽成变量给下面的进度回调引用
 
@@ -608,7 +613,7 @@ for word, score in wv.most_similar(positive=["paris", "italy"], negative=["franc
     print(f"  {word:12s} {score:.3f}")
 ```
 
-**预期现象**：`king - man + woman` 的最近邻里 **`queen` 排在最前面**（余弦约 0.66；受训练随机性影响名次偶有波动，但一般稳居榜首）；`cat` 的近邻是 `prionailurus`（豹猫属）、`felis`（猫属）、`meow`（喵）、`dog` 这类**猫科 / 近缘词 + 拟声词**（text8 取自维基百科，口径偏百科，所以学名占比偏高）；`paris - france + italy` 会落到**意大利的城市**上（`venice` / `bologna` / `turin` 等）——「某国的城市」这个关系迁移对了（小语料下未必精准命中首都 `rome`）。这就是第 2.3 节「语义结构从预测上下文里自然涌现」的验证。
+**预期现象**：`king - man + woman` 的最近邻**清一色是「王室 / 王位 / 女性亲属」这一族词**（余弦约 0.62–0.68），如 `queen`、`throne`（王位）、`consort`（配偶）、`dowager`（太后）、`matilda` / `isabella`（王后名）、`daughter`。注意 gensim 默认不固定随机种子、text8 语料又小，**具体名次每次跑都不一样**——`queen` 有时排第一，有时被上面那些词挤到后面甚至掉出前五，这都正常。该看的不是名次，而是这一族词的语义方向对不对；`cat` 的近邻是 `prionailurus`（豹猫属）、`felis`（猫属）、`meow`（喵）、`dog` 这类**猫科 / 近缘词 + 拟声词**（text8 取自维基百科，口径偏百科，所以学名占比偏高）；`paris - france + italy` 会落到**意大利的城市**上（`venice` / `bologna` / `turin` 等）——「某国的城市」这个关系迁移对了（小语料下未必精准命中首都 `rome`）。这就是第 2.3 节「语义结构从预测上下文里自然涌现」的验证。
 
 ### 9.4 自注意力的置换等变性
 
