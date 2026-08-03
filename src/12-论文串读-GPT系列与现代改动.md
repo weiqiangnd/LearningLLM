@@ -2,7 +2,7 @@
 
 上一章我们逐节读完了 2017 年那篇奠基论文，末尾留了一张「2017 → 今天」的对照表：整体架构从两栈变成 decoder-only，归一化从 Post-LN 换到 Pre-LN、从 LayerNorm 换到 RMSNorm，FFN 的激活从 ReLU 换成 SwiGLU，位置编码从 sinusoidal 换成 RoPE，注意力从 MHA 换成 GQA。那张表的右列，就是**这一章要逐项展开的全部内容**。
 
-这一章咱们不再读单独一篇论文，而是**顺着一条时间线串读一批论文**——不抠某一篇的每个公式，而是把同一条技术脉络上的几篇关键论文摆在一起，看清**每一代相对上一代到底改了什么、为什么改**。我们串两条线：
+这一章咱们不再读单独一篇论文，而是**顺着时间线串读一批论文**——不抠某一篇的每个公式，而是把同一条技术脉络上的几篇关键论文摆在一起，看清**每一代相对上一代到底改了什么、为什么改**。我们串两条线：
 
 - **第一条线（第 2-5 节）：GPT-1 → GPT-2 → GPT-3**，看 **decoder-only 这条路线是怎么一步步被确立**的——从「预训练 + 微调」到「零样本」，再到「few-shot 上下文学习」，规模一路放大到质变。
 - **第二条线（第 6 节）：从原版 Transformer 到 LLaMA / Qwen**，把现代大模型相对原版换掉的那批零件（RoPE / RMSNorm / SwiGLU / GQA / MoE）逐项拆开对照。
@@ -29,10 +29,10 @@
   - [3.1 核心主张：语言模型是无监督的多任务学习器](#31-核心主张语言模型是无监督的多任务学习器)
   - [3.2 架构上的三个小改动（Pre-LN 就在这里定型）](#32-架构上的三个小改动pre-ln-就在这里定型)
 - [四、GPT-3（2020）：few-shot 上下文学习与规模的质变](#四gpt-32020few-shot-上下文学习与规模的质变)
-  - [4.1 175B：把规模推到前所未有](#41-175b把规模推到前所未有)
+  - [4.1 175B：把规模再放大两个数量级](#41-175b把规模再放大两个数量级)
   - [4.2 in-context learning：不更新参数就能学新任务](#42-in-context-learning不更新参数就能学新任务)
-  - [4.3 GPT 三代的数字对照表](#43-gpt-三代的数字对照表)
-- [五、小结这条线：decoder-only 路线是怎么确立的](#五小结这条线decoder-only-路线是怎么确立的)
+  - [4.3 GPT 三代关键指标对照表](#43-gpt-三代关键指标对照表)
+- [五、小结：decoder-only 路线是怎么确立的](#五小结decoder-only-路线是怎么确立的)
 - [六、LLaMA / Qwen 的现代改动逐项拆解](#六llama--qwen-的现代改动逐项拆解)
   - [6.1 RoPE：绝对位置编码 → 旋转式相对位置](#61-rope绝对位置编码--旋转式相对位置)
   - [6.2 RMSNorm：LayerNorm 砍掉一半](#62-rmsnormlayernorm-砍掉一半)
@@ -122,13 +122,13 @@ GPT-1 时还看不出这三点有多决定性（那会儿它只是「效果不�
 
 几乎同时（2018 年底），Google 的 **BERT** 用的是 **encoder-only** 栈 + **掩码语言建模（MLM）**——随机盖住句子里一部分 token、让模型**同时看左右两边**去猜被盖住的词。BERT 是**双向**的（每个位置能看到整句话），在「理解类」任务（分类、抽取、检索）上一度全面压过 GPT。
 
-所以 2018 那会儿其实是**两条路线并行**：GPT 走「单向 + 生成」，BERT 走「双向 + 理解」。为什么最后是 GPT 这条单向路线通向了今天的大模型？核心就是第 9 章第 4 节讲的：**单向的因果语言建模能把所有任务统一成「续写」，且 scale 到足够大以后 in-context learning 会自己涌现**——而这两点恰恰是 GPT-2、GPT-3 接下来要证明的事。BERT 那条路今天仍活在检索 / embedding 模型里，但通用大模型的主赛道被 GPT 这条路拿下了。
+所以 2018 那会儿其实是**两条路线并行**：GPT 走「单向 + 生成」，BERT 走「双向 + 理解」。为什么最后是 GPT 这条单向路线通向了今天的大模型？核心就是第 9 章第 4 节讲的：**单向的因果语言建模能把所有任务统一成「续写」，且规模放大到足够大以后 in-context learning 会自己涌现**——而这两点恰恰是 GPT-2、GPT-3 接下来要证明的事。BERT 那条路今天仍出现在检索 / embedding 模型里，但通用大模型的主赛道被 GPT 这条路拿下了。
 
 ---
 
 ## 三、GPT-2（2019）：规模变大，零样本登场
 
-> **这一代的 delta**：**骨架几乎不变，把规模和数据大幅拉大**（最大 1.5B 参数、40 GB 的 WebText），并提出一个大胆主张——**足够强的语言模型不微调也能直接做任务（zero-shot，零样本）**。架构上只有几处工程性小改，其中就包括把 Pre-LN 定为默认。
+> **这一代的 delta**：**骨架几乎不变，把规模和数据大幅拉大**（最大 1.5B 参数、40 GB 的 WebText），并提出一个大胆主张——**足够强的语言模型不微调也能直接做任务（zero-shot，零样本）**。架构上只做了三处工程性的小改动，其中最重要的一处是把 Pre-LN 定为后续模型的默认配置。
 
 GPT-2 的论文题目是《Language Models are Unsupervised Multitask Learners》（Radford 等，OpenAI，2019）。
 
@@ -142,13 +142,15 @@ GPT-2 用这套思路做了 **zero-shot（零样本）** 测试：**不给任何
 
 ### 3.2 架构上的三个小改动（Pre-LN 就在这里定型）
 
-GPT-2 的模型结构和 GPT-1 基本一样，论文里只提了几处工程性调整。这几处第 8、9 章都讲过原理，这里只做时间定位——**它们是从 GPT-2 这一代开始成为默认的**：
+GPT-2 的模型结构和 GPT-1 基本一样，论文里只提了三处工程性调整。前两处第 8、9 章都讲过原理，第三处是本章第一次出现、下面顺带说清——**它们都是从 GPT-2 这一代起，成为后来大模型的默认配置的**：
 
-- **LayerNorm 挪到子层输入端（Pre-LN）**：原版和 GPT-1 是 Post-LN（ $\text{LayerNorm}(x + \text{Sublayer}(x))$ ），GPT-2 把 LayerNorm 移到每个子层**之前**（ $x + \text{Sublayer}(\text{LayerNorm}(x))$ ）。原理见第 8 章第 3 节（残差高速公路）与第 9 章第 5 节（Pre-LN vs Post-LN）：Pre-LN 让残差成为一条干净的恒等高速公路，深层才训得稳。**「GPT-2 起，主流大模型清一色 Pre-LN」这句话，说的就是这处改动。**
+- **LayerNorm 挪到子层输入端（Pre-LN）**：原版和 GPT-1 是 Post-LN（ $\text{LayerNorm}(x + \text{Sublayer}(x))$ ），GPT-2 把 LayerNorm 移到每个子层**之前**（ $x + \text{Sublayer}(\text{LayerNorm}(x))$ ）。原理见第 8 章第 3 节（残差高速公路）与第 9 章第 5 节（Pre-LN vs Post-LN）：Pre-LN 让残差成为一条干净的恒等高速公路，深层才训得稳。
 - **最后一个 block 之后再加一道 LayerNorm（final norm）**：Pre-LN 的残差流会一路累加、幅度越来越大，所以在输出头（代码里叫 `lm_head`）之前补一道归一化把它拉回正常尺度。第 9 章第 2 节画的那条流水线里，`Final Norm` 这一环就是它。
-- **残差投影的初始化按 $1/\sqrt{N}$ 缩放**（ $N$ 为残差层数，约 2× block 层数——每个 block 有注意力、FFN 两条残差）：层数一多，几十条残差增量累加起来会让激活爆掉，所以把每个子层输出投影的初始权重按残差层数开根号缩小，抵消这种累加。这是个纯粹的**训练稳定性**技巧。
+- **残差投影的初始化按 $1/\sqrt{N}$ 缩放**（ $N$ 为残差层数，约 2× block 层数——每个 block 有注意力、FFN 两条残差）：具体做法是把每条残差支路**末端那个输出投影矩阵**（注意力的 $W_O$ 、FFN 的 $W_{\text{down}}$ ，现代实现里叫 `o_proj` / `down_proj`，GPT-2 原始实现里两处都叫 `c_proj`）的初始权重乘上 $1/\sqrt{N}$ ，再开始训练。这是个纯粹的**训练稳定性**技巧。
+  - **为什么要乘这一下**：Pre-LN 下子层「读流」时先归一化，但**写回流的增量 $\Delta$ 是未归一化的**（第 9 章第 5.3 节），而这些增量彼此近似独立，方差**逐条相加**—— $N$ 条累加下来，残差流的方差就涨到约 $N$ 倍，深层激活值的幅度随之失控膨胀。把这些投影矩阵的初值按 $\sqrt{N}$ 缩小，它们算出的增量 $\Delta$ 也随之变小，每条的方差变成原来的 $1/N$ ， $N$ 条加起来总方差正好回到 $O(1)$ ，跟单层时同量级。
+  - **它和上一条 final norm 分工不同、互相替代不了**：final norm 只在整个栈的**末端**动一次手，管的是交给输出头的那个向量尺度；初始化缩放作用在全部 $N$ 条残差支路上，管的是**沿途每一层**的幅度。而且 final norm 是等比例缩放，改不掉「越靠后的层，其增量占残差流的比例越小」这个层间失衡。时机上两者也差一截：final norm 是带可学习参数的常驻组件，训练和推理时一直在起作用；而 $1/\sqrt{N}$ 只在训练开始前动一次手，缩小的是这些投影矩阵的**初值**——训练跑起来后权重随梯度更新、初值不再保留，但它撑住的那段稳定状态正好覆盖开头最容易发散的几百步。一个是常驻部件，一个是起跑姿势。
 
-除此之外，GPT-2 还把上下文长度从 512 提到 1024、词表提到 50257、用 byte-level BPE（第 3 章的 BBPE）。**注意这里在模型结构上没有任何一处是「发明新组件」——全是把已有零件调参、换位置、扩规模**（真要说新东西，是 tokenizer 那一侧的 byte-level BPE，而它不属于 block 内部的结构）。这也印证了本章开头那句：GPT 系列这条线的关键词是**骨架和规模**，不是零件本身。
+除此之外，GPT-2 还把上下文长度从 512 提到 1024、词表提到 50257、用 byte-level BPE（第 3 章的 BBPE）。**注意这里在模型结构上没有任何一处是「发明新组件」——全是把已有零件调参、换位置、扩规模**（真要说新东西，是 tokenizer 那一侧的 byte-level BPE，而它不属于 block 内部的结构）。
 
 ---
 
@@ -158,15 +160,15 @@ GPT-2 的模型结构和 GPT-1 基本一样，论文里只提了几处工程性�
 
 GPT-3 的论文题目是《Language Models are Few-Shot Learners》（Brown 等，OpenAI，2020）。光看标题就知道，它接着 GPT-2「zero-shot」的话头，往前推到了「few-shot」。
 
-### 4.1 175B：把规模推到前所未有
+### 4.1 175B：把规模再放大两个数量级
 
-GPT-3 最大的型号有 **1750 亿（175B）参数、96 层、 $d_{\text{model}} = 12288$ 、96 个注意力头**，在约 3000 亿 token 的语料上训练。相比 GPT-2 的 1.5B，参数量涨了 **100 多倍**。架构上唯一值得一提的改动是**注意力层交替使用稠密（dense）和局部带状稀疏（locally banded sparse）注意力**（一种省显存的稀疏注意力，思路和第 23 章的 sliding window 一脉相承）——除此之外，**还是那套 decoder-only + Pre-LN 骨架**。
+GPT-3 最大的型号有 **1750 亿（175B）参数、96 层、 $d_{\text{model}} = 12288$ 、96 个注意力头**，在约 3000 亿 token 的语料上训练。相比 GPT-2 的 1.5B，参数量涨了 **100 多倍**。架构上唯一值得一提的改动是**注意力层交替使用稠密（dense）和局部带状稀疏（locally banded sparse）注意力**——所谓「带状」，是指每个 token 只关注邻近一段固定宽度的位置，注意力矩阵上只保留对角线附近的一条带，算力和显存都随之下降；GPT-3 让稀疏层和稠密层逐层交替，用稠密层补回全局视野。这个做法出自 Sparse Transformer（Child 等，2019），思路和第 23 章要讲的 sliding window 一脉相承，**不过 LLaMA / Qwen 这条主线并没有沿用它**——今天的 LLaMA / Qwen 用的都是稠密注意力，省显存这件事改由 FlashAttention（第 16 章）和 GQA 接手。除此之外，**还是那套 decoder-only + Pre-LN 骨架**。
 
 这里第一次清晰地显现出一件事：**这套骨架的主要「旋钮」就是规模**——把宽度（ $d_{\text{model}}$ ）、深度（层数）、头数一起往上推，模型能力就随之增长。至于「推多大最划算」，是第 21 章 scaling law 要回答的问题；GPT-3 用行动给出的答案是「再大两个数量级，会有惊喜」。
 
 ### 4.2 in-context learning：不更新参数就能学新任务
 
-GPT-3 论文最重要的发现，是 **in-context learning（上下文学习，也叫上下文内学习）**。第 9 章第 4 节提到过，这里把它讲清楚。
+GPT-3 论文最重要的发现，是 **in-context learning（上下文学习，也叫上下文内学习）**。
 
 传统的「学一个新任务」= 拿这个任务的数据去**更新模型参数**（训练 / 微调）。in-context learning 完全不动参数，而是**把示范直接写进 prompt**，让模型在这一次前向推理里「现学现用」。按 prompt 里给几个示范，分成三档：
 
@@ -179,15 +181,13 @@ GPT-3 论文最重要的发现，是 **in-context learning（上下文学习，�
       cheese => fromage
       I love you =>          ← 模型在这里续写出 "je t'aime"
 
-关键在于：**从头到尾没有任何一次反向传播、没有更新一个参数**。模型只是「读到」prompt 里的几个示范，就在这一次生成里照着模式续写。这几乎重写了 NLP 的使用方式——**过去用一个模型要先为每个任务训练，现在只要会写 prompt**。后来的 prompt 工程、few-shot、CoT 全都建立在这个能力之上。
+关键在于：**从头到尾没有任何一次反向传播、没有更新一个参数**。模型只是「读到」prompt 里的几个示范，就在这一次生成里照着模式续写。这几乎重写了 NLP 的使用方式——**过去用一个模型要先为每个任务训练，现在只要会写 prompt**。后来的 prompt 工程、few-shot、CoT（chain-of-thought，思维链：让模型把推理步骤一步步显式写出来再给答案）全都建立在这个能力之上。
 
-为什么 in-context learning 会出现？至今没有完全定论，但有一个朴素的直觉：GPT-2 那节说过，海量语料里天然混着各种任务的示范模式；模型大到一定程度，就学会了**识别 prompt 里正在演示的是什么模式、并把它延续下去**这种更抽象的能力。而这个能力**只在模型足够大时才明显涌现**——小模型 few-shot 几乎没有增益，大模型才有。这正是「规模带来质变」的典型证据，也是 GPT-3 之所以震动整个领域的原因。
+为什么 in-context learning 会出现？至今没有完全定论，但有一个朴素的直觉：第 3.1 节说过，海量语料里天然混着各种任务的示范模式；模型大到一定程度，就学会了**识别 prompt 里正在演示的是什么模式、并把它延续下去**这种更抽象的能力。而这个能力**随规模增大才逐渐明显**——小模型 few-shot 几乎没有增益，大模型才有。这正是「规模带来质变」的典型证据，也是 GPT-3 之所以震动整个领域的原因。
 
-### 4.3 GPT 三代的数字对照表
+### 4.3 GPT 三代关键指标对照表
 
-把三代的关键数字并排，最能看出这条线「骨架不大改、规模猛拉」的特点：
-
-| 指标 | GPT-1（2018） | GPT-2（2019，最大） | GPT-3（2020，最大） |
+| 指标 | GPT-1（2018） | GPT-2（2019，最大型号） | GPT-3（2020，最大型号） |
 |------|--------------|--------------------|--------------------|
 | 参数量 | 117 M | 1.5 B | 175 B |
 | 层数 | 12 | 48 | 96 |
@@ -199,11 +199,11 @@ GPT-3 论文最重要的发现，是 **in-context learning（上下文学习，�
 | 位置编码 | learned 绝对 | learned 绝对 | learned 绝对 |
 | 代表能力 | 预训练 + 微调 | zero-shot | **few-shot（in-context learning）** |
 
-看这张表最该注意两件事：一是**参数量三代涨了约 1500 倍**，而**架构上的实质改动只有 GPT-2 那处 Post-LN → Pre-LN**——「规模是主旋律、架构基本冻结」写在脸上；二是**位置编码三代都是 learned 绝对位置编码**（第 4 章第 5 节），还没换成 RoPE——**RoPE 是下一条线（LLaMA / Qwen）才引入的**，这正好把话题交接到第 6 节。
+从 GPT 的三代模型可以看到：一是**参数量三代涨了约 1500 倍**，而**架构上的实质改动只有 GPT-2 那处 Post-LN → Pre-LN**（GPT-3 那处交替稀疏注意力没被后续继承，不计在内）——规模是主旋律、架构基本冻结；二是**位置编码三代都是 learned 绝对位置编码**（第 4 章第 5 节），还没换成 RoPE——**RoPE 是下一条线（LLaMA / Qwen）才引入的**。
 
 ---
 
-## 五、小结这条线：decoder-only 路线是怎么确立的
+## 五、小结：decoder-only 路线是怎么确立的
 
 把 GPT-1/2/3 这条线用一句话收束：
 
@@ -213,15 +213,13 @@ GPT-3 论文最重要的发现，是 **in-context learning（上下文学习，�
 
 读到这里你多半想问一句：**那从 GPT-3 到 ChatGPT 的那一步呢？为什么这条线到 GPT-3 就停了？** 因为**那一步不在架构上**。GPT-3 虽然会 few-shot，但它骨子里只会「续写」——你丢给它一个问题，它可能顺手再给你编三道类似的题目，而不是回答。把它变成一个听得懂指令、答得像助手的模型，靠的是 **InstructGPT（2022）那条后训练路线**：先用人写的示范数据做 SFT（有监督微调），再用人类偏好训一个奖励模型、拿它去做 RLHF（基于人类反馈的强化学习）。**模型骨架一个零件都没动，动的是训练流程。** ChatGPT 就是这套后训练配方的产物，而后训练与对齐本身就是完整的一个阶段，留到第 27-36 章专门讲。
 
-至于 GPT-4 及之后的闭源模型，官方从未公开过架构细节，串读也就无从串起。这也正是本章第二条线要转向**开源**模型的原因：**只有开源模型，才能真正把「它相对上一代改了哪几件事」逐项读出来。**
-
-于是接下来几年，社区的注意力从「选哪种架构」转向了「**在这个已经定型的骨架里，把每个零件换成更好的版本**」。这就是第二条线——LLaMA / Qwen 的现代改动。
+接下来几年，社区的注意力从「选哪种架构」转向了「**在这个已经定型的骨架里，把每个零件换成更好的版本**」。这就是第二条线——LLaMA / Qwen 的现代改动。
 
 ---
 
 ## 六、LLaMA / Qwen 的现代改动逐项拆解
 
-2023 年 Meta 开源 **LLaMA**、阿里开源 **Qwen**，把「decoder-only 骨架 + 一套现代零件」的配方推广到了整个开源社区。这套配方相对原版 Transformer（乃至 GPT-3）换掉的零件，**前面各章几乎都介绍过**，所以这一节每个零件只做一句话回顾 + 一句「它换在哪、为什么」，重点是把它们凑成一张完整的对照表。
+2023 年 Meta 开源 **LLaMA**、阿里开源 **Qwen**，把「decoder-only 骨架 + 一套现代零件」的配方推广到了整个开源社区。这套配方相对原版 Transformer（乃至 GPT-3）换掉的零件，**前面各章几乎都介绍过**，所以这一节每个零件只做一个简单回顾，重点是把它们凑成一张完整的对照表。
 
 先看它们共同的骨架长什么样——这也是今天绝大多数开源大模型的标准配置：
 
@@ -235,7 +233,7 @@ input_ids
   → lm_head → logits
 ```
 
-对照第 9 章第 2 节那条「原版风格」的流水线，骨架一模一样（embedding → N 个形状守恒的 block → final norm → lm_head），**变的全是 block 内部每个零件的型号**。下面逐个说。
+对照第 9 章第 2 节那条 decoder-only 流水线，骨架一模一样（embedding → N 个形状守恒的 block → final norm → lm_head），**变的全是 block 内部每个零件的型号**。下面逐个说。
 
 ### 6.1 RoPE：绝对位置编码 → 旋转式相对位置
 
@@ -265,13 +263,13 @@ $$
 
 因为多了一个门控矩阵 $W_{\text{gate}}$ ，为对齐参数量，中间维度 $d_{\text{ff}}$ 从原版的 $4\thinspace d_{\text{model}}$ 收到约 $\frac{8}{3}\thinspace d_{\text{model}}$ （这是 LLaMA 的惯例值，不同模型略有出入，如 Qwen3-8B 约 $3\thinspace d_{\text{model}}$ ）。
 
-**换在哪**：**激活函数**这条线是 ReLU（原版）→ GELU（GPT 系列）→ **SiLU**（LLaMA / Qwen）；而从 SiLU 这一代起还额外套了一层**门控**，激活加门控合起来才叫 **SwiGLU**——所以严格说，换掉的不只是激活函数，是整个 FFN 的形式。动机是**同样参数量下效果更好**，代价是 FFN 里多一个矩阵（三个投影而非两个）。config 里 `hidden_act` 为 `silu`、且有 `gate_proj` / `up_proj` / `down_proj` 三个投影，就是 SwiGLU 的标志。
+**换在哪**：**激活函数**这条线是 ReLU（原版）→ GELU（GPT 系列）→ **SiLU**（LLaMA / Qwen）；而从 SiLU 这一代起还额外套了一层**门控**，激活加门控合起来才叫 **SwiGLU**——所以严格说，换掉的不只是激活函数，是整个 FFN 的形式。动机是**同样参数量下效果更好**，代价是 FFN 里多一个矩阵（三个投影而非两个）。config 里 `hidden_act` 为 `silu`、且有门控 / 升维 / 降维三个投影 $W_{\text{gate}}$ / $W_{\text{up}}$ / $W_{\text{down}}$ （代码里叫 `gate_proj` / `up_proj` / `down_proj`），就是 SwiGLU 的标志。
 
 ### 6.4 GQA：为省 KV cache 削减 K/V 头
 
 **一句话回顾**（详见第 7 章第 5 节）：GQA（分组查询注意力）让 **query 头数保持 $H$ 不变、只削减 K/V 头数到 $G$ 组**，每组 K/V 被多个 query 头共享（ $G=H$ 即退化回 MHA、 $G=1$ 即 MQA）。
 
-**换在哪**：原版和 GPT 系列用标准 MHA（Q/K/V 头数相等）。LLaMA-2 的 34B / 70B 两个型号、以及 Qwen2 起的各型号换成 GQA（LLaMA-1 和 LLaMA-2 的 7B / 13B 还是 MHA——GQA 是从「模型大到 KV cache 疼」才开始划算的），动机是**推理时 KV cache 太占显存**——KV cache 的大小正比于 K/V 头数，把 K/V 头砍到 1/4，KV cache 就省 3/4，长上下文推理才吃得消（第 14 章）。config 里 `num_attention_heads`（query 头数）**大于** `num_key_value_heads`（KV 头数）就是 GQA 的标志；Qwen3-8B 是 32 query 头 / 8 KV 头。
+**换在哪**：原版和 GPT 系列用标准 MHA（Q/K/V 头数相等）。LLaMA-2 的 34B / 70B 两个型号、以及 Qwen2 起的各型号换成 GQA（LLaMA-1 和 LLaMA-2 的 7B / 13B 还是 MHA——GQA 是从「模型大到 KV cache 占用成为瓶颈」才开始划算的），动机是**推理时 KV cache 太占显存**——KV cache 的大小正比于 K/V 头数，把 K/V 头砍到 1/4，KV cache 就省 3/4，长上下文推理才吃得消（第 14 章）。config 里 `num_attention_heads`（query 头数）**大于** `num_key_value_heads`（KV 头数）就是 GQA 的标志；Qwen3-8B 是 32 query 头 / 8 KV 头。
 
 ### 6.5 MoE：把一个 FFN 换成一堆稀疏专家
 
@@ -285,32 +283,32 @@ $$
 
 - **去掉线性层的 bias**：LLaMA 与 Qwen3 的线性投影（Q/K/V/O、FFN 的三个投影）**都不带 bias**。少一组 bias 参数、对效果几乎无影响，还略微稳一点。顺带一提，Qwen 早期版本（Qwen1 / Qwen2）的 Q/K/V 投影是**带 bias** 的，到 Qwen3 才去掉、换成下面的 QK-norm——可见「去 bias」也不是一步到位的。
 - **QK-norm**：在 Q、K 投影之后各加一道 RMSNorm 再去算注意力（Qwen3 用了），让注意力分数的尺度更稳、长训练更不容易发散。
-- **weight tying（权重共享）**：token embedding 和输出头 `lm_head` 共享同一个矩阵（互为转置，第 4 章第 1.3 节讲过）。小模型上省参数明显（两端各占词表 × $d_{\text{model}}$ ），所以 Qwen3 里参数量小的几个型号（0.6B / 1.7B / 4B）默认 tie、参数量大的（8B 及以上）默认不 tie——config 里 `tie_word_embeddings` 字段记录这个选择。
+- **weight tying（权重共享）**：token embedding 和输出头 `lm_head` 共享同一个矩阵（互为转置，第 4 章第 1.3 节讲过）。小模型上省参数明显（两端各占词表 × $d_{\text{model}}$ ），所以 Qwen3 里参数量小的几个型号（0.6B / 1.7B / 4B）默认共享、参数量大的（8B 及以上）默认不共享——config 里 `tie_word_embeddings` 字段记录这个选择。
 
 这些小改动单看每个都不起眼，但「**能省就省、能稳就稳**」的工程哲学，正是现代大模型配方的底色。
 
 ### 6.7 这些零件是谁提出的：出处与时间差
 
-上面每一项我们都说了「LLaMA / Qwen 换成了 X」，但有一点必须讲清楚，否则容易造成误解：**这些零件基本都不是 LLaMA 或 Qwen 发明的**。它们各自出自更早的一篇专门论文，LLaMA / Qwen 做的事是**把这些零散的改良挑出来、组装成一套完整配方并做到最大规模**——这正是把几篇论文摆在一起读才看得出来、只读单篇看不出来的东西：
+上面每一项我们都说了「LLaMA / Qwen 换成了 X」，但有一点必须讲清楚，否则容易造成误解：**这些零件基本都不是 LLaMA 或 Qwen 发明的**。它们大多出自更早的专门论文，LLaMA / Qwen 做的事是**把这些零散的改良挑出来、组装成一套完整配方并做到最大规模**：
 
 | 零件 | 提出它的论文 | 提出年份 | 首个广为人知的大规模采用 |
 |------|------------|---------|--------------------|
 | decoder-only 语言模型 | 《Generating Wikipedia by Summarizing Long Sequences》（Liu 等） | 2018.01 | GPT-1（2018.06） |
-| GELU | 《Gaussian Error Linear Units》（Hendrycks & Gimpel） | 2016 | GPT-1 / BERT（2018） |
-| Pre-LN | 无单一出处：GPT-2（2019）先定为默认，《On Layer Normalization in the Transformer Architecture》（Xiong 等，2020）补上理论分析 | 2019–2020 | GPT-2（2019） |
-| RMSNorm | 《Root Mean Square Layer Normalization》（Zhang & Sennrich） | 2019 | LLaMA（2023） |
+| GELU | 《Gaussian Error Linear Units (GELUs)》（Hendrycks & Gimpel） | 2016 | GPT-1 / BERT（2018） |
+| Pre-LN | 无单一出处：GPT-2（2019）把它带成主流默认，《On Layer Normalization in the Transformer Architecture》（Xiong 等，2020）补上理论分析 | 2019–2020 | GPT-2（2019） |
+| RMSNorm | 《Root Mean Square Layer Normalization》（Zhang & Sennrich） | 2019 | Gopher（2021）、LLaMA（2023）让它普及 |
 | MQA | 《Fast Transformer Decoding: One Write-Head is All You Need》（Shazeer） | 2019 | PaLM（2022） |
 | SwiGLU | 《GLU Variants Improve Transformer》（Shazeer） | 2020 | PaLM（2022）、LLaMA（2023） |
 | RoPE | 《RoFormer: Enhanced Transformer with Rotary Position Embedding》（Su 等） | 2021 | GPT-NeoX（2022）、PaLM（2022）、LLaMA（2023） |
 | GQA | 《GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints》（Ainslie 等） | 2023 | LLaMA-2 34B / 70B（2023） |
-| QK-norm | 《Query-Key Normalization for Transformers》（Henry 等，2020）提出雏形，《Scaling Vision Transformers to 22 Billion Parameters》（Dehghani 等，2023）让它流行 | 2020–2023 | Qwen3（2025） |
-| 稀疏 MoE | 《Outrageously Large Neural Networks》（Shazeer 等，2017）提出稀疏门控，《Switch Transformer》（Fedus 等，2021）给出 Transformer 上的现代形态 | 2017–2021 | Mixtral（2023）、DeepSeek-V3（2024）、Qwen3-MoE（2025） |
+| QK-norm | 《Query-Key Normalization for Transformers》（Henry 等）提出雏形（对 Q、K 做 L2 归一化）；今天通行的「Q、K 上各加一道 LayerNorm / RMSNorm」由 ViT-22B（2023）确立 | 2020 | ViT-22B（2023，视觉）、OLMo 2（2024）、Qwen3（2025） |
+| 稀疏 MoE | 《Outrageously Large Neural Networks》（Shazeer 等，2017）提出稀疏门控，《Switch Transformers》（Fedus 等，2021）给出 Transformer 上的现代形态 | 2017–2021 | Mixtral（2023）、DeepSeek-V3（2024）、Qwen3-MoE（2025） |
 
-这张表里最值得琢磨的是**那个时间差**——把它画到时间轴上看得更清楚（空心点是论文提出、实心点是首个大规模采用，中间那段虚线就是「躺着」的时间）：
+这张表里最值得琢磨的是**那个时间差**——把它画到时间轴上看得更清楚（空心点是论文提出、实心点是首个大规模采用，中间那段虚线就是从提出到被采用的等待时间）：
 
 ![现代零件的出处与时间差：稀疏 MoE、RMSNorm、MQA、SwiGLU、QK-norm、RoPE、GQA 七项零件各自的「论文提出年份」与「首个大规模采用年份」，中间用虚线连出时间差](../assets/12/parts-origin.png)
 
-慢的可以很慢：稀疏 MoE 2017 年就有论文，到 2023 年 Mixtral 才让它广为人知，隔了 6 年；QK-norm 2020 年提出，直到 2025 年的 Qwen3 才用上；RMSNorm 也躺了 4 年。快的当然也有：RoPE 2021 年提出、2022 年 GPT-NeoX 就用上了，GQA 更是 2023 年提出、同年就进了 LLaMA-2。但总体看，**一项改良从「有论文」到「被大规模用上」，隔个两三年是常态。**
+慢的可以很慢：稀疏 MoE 2017 年就有论文，到 2023 年 Mixtral 才让它广为人知，隔了 6 年；QK-norm 2020 年提出，2023 年先在视觉模型 ViT-22B 上流行起来，2024 年才进入开源 LLM（OLMo 2）。快的当然也有：RoPE 2021 年提出、2022 年 GPT-NeoX 就用上了，GQA 更是 2023 年提出、同年就进了 LLaMA-2。但总体看，**一项改良从「有论文」到「被大规模用上」，隔个两三年是常态。**
 
 为什么会有这个时间差？原因不难理解：单篇论文通常只在小模型上验证了「有一点提升」，而真正决定它能不能进主流配方的，是**有没有人在几十亿参数、上万亿 token 的规模上验证它依然有效**——这种验证的成本，只有做大模型的团队付得起。LLaMA / Qwen 这类开源大模型的技术报告，扮演的正是这个「大规模复检 + 打包成配方」的角色。所以读一个新模型的 technical report，最有价值的往往不是它发明了什么，而是**它从过去几年的论文里挑中了哪几项、又放弃了哪几项**。
 
@@ -335,13 +333,13 @@ $$
 - **「首次」是相对这张表的四列而言的**，指「在原版 → GPT-2 → LLaMA → Qwen3 这条采样出来的路径上，它是从这一代开始变的」，**不等于这个零件是这一代发明的**——每项零件真正的出处论文与年份见上面第 6.7 节那张表（比如 RoPE 加粗在 LLaMA 列，但它是 2021 年 RoFormer 提出的）。
 - **decoder-only、GELU、learned 绝对位置其实都是 GPT-1（2018，表中未单列）首先用上的**，GPT-2 只是沿用，所以这三项在 GPT-2 列都不加粗（表里能看到它们相对原版确实变了，但「首次」不落在 GPT-2）。
 
-真正由 GPT-2 首次立起的是 **Pre-LN**；从它这个加粗格起顺着往右读，就是一部浓缩的大模型架构演进史：**GPT-2 立起 Pre-LN，LLaMA 一口气换上 RMSNorm / SwiGLU / RoPE / GQA / 去 bias 这套现代零件，Qwen3 再补上 QK-norm 和可选的 MoE。** 骨架自 2017 年就没变过，变的全是零件的型号——这正是第 11 章那句话的完整展开：**Transformer 的骨架八年未变，后来的进步都是在这个骨架上换更好的零件。**
+这个表格就是一部浓缩的大模型架构演进史：**GPT-2 立起 Pre-LN，LLaMA 一口气换上 RMSNorm / SwiGLU / RoPE / GQA / 去 bias 这套现代零件，Qwen3 再补上 QK-norm 和可选的 MoE。** 骨架自 2017 年就没变过，变的全是零件的型号。
 
 ---
 
 ## 七、实战：从 config 读懂演进
 
-本章实战不训练、不推理，只做一件事：**用 `AutoConfig` 把上面几张表里的「论文说法」和真实模型 config.json 里的「字段值」一一对上**。全程 CPU、只下载几 KB 的 json。实战代码分成下面六个 Cell。
+本章实战不训练、不推理，只做一件事：**用 `AutoConfig` 把上面几张表里的「论文说法」和真实模型 config.json 里的「字段值」一一对上**。全程 CPU、只下载几 KB 的 json。
 
 ### 7.1 环境自检与依赖
 
@@ -509,7 +507,7 @@ print("-" * (sum(widths) + 3 * (len(widths) - 1)))
 for r in rows:
     print(fmt_row(r))
 print("\n带 * 的是「该零件在这一代首次换上」。decoder-only、GELU、learned 绝对位置都始于 GPT-1（表中未单列），")
-print("故 GPT-2 列这三项不带 *；由 GPT-2 首次立起的是 Pre-LN。顺着 * 往右读：GPT-2 立起 Pre-LN，")
+print("故 GPT-2 列这三项不带 *。这张表就是一部浓缩的架构演进史：GPT-2 立起 Pre-LN，")
 print("LLaMA 换上 RMSNorm/SwiGLU/RoPE/GQA/去bias，Qwen3 再补 QK-norm 与可选 MoE。骨架自 2017 未变。")
 ```
 
@@ -521,13 +519,13 @@ print("LLaMA 换上 RMSNorm/SwiGLU/RoPE/GQA/去bias，Qwen3 再补 QK-norm 与�
 
 - **系列论文的读法**：盯代际之间的 delta——每一代只问三件事「上一代瓶颈是什么、这一代改了哪几件事、多出了什么新能力」，不必逐字读完每篇。
 - **GPT-1（2018）**：首次证明「decoder-only + 大规模自回归预训练 + 下游微调」这套两阶段范式能大幅超过专用模型。奠定了 decoder-only 骨架。
-- **预训练—微调范式**：先在海量无标注文本上做自回归预训练（免费监督信号），再用少量标注数据微调到下游任务。今天的 SFT / LoRA 是它的延续。
-- **BERT 这条并行路线**：同期（2018）Google 的 BERT 走 encoder-only + 掩码语言建模（MLM），是**双向**的，在理解类任务上一度压过 GPT。最终是 GPT 的单向路线通向通用大模型（能把任务统一成「续写」、scale 后涌现 in-context learning）；BERT 那条路今天活在检索 / embedding 模型里。
-- **GPT-2（2019）**：骨架几乎不变、规模拉到 1.5B，提出「语言模型是无监督多任务学习器」，展示 **zero-shot**。架构上把 **Pre-LN** 定为默认（外加 final norm、 $1/\sqrt{N}$ 残差初始化缩放）。
+- **预训练—微调范式**：先在海量无标注文本上做自回归预训练（无需人工标注的监督信号），再用少量标注数据微调到下游任务。今天的 SFT / LoRA 是它的延续。
+- **BERT 这条并行路线**：同期（2018）Google 的 BERT 走 encoder-only + 掩码语言建模（MLM），是**双向**的，在理解类任务上一度压过 GPT。最终是 GPT 的单向路线通向通用大模型（能把任务统一成「续写」、规模放大后涌现 in-context learning）；BERT 那条路今天出现在检索 / embedding 模型里。
+- **GPT-2（2019）**：骨架几乎不变、规模拉到 1.5B，提出「语言模型是无监督多任务学习器」，展示 **zero-shot**。架构上把 **Pre-LN** 定为后续模型的默认配置（外加 final norm、 $1/\sqrt{N}$ 残差初始化缩放）。
 - **GPT-3（2020）**：规模再放大到 **175B**，涌现出 **in-context learning**——prompt 里给几个示范（few-shot），不更新参数就能做新任务。「量变引起质变」的经典案例。
-- **in-context learning（上下文学习）**：把示范写进 prompt、模型在一次前向里现学现用，全程不更新参数。分 zero-shot / one-shot / few-shot 三档；只在模型足够大时明显涌现。是 prompt 工程、few-shot、CoT 的基础。
+- **in-context learning（上下文学习）**：把示范写进 prompt、模型在一次前向里现学现用，全程不更新参数。分 zero-shot / one-shot / few-shot 三档；随规模增大才逐渐明显。是 prompt 工程、few-shot、CoT 的基础。
 - **GPT 这条线的关键词是「骨架 + 规模」**：三代参数量涨约 1500 倍，架构实质改动只有 GPT-2 那处 Post-LN → Pre-LN，位置编码三代都还是 learned 绝对。
-- **从 GPT-3 到 ChatGPT 那一步不在架构上**：靠的是 InstructGPT（2022）那条**后训练**路线（SFT + 奖励模型 + RLHF），骨架一个零件没动，留到第 27-31 章。GPT-4 起闭源、不公开架构，所以架构演进这条线只能靠**开源模型**继续读下去。
+- **从 GPT-3 到 ChatGPT 那一步不在架构上**：靠的是 InstructGPT（2022）那条**后训练**路线（SFT + 奖励模型 + RLHF），骨架一个零件没动，留到第 27-31 章（后训练与对齐这一整个阶段是第 27-36 章）。GPT-4 起闭源、不公开架构，所以架构演进这条线只能靠**开源模型**继续读下去。
 - **LLaMA / Qwen（2023 起）的现代零件**：RoPE（绝对 → 旋转相对位置，第 4 章第 6 节）、RMSNorm（LayerNorm 砍掉减均值和 bias，第 8 章第 4 节）、SwiGLU（给 FFN 加 SiLU 门控，第 8 章第 5 节）、GQA（削减 K/V 头省 KV cache，第 7 章第 5 节）、可选 MoE（稠密 FFN → 稀疏专家，第 9 章第 2.5 节、第 22 章），外加去 bias / QK-norm / weight tying 等小改动。
 - **零件的出处与「时间差」**：这些零件都不是 LLaMA / Qwen 发明的——RMSNorm（2019）、MQA（2019）、SwiGLU（2020）、RoPE（2021）、GQA（2023）各有更早的专门论文。一项改良从「有论文」到「成为标配」通常隔两三年，因为要等有人在大规模上复检它依然有效。开源大模型的技术报告扮演的正是「大规模复检 + 打包成配方」的角色。
 - **零件对照矩阵**：原版 / GPT-2 / LLaMA / Qwen3 逐行对照，加粗（代码里用 `*`）标出每项零件「首次换上」的那一代——注意「首次」是相对这四列而言，不等于该零件由这一代发明。
@@ -535,13 +533,13 @@ print("LLaMA 换上 RMSNorm/SwiGLU/RoPE/GQA/去bias，Qwen3 再补 QK-norm 与�
 
 ## 九、本章小结
 
-- **本章不引入新组件，做的是一次「论文串读」**：顺两条时间线，把大模型从 2017 原版走到今天 Qwen3 的演进串成一条完整叙事。凡是前面介绍过的零件都只做一句话回顾 + 时间定位，重点是那条贯穿多篇论文的脉络。
+- **本章不引入新组件，做的是一次「论文串读」**：顺两条时间线，把大模型从 2017 原版走到今天 Qwen3 的演进串成一条完整叙事。凡是前面介绍过的零件都只做一个简单回顾，重点是那条贯穿多篇论文的脉络。
 - **第一条线 GPT-1 → GPT-2 → GPT-3，讲 decoder-only 路线怎么确立**：GPT-1 证明「decoder-only + 预训练」能走通，GPT-2 证明「规模够大能不微调直接做任务（zero-shot）」，GPT-3 证明「规模再大两个数量级会涌现 in-context learning（few-shot）」。三代把 decoder-only 从「一种选择」推成了「事实标准」，而这一路上**架构基本冻结、规模是主旋律**（参数量涨约 1500 倍，实质架构改动只有 Pre-LN 一处）。
 - **第一条线到 GPT-3 为止是有原因的**：GPT-3 → ChatGPT 那一步改的是**训练流程**（SFT + RLHF，第 27-31 章）而非架构，GPT-4 之后又不再公开架构细节。所以架构演进这条线自然接到了**开源**的 LLaMA / Qwen 上。
-- **第二条线原版 → LLaMA / Qwen，讲骨架定型后怎么换零件**：decoder-only 赢下主赛道后，改进从「选架构」转向「在固定骨架里换更好的零件」——RoPE、RMSNorm、SwiGLU、GQA、可选 MoE，外加去 bias / QK-norm / weight tying。这些零件前面各章都介绍过，本章把它们凑成一张对照矩阵，看清每一项是哪一代首次换上的；同时也点明**它们各自的出处论文都比 LLaMA 早两三年**，LLaMA / Qwen 的贡献是「在最大规模上复检并打包成一套配方」。
-- **一张零件对照矩阵收束全章**：原版（2017）/ GPT-2（2019）/ LLaMA（2023）/ Qwen3（2025）逐行对照，加粗标出「首次换上」——decoder-only、GELU、learned 绝对位置都始于 GPT-1（表中未单列），GPT-2 首次立起 Pre-LN，LLaMA 一口气换上 RMSNorm / SwiGLU / RoPE / GQA / 去 bias，Qwen3 补上 QK-norm 与可选 MoE。**骨架自 2017 未变，变的全是零件型号**——这正是第 11 章那句话的完整展开。
-- **实战我们没训练、没推理，只用 `AutoConfig` 读了 GPT-2 和 Qwen3-8B 的 config**，把「论文说换了什么」和「config 里改了哪个字段」一一对上，画了 GPT-1/2/3 参数量增长图，打印了零件对照矩阵。掌握这套「读 config 反推零件」的本事，你以后拿到任何新模型都能快速判断它的架构谱系。
+- **第二条线原版 → LLaMA / Qwen，讲骨架定型后怎么换零件**：decoder-only 赢下主赛道后，改进从「选架构」转向「在固定骨架里换更好的零件」——RoPE、RMSNorm、SwiGLU、GQA、可选 MoE，外加去 bias / QK-norm / weight tying。这些零件前面各章都介绍过，本章把它们凑成一张对照矩阵，看清每一项是哪一代首次换上的；同时也点明**它们大多出自比 LLaMA 更早的专门论文**（GQA 是同年落地的例外），LLaMA / Qwen 的贡献是「在最大规模上复检并打包成一套配方」。
+- **一张零件对照矩阵收束全章**：原版（2017）/ GPT-2（2019）/ LLaMA（2023）/ Qwen3（2025）逐行对照，加粗标出「首次换上」——decoder-only、GELU、learned 绝对位置都始于 GPT-1（表中未单列），GPT-2 首次立起 Pre-LN，LLaMA 一口气换上 RMSNorm / SwiGLU / RoPE / GQA / 去 bias，Qwen3 补上 QK-norm 与可选 MoE。**骨架自 2017 未变，变的全是零件型号**。
+- **实战我们用 `AutoConfig` 读了 GPT-2 和 Qwen3-8B 的 config**，把「论文说换了什么」和「config 里改了哪个字段」一一对上，画了 GPT-1/2/3 参数量增长图，打印了零件对照矩阵。掌握这套「读 config 反推零件」的本事，你以后拿到任何新模型都能快速判断它的架构谱系。
 
 ---
 
-到这里，第 3-12 章这段「Transformer 架构原理」就讲完了：我们从 tokenizer 一路拆到整体架构（第 3-9 章）、讲清了自回归训练目标（第 10 章）、精读了奠基论文（第 11 章）、串读了 GPT 与现代模型的演进（本章）。**零件、总装、目标、源流，四件事齐了**。下一章第 13 章是这一阶段的收官之作，咱们把这些知识落到最实处——**从零实现一个 mini-GPT**，在 tiny-shakespeare 数据集上完整跑通「训练 → 生成」的闭环，亲手验证这一整段学到的所有东西。
+到这里，第 3-12 章这段「Transformer 架构原理」就讲完了：我们从 tokenizer 一路讲到整体架构（第 3-9 章）、讲清了自回归训练目标（第 10 章）、精读了奠基论文（第 11 章）、串读了 GPT 与现代模型的演进（本章）。**零件、总装、目标、源流，四件事齐了**。下一章第 13 章是这一阶段的收官之作，咱们把这些知识落到最实处——**从零实现一个 mini-GPT**，在 tiny-shakespeare 数据集上完整跑通「训练 → 生成」的闭环，亲手验证这一整段学到的所有东西。
