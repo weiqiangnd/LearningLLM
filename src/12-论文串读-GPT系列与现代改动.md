@@ -9,7 +9,7 @@
 
 需要提前说明：**这两条线上用到的零件，前面各章几乎都已经介绍过了**——RoPE 在第 4 章第 6 节、GQA 在第 7 章第 5 节、RMSNorm / SwiGLU 在第 8 章第 4-5 节、decoder-only / Pre-LN / MoE 在第 9 章、in-context learning 也在第 9 章第 4 节提到过。所以本章不做重复推导，侧重于那条**贯穿多篇论文的演进叙事**，以及「哪一项改动是哪一篇论文、哪一年引入的」这张时间地图。
 
-实战依旧 **全程 CPU**：不训练、不推理，只用 `AutoConfig` 读几个真实模型的 config.json（GPT-2、Qwen3-8B），把「论文里说的改动」和「config 里的字段」一一对上，再画一张 GPT-1/2/3 参数量增长图，最后打印一张原版 / GPT-2 / LLaMA / Qwen3 的零件对照矩阵。
+实战依旧 **全程 CPU**：不训练、不推理，只用 `AutoConfig` 读几个真实模型的 config.json（GPT-2、Qwen3-8B），把「论文里说的改动」和「config 里的字段」一一对上，最后画一张 GPT-1/2/3 参数量增长图。
 
 > 想直接跑示例？点这里 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/weiqiangnd/LearningLLM/blob/main/src/12.ipynb)。
 >
@@ -47,7 +47,6 @@
   - [7.2 读 GPT-2 config：早期 decoder-only 长什么样](#72-读-gpt-2-config早期-decoder-only-长什么样)
   - [7.3 读 Qwen3-8B config：现代改动逐项对上](#73-读-qwen3-8b-config现代改动逐项对上)
   - [7.4 画 GPT-1/2/3 参数量增长](#74-画-gpt-123-参数量增长)
-  - [7.5 打印零件对照矩阵](#75-打印零件对照矩阵)
 - [八、关键概念回顾](#八关键概念回顾)
 - [九、本章小结](#九本章小结)
 
@@ -269,7 +268,7 @@ $$
 
 **一句话回顾**（详见第 7 章第 5 节）：GQA（分组查询注意力）让 **query 头数保持 $H$ 不变、只削减 K/V 头数到 $G$ 组**，每组 K/V 被多个 query 头共享（ $G=H$ 即退化回 MHA、 $G=1$ 即 MQA）。
 
-**换在哪**：原版和 GPT 系列用标准 MHA（Q/K/V 头数相等）。LLaMA-2 的 34B / 70B 两个型号、以及 Qwen2 起的各型号换成 GQA（LLaMA-1 和 LLaMA-2 的 7B / 13B 还是 MHA——GQA 是从「模型大到 KV cache 占用成为瓶颈」才开始划算的），动机是**推理时 KV cache 太占显存**——KV cache 的大小正比于 K/V 头数，把 K/V 头砍到 1/4，KV cache 就省 3/4，长上下文推理才吃得消（第 14 章）。config 里 `num_attention_heads`（query 头数）**大于** `num_key_value_heads`（KV 头数）就是 GQA 的标志；Qwen3-8B 是 32 query 头 / 8 KV 头。
+**换在哪**：原版和 GPT 系列用标准 MHA（Q/K/V 头数相等）。LLaMA-2 的 34B / 70B 两个型号、以及 Qwen2 起的各型号换成 GQA（LLaMA-1 和 LLaMA-2 的 7B / 13B 还是 MHA——GQA 是从「模型大到 KV cache 占用成为瓶颈」才开始划算的）。这里有一点要说明：**34B 这个型号只存在于 LLaMA-2 的论文里**——论文给了它的配置和评测成绩，但 Meta 最终**没有发布它的权重**（官方理由是安全评估没做完），所以实际能下载到的 GQA 版 LLaMA-2 只有 70B。本章几处提到 34B，指的都是论文里那份配置。GQA 的动机是**推理时 KV cache 太占显存**——KV cache 的大小正比于 K/V 头数，把 K/V 头砍到 1/4，KV cache 就省 3/4，长上下文推理才吃得消（第 14 章）。config 里 `num_attention_heads`（query 头数）**大于** `num_key_value_heads`（KV 头数）就是 GQA 的标志；Qwen3-8B 是 32 query 头 / 8 KV 头。
 
 ### 6.5 MoE：把一个 FFN 换成一堆稀疏专家
 
@@ -343,6 +342,8 @@ $$
 
 ### 7.1 环境自检与依赖
 
+**Cell 0** 是常规环境自检——本章纯 CPU，只打印环境信息、不强制 GPU：
+
 ```python
 # ============================================================
 # Cell 0: 环境自检（本章纯 CPU 即可，无需 GPU）
@@ -358,6 +359,8 @@ print("PyTorch:", torch.__version__)
 print("CUDA 可用:", torch.cuda.is_available(), "（本章用不到，CPU 即可）")
 ```
 
+**Cell 1** 装依赖。本章只用 `transformers` 的 `AutoConfig` 读 config，外加 `matplotlib` 画一张图：
+
 ```python
 %%capture
 # ============================================================
@@ -371,13 +374,22 @@ print("CUDA 可用:", torch.cuda.is_available(), "（本章用不到，CPU 即�
 
 ### 7.2 读 GPT-2 config：早期 decoder-only 长什么样
 
-先读 GPT-2（HuggingFace 上的 `gpt2`，即 124M 的最小版本），看看 GPT 系列早期这套「decoder-only + learned 绝对位置 + GELU」的配置。注意 GPT-2 的 config 字段名和现代模型不一样（`n_layer` / `n_embd` / `n_head`），这本身也说明了「配置命名都还没统一」的年代感。
+**Cell 2** 先读 GPT-2（HuggingFace 上的 `gpt2`，即 124M 的最小版本），看看 GPT 系列早期这套「decoder-only + learned 绝对位置 + GELU」的配置。注意 GPT-2 的 config 字段名和现代模型不一样（`n_layer` / `n_embd` / `n_head`）。
 
 ```python
 # ============================================================
 # Cell 2: 读 GPT-2 config，看早期 decoder-only 的配置
 # ============================================================
 from transformers import AutoConfig
+
+# rope_theta（RoPE 的 base θ）在 config 里的位置随 transformers 版本而变：4.x 放在顶层
+# cfg.rope_theta；5.x 起挪进嵌套字典 cfg.rope_parameters["rope_theta"]。下面这个小工具两处都试，
+# 兼容新旧版本；两处都没有就返回 None——说明这个模型根本不用 RoPE。Cell 3 读 Qwen3 时还会再用一次。
+def get_rope_theta(cfg):
+    theta = getattr(cfg, "rope_theta", None)
+    if theta is None:
+        theta = (getattr(cfg, "rope_parameters", None) or {}).get("rope_theta")
+    return theta
 
 # gpt2 = GPT-2 最小的那个版本（124M）。AutoConfig 只下载 config.json（几 KB），不下载权重。
 gpt2 = AutoConfig.from_pretrained("gpt2")
@@ -390,16 +402,16 @@ print(f"  上下文长度   n_positions        = {gpt2.n_positions}")
 print(f"  词表大小     vocab_size         = {gpt2.vocab_size}")
 print(f"  激活函数     activation_function= {gpt2.activation_function}")  # gelu_new
 # GPT-2 的位置编码是 learned 绝对：config 里体现为有一张 n_positions 长的位置 embedding 表
-# （wpe），而不像现代模型那样带 rope_theta。下面这句确认它【没有】rope 相关字段。
-print(f"  有 rope_theta 吗？             = {hasattr(gpt2, 'rope_theta')}  (False => 用 learned 绝对位置，不是 RoPE)")
+# （wpe），而不像现代模型那样带 rope_theta。下面这句确认它两处【都】没有 rope 参数。
+print(f"  RoPE base    rope_theta         = {get_rope_theta(gpt2)}  (None => 用 learned 绝对位置，不是 RoPE)")
 print(f"  归一化 eps   layer_norm_epsilon = {gpt2.layer_norm_epsilon}  (LayerNorm，不是 RMSNorm)")
 ```
 
-跑出来能看到：这个 124M 版本是 12 层、 $d_{\text{model}} = 768$ 、12 头、上下文 1024、GELU 激活、LayerNorm、**没有** `rope_theta`（用的是 learned 绝对位置）。注意这里读的是 **124M 的最小版本**，层数 / 维度都是它自己的数（第 4 节表里 GPT-2 那一列取的是 1.5B 的最大版本，48 层 / 1600）；真正能和表对上的是**定性特征**——**位置编码还是绝对的、激活还是 GELU、归一化还是 LayerNorm**，现代那套零件一个都还没换上。
+跑出来能看到：这个 124M 版本是 12 层、 $d_{\text{model}} = 768$ 、12 个注意力头、上下文 1024、GELU 激活、LayerNorm、`rope_theta` 取出来是 **`None`**（用的是 learned 绝对位置）。注意这里读的是 **124M 的最小版本**，层数 / 维度都是它自己的数，和第 4.3 节那张表对不上——那张表里 GPT-2 那一列取的是 **1.5B 的最大版本（gpt2-xl）**：48 层、 $d_{\text{model}} = 1600$ 、25 个注意力头。两者是同一个 GPT-2 家族里的不同型号，同一套结构、只是宽度和深度不同。真正能和表对上的是**定性特征**——**位置编码还是绝对的、激活还是 GELU、归一化还是 LayerNorm**，现代那套零件一个都还没换上。
 
 ### 7.3 读 Qwen3-8B config：现代改动逐项对上
 
-再读一次 Qwen3-8B（第 11 章末尾读过一次，这里换个角度：逐项对上第 6 节的「现代改动」清单）。
+**Cell 3** 再读一次 Qwen3-8B（第 11 章末尾读过一次，这里换个角度：逐项对上第 6 节的「现代改动」清单）。
 
 ```python
 # ============================================================
@@ -409,11 +421,9 @@ from transformers import AutoConfig
 
 cfg = AutoConfig.from_pretrained("Qwen/Qwen3-8B")
 
-# rope_theta 在 config 里的位置随 transformers 版本而变：有的版本放在顶层 cfg.rope_theta，
-# 有的挪进嵌套字典 cfg.rope_parameters["rope_theta"]。下面两处都试，兼容新旧版本。
-rope_theta = getattr(cfg, "rope_theta", None)
-if rope_theta is None:
-    rope_theta = (getattr(cfg, "rope_parameters", None) or {}).get("rope_theta")
+# 复用 Cell 2 里定义的 get_rope_theta()：顶层 cfg.rope_theta 与嵌套 cfg.rope_parameters["rope_theta"]
+# 两处都试，所以不管装的是 transformers 4.x 还是 5.x 都能取到值。
+rope_theta = get_rope_theta(cfg)
 
 print("Qwen3-8B 关键配置（对上第 6 节现代改动清单）：")
 print(f"  层数           num_hidden_layers   = {cfg.num_hidden_layers}")
@@ -436,11 +446,11 @@ print("  6.5 MoE    ：Qwen3-8B 是稠密版、无 MoE 字段，故此处不列�
 print(f"  6.6 tying  ：tie_word_embeddings={cfg.tie_word_embeddings}  => 8B 参数量不小，默认不共享")
 ```
 
-对比 7.2 和 7.3 两段输出，第 6 节讲的每一项改动都能在 config 里找到对应字段：Qwen3-8B **有** `rope_theta`（RoPE）、**有** `rms_norm_eps`（RMSNorm）、`hidden_act` 是 `silu`（SwiGLU）、`num_attention_heads`（32）> `num_key_value_heads`（8）（GQA）——而 GPT-2 这些字段要么没有、要么是老式的 LayerNorm / GELU / 绝对位置。**「论文说换了什么」和「config 里改了哪个字段」，就这么对上了。**
+对比 Cell 2 和 Cell 3 两段输出，第 6 节讲的每一项改动都能在 config 里找到对应字段：Qwen3-8B **有** `rope_theta`（RoPE）、**有** `rms_norm_eps`（RMSNorm）、`hidden_act` 是 `silu`（SwiGLU）、`num_attention_heads`（32）> `num_key_value_heads`（8）（GQA）——而 GPT-2 这些字段要么没有、要么是老式的 LayerNorm / GELU / 绝对位置。
 
 ### 7.4 画 GPT-1/2/3 参数量增长
 
-把第 4.3 节那张表里的参数量画成图，直观感受「三代涨了约 1500 倍」是什么概念。参数量跨度太大，用对数纵轴才看得清。
+**Cell 4** 把第 4.3 节那张表里的参数量画成图，直观感受「三代涨了约 1500 倍」是什么概念。参数量跨度太大，用对数纵轴才看得清。
 
 ```python
 # ============================================================
@@ -465,53 +475,10 @@ plt.show()
 
 # 观察：纵轴每一格是 10 倍。GPT-1(117M) -> GPT-2(1.5B) 约 13 倍，
 # GPT-2 -> GPT-3(175B) 约 117 倍，两年累计约 1500 倍——而架构几乎没变。
-# 这张图就是「规模是 GPT 系列主旋律」最直白的证据。
+# 这张图就是「规模是 GPT 系列主旋律」最直接的证据。
 ```
 
-### 7.5 打印零件对照矩阵
-
-最后把第 6.8 节那张零件对照矩阵用代码打印出来，作为全章结论的实测收尾。这里用一个纯 Python 的二维表（不依赖任何库），把「哪一项在哪一代首次换上」用星号 `*` 标出来（对应 markdown 表格里的加粗）。
-
-```python
-# ============================================================
-# Cell 5: 打印「原版 / GPT-2 / LLaMA / Qwen3」零件对照矩阵
-# ============================================================
-# 每行：(零件, 原版Transformer, GPT-2, LLaMA, Qwen3)。星号 * 标记「这一代首次换上」。
-# 注意 * 是「在这四列这条路径上从这一代开始变」，不代表该零件由这一代发明
-# （各零件真正的出处论文见第 6.7 节，如 RoPE 出自 2021 年的 RoFormer）。
-rows = [
-    ("整体架构",    "enc-dec 两栈", "decoder-only", "decoder-only", "decoder-only"),
-    ("归一化位置",  "Post-LN",      "Pre-LN*",      "Pre-LN",       "Pre-LN"),
-    ("归一化类型",  "LayerNorm",    "LayerNorm",    "RMSNorm*",     "RMSNorm"),
-    ("FFN 形式",    "ReLU",         "GELU",         "SwiGLU*",      "SwiGLU"),
-    ("位置编码",    "sinusoidal",   "learned 绝对", "RoPE*",        "RoPE"),
-    ("注意力",      "MHA",          "MHA",          "GQA*(34B/70B)", "GQA"),
-    ("线性层 bias", "有",           "有",           "无*",          "无"),
-    ("QK-norm",     "无",           "无",           "无",           "有*"),
-    ("FFN 变体",    "稠密",         "稠密",         "稠密",         "稠密/MoE*"),
-]
-header = ("零件", "原版(2017)", "GPT-2(2019)", "LLaMA(2023)", "Qwen3(2025)")
-
-# 计算每列宽度做对齐（中文按 2 个显示宽度粗略处理）
-def w(s):  # 显示宽度：非 ASCII 记 2、ASCII 记 1
-    return sum(2 if ord(c) > 127 else 1 for c in s)
-cols = list(zip(header, *rows))
-widths = [max(w(str(x)) for x in col) for col in cols]
-
-def fmt_row(cells):
-    return " | ".join(str(c) + " " * (widths[i] - w(str(c))) for i, c in enumerate(cells))
-
-print(fmt_row(header))
-# 分隔线长度 = 各列宽度之和 + 分隔符 " | " 的总长（它只出现在列与列之间，故是 列数-1 次）
-print("-" * (sum(widths) + 3 * (len(widths) - 1)))
-for r in rows:
-    print(fmt_row(r))
-print("\n带 * 的是「该零件在这一代首次换上」。decoder-only、GELU、learned 绝对位置都始于 GPT-1（表中未单列），")
-print("故 GPT-2 列这三项不带 *。这张表就是一部浓缩的架构演进史：GPT-2 立起 Pre-LN，")
-print("LLaMA 换上 RMSNorm/SwiGLU/RoPE/GQA/去bias，Qwen3 再补 QK-norm 与可选 MoE。骨架自 2017 未变。")
-```
-
-跑出来的这张表，就是本章两条线的最终结论：**GPT 系列（第 2-5 节）把 decoder-only 骨架立了起来，LLaMA / Qwen（第 6 节）把骨架里的零件逐个换新**。你现在拿到任何一个新模型的 config，都能照着这张表快速判断它「用的是哪一代的哪套零件」。
+上面这几段代码合起来就是本章两条线的实测版：**GPT 系列（第 2-5 节）把 decoder-only 骨架立了起来，LLaMA / Qwen（第 6 节）把骨架里的零件逐个换新**。你现在拿到任何一个新模型的 config，都能照着第 6.8 节那张矩阵快速判断它「用的是哪一代的哪套零件」。
 
 ---
 
@@ -528,7 +495,7 @@ print("LLaMA 换上 RMSNorm/SwiGLU/RoPE/GQA/去bias，Qwen3 再补 QK-norm 与�
 - **从 GPT-3 到 ChatGPT 那一步不在架构上**：靠的是 InstructGPT（2022）那条**后训练**路线（SFT + 奖励模型 + RLHF），骨架一个零件没动，留到第 27-31 章（后训练与对齐这一整个阶段是第 27-36 章）。GPT-4 起闭源、不公开架构，所以架构演进这条线只能靠**开源模型**继续读下去。
 - **LLaMA / Qwen（2023 起）的现代零件**：RoPE（绝对 → 旋转相对位置，第 4 章第 6 节）、RMSNorm（LayerNorm 砍掉减均值和 bias，第 8 章第 4 节）、SwiGLU（给 FFN 加 SiLU 门控，第 8 章第 5 节）、GQA（削减 K/V 头省 KV cache，第 7 章第 5 节）、可选 MoE（稠密 FFN → 稀疏专家，第 9 章第 2.5 节、第 22 章），外加去 bias / QK-norm / weight tying 等小改动。
 - **零件的出处与「时间差」**：这些零件都不是 LLaMA / Qwen 发明的——RMSNorm（2019）、MQA（2019）、SwiGLU（2020）、RoPE（2021）、GQA（2023）各有更早的专门论文。一项改良从「有论文」到「成为标配」通常隔两三年，因为要等有人在大规模上复检它依然有效。开源大模型的技术报告扮演的正是「大规模复检 + 打包成配方」的角色。
-- **零件对照矩阵**：原版 / GPT-2 / LLaMA / Qwen3 逐行对照，加粗（代码里用 `*`）标出每项零件「首次换上」的那一代——注意「首次」是相对这四列而言，不等于该零件由这一代发明。
+- **零件对照矩阵**：原版 / GPT-2 / LLaMA / Qwen3 逐行对照，加粗标出每项零件「首次换上」的那一代——注意「首次」是相对这四列而言，不等于该零件由这一代发明。
 - **config 字段 ↔ 论文改动的对应**：`rope_theta` ↔ RoPE、`rms_norm_eps` ↔ RMSNorm、`hidden_act=silu` ↔ SwiGLU、`num_attention_heads > num_key_value_heads` ↔ GQA、`tie_word_embeddings` ↔ weight tying。读 config 就能反推一个模型用了哪套零件。
 
 ## 九、本章小结
@@ -538,7 +505,7 @@ print("LLaMA 换上 RMSNorm/SwiGLU/RoPE/GQA/去bias，Qwen3 再补 QK-norm 与�
 - **第一条线到 GPT-3 为止是有原因的**：GPT-3 → ChatGPT 那一步改的是**训练流程**（SFT + RLHF，第 27-31 章）而非架构，GPT-4 之后又不再公开架构细节。所以架构演进这条线自然接到了**开源**的 LLaMA / Qwen 上。
 - **第二条线原版 → LLaMA / Qwen，讲骨架定型后怎么换零件**：decoder-only 赢下主赛道后，改进从「选架构」转向「在固定骨架里换更好的零件」——RoPE、RMSNorm、SwiGLU、GQA、可选 MoE，外加去 bias / QK-norm / weight tying。这些零件前面各章都介绍过，本章把它们凑成一张对照矩阵，看清每一项是哪一代首次换上的；同时也点明**它们大多出自比 LLaMA 更早的专门论文**（GQA 是同年落地的例外），LLaMA / Qwen 的贡献是「在最大规模上复检并打包成一套配方」。
 - **一张零件对照矩阵收束全章**：原版（2017）/ GPT-2（2019）/ LLaMA（2023）/ Qwen3（2025）逐行对照，加粗标出「首次换上」——decoder-only、GELU、learned 绝对位置都始于 GPT-1（表中未单列），GPT-2 首次立起 Pre-LN，LLaMA 一口气换上 RMSNorm / SwiGLU / RoPE / GQA / 去 bias，Qwen3 补上 QK-norm 与可选 MoE。**骨架自 2017 未变，变的全是零件型号**。
-- **实战我们用 `AutoConfig` 读了 GPT-2 和 Qwen3-8B 的 config**，把「论文说换了什么」和「config 里改了哪个字段」一一对上，画了 GPT-1/2/3 参数量增长图，打印了零件对照矩阵。掌握这套「读 config 反推零件」的本事，你以后拿到任何新模型都能快速判断它的架构谱系。
+- **实战我们用 `AutoConfig` 读了 GPT-2 和 Qwen3-8B 的 config**，把「论文说换了什么」和「config 里改了哪个字段」一一对上，并画了 GPT-1/2/3 参数量增长图。掌握这套「读 config 反推零件」的本事，你以后拿到任何新模型都能快速判断它的架构谱系。
 
 ---
 
