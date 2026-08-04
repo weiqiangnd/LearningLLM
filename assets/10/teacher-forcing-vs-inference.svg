@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 760">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aSlate" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#334155"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 25px; font-weight: 700; fill: #374151; }
+    .h2     { font-size: 18px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 15px; font-weight: 600; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 15px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 700; }
+  </style>
+<text x="710.0" y="46" text-anchor="middle" class="title">Teacher Forcing 并行训练  vs  自回归串行推理</text>
+<text x="710.0" y="72" text-anchor="middle" class="cap">同一个分布 Pθ(·│前文) 的两面：训练塑造它，推理从它采样</text>
+<rect x="40" y="96" width="660" height="600" rx="16" fill="#fcfdff" stroke="#2563eb" stroke-width="2"/>
+<text x="370.0" y="132" text-anchor="middle" class="h2">训练：teacher forcing（一次并行）</text>
+<text x="126" y="192" text-anchor="end" class="lbl">真实序列</text>
+<rect x="157.0" y="172" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="190" y="199" text-anchor="middle" class="monob">x0</text>
+<rect x="275.0" y="172" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="308" y="199" text-anchor="middle" class="monob">x1</text>
+<rect x="393.0" y="172" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="426" y="199" text-anchor="middle" class="monob">x2</text>
+<rect x="511.0" y="172" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="544" y="199" text-anchor="middle" class="monob">x3</text>
+<rect x="629.0" y="172" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="662" y="199" text-anchor="middle" class="monob">x4</text>
+<rect x="100" y="246" width="540" height="50" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.8"/>
+<text x="370.0" y="277" text-anchor="middle" class="sub">因果掩码 + 一次前向（每个位置前文 = 真值、彼此独立）</text>
+<line x1="190" y1="214" x2="190" y2="242" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<line x1="308" y1="214" x2="308" y2="242" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<line x1="426" y1="214" x2="426" y2="242" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<line x1="544" y1="214" x2="544" y2="242" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<text x="126" y="357" text-anchor="end" class="lbl">模型预测</text>
+<line x1="190" y1="296" x2="190" y2="326" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<rect x="157.0" y="330" width="66" height="42" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="190" y="357" text-anchor="middle" class="monob">ŷ1</text>
+<line x1="308" y1="296" x2="308" y2="326" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<rect x="275.0" y="330" width="66" height="42" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="308" y="357" text-anchor="middle" class="monob">ŷ2</text>
+<line x1="426" y1="296" x2="426" y2="326" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<rect x="393.0" y="330" width="66" height="42" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="426" y="357" text-anchor="middle" class="monob">ŷ3</text>
+<line x1="544" y1="296" x2="544" y2="326" stroke="#334155" stroke-width="2" marker-end="url(#aSlate)"/>
+<rect x="511.0" y="330" width="66" height="42" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="544" y="357" text-anchor="middle" class="monob">ŷ4</text>
+<text x="126" y="457" text-anchor="end" class="lbl">对照真值</text>
+<line x1="190" y1="372" x2="190" y2="426" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aRed)"/>
+<rect x="157.0" y="430" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="190" y="457" text-anchor="middle" class="monob">x1</text>
+<line x1="308" y1="372" x2="308" y2="426" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aRed)"/>
+<rect x="275.0" y="430" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="308" y="457" text-anchor="middle" class="monob">x2</text>
+<line x1="426" y1="372" x2="426" y2="426" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aRed)"/>
+<rect x="393.0" y="430" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="426" y="457" text-anchor="middle" class="monob">x3</text>
+<line x1="544" y1="372" x2="544" y2="426" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aRed)"/>
+<rect x="511.0" y="430" width="66" height="42" rx="9" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="544" y="457" text-anchor="middle" class="monob">x4</text>
+<rect x="170" y="528" width="400" height="52" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8"/>
+<text x="370.0" y="560" text-anchor="middle" class="lbl">cross-entropy 求平均 → loss（标量）</text>
+<line x1="190" y1="472" x2="190" y2="524" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+<line x1="308" y1="472" x2="308" y2="524" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+<line x1="426" y1="472" x2="426" y2="524" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+<line x1="544" y1="472" x2="544" y2="524" stroke="#dc2626" stroke-width="1.8" marker-end="url(#aRed)"/>
+<text x="370.0" y="626" text-anchor="middle" class="small">全部 L−1 个位置同时算 loss——整列一次前向，不偷看未来。</text>
+<text x="370.0" y="664" text-anchor="middle" class="small">前文来自真实语料 → 高效、稳定，但埋下 exposure bias。</text>
+<rect x="720" y="96" width="660" height="600" rx="16" fill="#fffdfb" stroke="#ea580c" stroke-width="2"/>
+<text x="1050.0" y="132" text-anchor="middle" class="h2">推理：自回归（串行）</text>
+<rect x="860.0" y="162" width="300" height="48" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.8"/>
+<text x="1010.0" y="191" text-anchor="middle" class="sub">prompt（前文 token 序列）</text>
+<line x1="1010.0" y1="210" x2="1010.0" y2="232" stroke="#334155" stroke-width="2.2" marker-end="url(#aSlate)"/>
+<rect x="835.0" y="236" width="350" height="46" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="1010.0" y="265" text-anchor="middle" class="sub">① 模型前向</text>
+<line x1="1010.0" y1="282" x2="1010.0" y2="304" stroke="#334155" stroke-width="2.2" marker-end="url(#aSlate)"/>
+<rect x="835.0" y="308" width="350" height="46" rx="10" fill="#cffafe" stroke="#0891b2" stroke-width="1.8"/>
+<text x="1010.0" y="337" text-anchor="middle" class="sub">② 取最后位置 logits → 采样 ŷ</text>
+<line x1="1010.0" y1="354" x2="1010.0" y2="376" stroke="#334155" stroke-width="2.2" marker-end="url(#aSlate)"/>
+<rect x="835.0" y="380" width="350" height="46" rx="10" fill="#dcfce7" stroke="#059669" stroke-width="1.8"/>
+<text x="1010.0" y="409" text-anchor="middle" class="sub">③ 把 ŷ 拼回前文末尾</text>
+<path d="M 1185.0 403 H 1231.0 V 259 H 1189.0" fill="none" stroke="#ea580c" stroke-width="2.2" marker-end="url(#aOrange)"/>
+<text x="1239.0" y="336.0" text-anchor="start" class="small">下一步</text>
+<line x1="1010.0" y1="426" x2="1010.0" y2="466" stroke="#dc2626" stroke-width="2.2" marker-end="url(#aRed)"/>
+<text x="1024.0" y="452" text-anchor="start" class="small">&lt;eos&gt; 或到上限</text>
+<rect x="860.0" y="470" width="300" height="46" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.8"/>
+<text x="1010.0" y="498" text-anchor="middle" class="sub">停止生成，输出整段文本</text>
+<text x="1050.0" y="560" text-anchor="middle" class="small">每步只取最后一个位置的 logits 采样，再拼回——串行，</text>
+<text x="1050.0" y="582" text-anchor="middle" class="small">一次只产出一个 token（第 14 章 KV cache 为它提速）。</text>
+<text x="1050.0" y="626" text-anchor="middle" class="small">前文来自模型自己生成的 ŷ——训练时从没见过这种前文。</text>
+<text x="1050.0" y="664" text-anchor="middle" class="small">采样策略（greedy / temperature / top-p，第 2 章）都在这一步做文章。</text>
+<text x="710.0" y="742" text-anchor="middle" class="cap">训练（写）用 cross-entropy 把分布塑造对；推理（读）从同一个分布采样。区别全在「前文从哪来」与「能不能并行」。</text>
+</svg>

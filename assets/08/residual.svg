@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 620">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 15px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 17px; font-weight: 700; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14.5px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="850.0" y="46" text-anchor="middle" class="title">残差连接：前向 x + F(x)，反向梯度经 +1 直通 —— 深层网络的梯度高速公路</text>
+<rect x="319.5" y="92" width="201.0" height="24" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.3"/>
+<text x="420" y="108.5" text-anchor="middle" class="tag" fill="#2563eb">一个残差块：y = x + F(x)</text>
+<rect x="102.0" y="265.0" width="96" height="70" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="305" text-anchor="middle" class="monob">x</text>
+<line x1="198" y1="300" x2="335" y2="300" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="355.0" y="258.0" width="150" height="84" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="430" y="296" text-anchor="middle" class="monob">F(x)</text>
+<text x="430" y="316" text-anchor="middle" class="small">子层（Norm+MHA/FFN）</text>
+<line x1="505" y1="300" x2="678" y2="300" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<circle cx="700" cy="300" r="22" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="700" y="307" text-anchor="middle" class="lbl" fill="#059669">+</text>
+<path d="M 150 265 Q 150 150 425.0 150 Q 700 150 700 276" fill="none" stroke="#059669" stroke-width="2.2" marker-end="url(#aGreen)"/>
+<text x="425.0" y="140" text-anchor="middle" class="sub" fill="#059669">残差旁路（恒等）</text>
+<line x1="722" y1="300" x2="810" y2="300" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="830" y="305" class="monob">y</text>
+<text x="420" y="390" text-anchor="middle" class="mono" fill="#dc2626">反向：∂y/∂x = 1 + ∂F/∂x</text>
+<text x="420" y="418" text-anchor="middle" class="sub">那个 1 让上游梯度【原样直通】，哪怕 ∂F/∂x≈0 也传得回去</text>
+<line x1="900" y1="100" x2="900" y2="540" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="5,5"/>
+<rect x="1199.5" y="92" width="201.0" height="24" rx="7" fill="#f3f4f6" stroke="#475569" stroke-width="1.3"/>
+<text x="1300" y="108.5" text-anchor="middle" class="tag" fill="#475569">40 层堆叠：底层梯度的命运</text>
+<text x="1130" y="150" text-anchor="middle" class="lbl" fill="#dc2626">无残差 F(x)</text>
+<rect x="1075.0" y="175" width="110" height="26" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<line x1="1130" y1="201" x2="1130" y2="209" stroke="#dc2626" stroke-width="1.6"/>
+<rect x="1075.0" y="209" width="110" height="26" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<line x1="1130" y1="235" x2="1130" y2="243" stroke="#dc2626" stroke-width="1.6"/>
+<rect x="1075.0" y="243" width="110" height="26" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<line x1="1130" y1="269" x2="1130" y2="277" stroke="#dc2626" stroke-width="1.6"/>
+<rect x="1075.0" y="277" width="110" height="26" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<line x1="1130" y1="303" x2="1130" y2="311" stroke="#dc2626" stroke-width="1.6"/>
+<rect x="1075.0" y="311" width="110" height="26" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="1130" y="165" text-anchor="middle" class="small">第 40 层（顶）</text>
+<text x="1130" y="363" text-anchor="middle" class="small">第 1 层（底）</text>
+<line x1="1230" y1="175" x2="1230" y2="345" stroke="#dc2626" stroke-width="1.2" marker-end="url(#aRed)"/>
+<text x="1242" y="260.0" class="sub" fill="#dc2626">梯度反传</text>
+<text x="1130" y="389" text-anchor="middle" class="mono" fill="#dc2626">底层梯度 ≈ 1e-10（学不动）</text>
+<text x="1480" y="150" text-anchor="middle" class="lbl" fill="#059669">有残差 x+F(x)</text>
+<rect x="1425.0" y="175" width="110" height="26" rx="5" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<line x1="1480" y1="201" x2="1480" y2="209" stroke="#059669" stroke-width="1.6"/>
+<rect x="1425.0" y="209" width="110" height="26" rx="5" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<line x1="1480" y1="235" x2="1480" y2="243" stroke="#059669" stroke-width="1.6"/>
+<rect x="1425.0" y="243" width="110" height="26" rx="5" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<line x1="1480" y1="269" x2="1480" y2="277" stroke="#059669" stroke-width="1.6"/>
+<rect x="1425.0" y="277" width="110" height="26" rx="5" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<line x1="1480" y1="303" x2="1480" y2="311" stroke="#059669" stroke-width="1.6"/>
+<rect x="1425.0" y="311" width="110" height="26" rx="5" fill="#dcfce7" stroke="#059669" stroke-width="1.6"/>
+<text x="1480" y="165" text-anchor="middle" class="small">第 40 层（顶）</text>
+<text x="1480" y="363" text-anchor="middle" class="small">第 1 层（底）</text>
+<line x1="1580" y1="175" x2="1580" y2="345" stroke="#059669" stroke-width="3" marker-end="url(#aGreen)"/>
+<text x="1592" y="260.0" class="sub" fill="#059669">梯度反传</text>
+<text x="1480" y="389" text-anchor="middle" class="mono" fill="#059669">底层梯度 健康（可学习）</text>
+<text x="850.0" y="596" text-anchor="middle" class="cap">无残差：梯度走「层层连乘」，几十层后指数衰减到几乎为 0；有残差：那条 +1 直通路让梯度健康送回底层。</text>
+</svg>

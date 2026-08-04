@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1145 540" font-family="Noto Sans CJK SC, PingFang SC, Helvetica, Arial, sans-serif">
+  <!-- fixed white background: keeps the PNG consistent on GitHub light/dark themes -->
+  <rect x="0" y="0" width="1145" height="540" fill="#ffffff"/>
+  <style>
+    .title   { font-size: 26px; font-weight: 600; fill: #374151; }
+    .subtitle{ font-size: 15px; fill: #374151; }
+    .colhdr  { font-size: 14px; font-weight: 600; fill: #334155; }
+    .yr      { font-size: 14px; fill: #374151; }
+    .part    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .paper   { font-size: 14px; fill: #374151; }
+    .adopt   { font-size: 14px; font-weight: 600; fill: #334155; }
+    .gap     { font-size: 14px; fill: #374151; }
+    .cap     { font-size: 15px; fill: #374151; }
+    .lgd     { font-size: 14px; fill: #374151; }
+  </style>
+
+  <!-- title -->
+  <text x="40" y="42" class="title">现代零件的出处与「时间差」</text>
+  <text x="40" y="70" class="subtitle">这些零件都不是 LLaMA / Qwen 发明的——大多出自更早的专门论文；从「有论文」到「被大规模用上」，中间往往还要再等好几年</text>
+
+  <!-- ===== year axis ===== -->
+  <text x="1105" y="110" text-anchor="end" class="colhdr">时间差</text>
+  <line x1="240" y1="120" x2="995" y2="120" stroke="#9ca3af" stroke-width="1.5"/>
+
+  <!-- year ticks: 2017..2024 at x = 290 + (y-2017)*95 -->
+  <g class="yr" text-anchor="middle">
+    <text x="290"  y="110">2017</text>
+    <text x="385"  y="110">2018</text>
+    <text x="480"  y="110">2019</text>
+    <text x="575"  y="110">2020</text>
+    <text x="670"  y="110">2021</text>
+    <text x="765"  y="110">2022</text>
+    <text x="860"  y="110">2023</text>
+    <text x="955"  y="110">2024</text>
+  </g>
+  <g stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3 4">
+    <line x1="290"  y1="126" x2="290"  y2="444"/>
+    <line x1="385"  y1="126" x2="385"  y2="444"/>
+    <line x1="480"  y1="126" x2="480"  y2="444"/>
+    <line x1="575"  y1="126" x2="575"  y2="444"/>
+    <line x1="670"  y1="126" x2="670"  y2="444"/>
+    <line x1="765"  y1="126" x2="765"  y2="444"/>
+    <line x1="860"  y1="126" x2="860"  y2="444"/>
+    <line x1="955"  y1="126" x2="955"  y2="444"/>
+  </g>
+
+  <!-- ===== rows: y = 165 + i*43 ===== -->
+
+  <!-- 1. 稀疏 MoE: 2017 -> 2023 -->
+  <g>
+    <text x="230" y="170" text-anchor="end" class="part">稀疏 MoE</text>
+    <line x1="290" y1="165" x2="860" y2="165" stroke="#c4b5fd" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="290" cy="165" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="860" cy="165" r="6.5" fill="#7c3aed"/>
+    <text x="286" y="186" class="paper">Shazeer 等（稀疏门控 MoE）</text>
+    <text x="860" y="152" text-anchor="middle" class="adopt">Mixtral</text>
+    <text x="1105" y="170" text-anchor="end" class="gap">隔 6 年</text>
+  </g>
+
+  <!-- 2. RMSNorm: 2019 -> 2021 -->
+  <g>
+    <text x="230" y="213" text-anchor="end" class="part">RMSNorm</text>
+    <line x1="480" y1="208" x2="670" y2="208" stroke="#c4b5fd" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="480" cy="208" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="670" cy="208" r="6.5" fill="#7c3aed"/>
+    <text x="476" y="229" class="paper">Zhang &amp; Sennrich</text>
+    <text x="670" y="195" text-anchor="middle" class="adopt">Gopher</text>
+    <text x="1105" y="213" text-anchor="end" class="gap">隔 2 年</text>
+  </g>
+
+  <!-- 3. MQA: 2019 -> 2022 -->
+  <g>
+    <text x="230" y="256" text-anchor="end" class="part">MQA</text>
+    <line x1="480" y1="251" x2="765" y2="251" stroke="#c4b5fd" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="480" cy="251" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="765" cy="251" r="6.5" fill="#7c3aed"/>
+    <text x="476" y="272" class="paper">Shazeer</text>
+    <text x="765" y="238" text-anchor="middle" class="adopt">PaLM</text>
+    <text x="1105" y="256" text-anchor="end" class="gap">隔 3 年</text>
+  </g>
+
+  <!-- 4. SwiGLU: 2020 -> 2022 -->
+  <g>
+    <text x="230" y="299" text-anchor="end" class="part">SwiGLU</text>
+    <line x1="575" y1="294" x2="765" y2="294" stroke="#c4b5fd" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="575" cy="294" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="765" cy="294" r="6.5" fill="#7c3aed"/>
+    <text x="571" y="315" class="paper">Shazeer（GLU Variants）</text>
+    <text x="765" y="281" text-anchor="middle" class="adopt">PaLM</text>
+    <text x="1105" y="299" text-anchor="end" class="gap">隔 2 年</text>
+  </g>
+
+  <!-- 5. QK-norm: 2020 -> 2023 -->
+  <g>
+    <text x="230" y="342" text-anchor="end" class="part">QK-norm</text>
+    <line x1="575" y1="337" x2="860" y2="337" stroke="#c4b5fd" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="575" cy="337" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="860" cy="337" r="6.5" fill="#7c3aed"/>
+    <text x="571" y="358" class="paper">Henry 等</text>
+    <text x="860" y="324" text-anchor="middle" class="adopt">ViT-22B（视觉）</text>
+    <text x="1105" y="342" text-anchor="end" class="gap">隔 3 年</text>
+  </g>
+
+  <!-- 6. RoPE: 2021 -> 2022 -->
+  <g>
+    <text x="230" y="385" text-anchor="end" class="part">RoPE</text>
+    <line x1="670" y1="380" x2="765" y2="380" stroke="#c4b5fd" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="670" cy="380" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="765" cy="380" r="6.5" fill="#7c3aed"/>
+    <text x="666" y="401" class="paper">Su 等（RoFormer）</text>
+    <text x="790" y="372" class="adopt">GPT-NeoX</text>
+    <text x="1105" y="385" text-anchor="end" class="gap">隔 1 年</text>
+  </g>
+
+  <!-- 7. GQA: 2023 -> 2023 -->
+  <g>
+    <text x="230" y="428" text-anchor="end" class="part">GQA</text>
+    <circle cx="860" cy="423" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+    <circle cx="874" cy="423" r="6.5" fill="#7c3aed"/>
+    <text x="856" y="444" class="paper">Ainslie 等</text>
+    <text x="894" y="415" class="adopt">LLaMA-2 34B/70B</text>
+    <text x="1105" y="428" text-anchor="end" class="gap">同年落地</text>
+  </g>
+
+  <!-- ===== caption ===== -->
+  <text x="40" y="478" class="cap">读法：空心点 = 论文提出的那一年，实心点 = 首个广为人知的大规模采用。中间那段虚线越长，说明这项改良等待得越久——因为要等有人在几十亿参数、</text>
+  <text x="40" y="500" class="cap">上万亿 token 的规模上复检它依然有效。开源大模型的技术报告，扮演的正是「大规模复检 + 打包成配方」的角色。</text>
+
+  <!-- ===== legend ===== -->
+  <circle cx="50" cy="527" r="6.5" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+  <text x="66" y="532" class="lgd">论文提出</text>
+  <circle cx="180" cy="527" r="6.5" fill="#7c3aed"/>
+  <text x="196" y="532" class="lgd">首个大规模采用</text>
+</svg>

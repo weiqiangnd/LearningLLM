@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 520">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 15px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 17px; font-weight: 700; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14.5px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="840.0" y="46" text-anchor="middle" class="title">FFN：升维到 d_ff（≈4×）→ 非线性激活 → 降回 d_model（逐 token、同一套权重）</text>
+<rect x="114" y="180" width="72" height="140" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="164" text-anchor="middle" class="lbl">x</text>
+<text x="150" y="346" text-anchor="middle" class="small">d_model</text>
+<line x1="186" y1="250" x2="335" y2="250" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<text x="260.5" y="234" text-anchor="middle" class="monos" fill="#7c3aed">W₁: d_model→d_ff</text>
+<rect x="355.0" y="202.0" width="150" height="96" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="430" y="246" text-anchor="middle" class="monob">W₁</text>
+<text x="430" y="266" text-anchor="middle" class="small">升维</text>
+<line x1="505" y1="250" x2="676" y2="250" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<rect x="676" y="135" width="88" height="230" rx="9" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="720" y="119" text-anchor="middle" class="lbl">h</text>
+<text x="720" y="390" text-anchor="middle" class="small">d_ff（≈4× 宽）</text>
+<line x1="764" y1="250" x2="900" y2="250" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="900.0" y="202.0" width="160" height="96" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="980" y="246" text-anchor="middle" class="lbl">激活</text>
+<text x="980" y="266" text-anchor="middle" class="small">ReLU / GELU / SiLU</text>
+<text x="980" y="184" text-anchor="middle" class="small" fill="#059669">唯一的非线性来源</text>
+<text x="980" y="322" text-anchor="middle" class="small">逐元素作用，形状不变（仍是 d_ff）</text>
+<line x1="1060" y1="250" x2="1195" y2="250" stroke="#7c3aed" stroke-width="2" marker-end="url(#aPurple)"/>
+<text x="1127.5" y="234" text-anchor="middle" class="monos" fill="#7c3aed">W₂: d_ff→d_model</text>
+<rect x="1215.0" y="202.0" width="150" height="96" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1290" y="246" text-anchor="middle" class="monob">W₂</text>
+<text x="1290" y="266" text-anchor="middle" class="small">降维</text>
+<line x1="1365" y1="250" x2="1524" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="1524" y="180" width="72" height="140" rx="9" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="1560" y="164" text-anchor="middle" class="lbl">out</text>
+<text x="1560" y="346" text-anchor="middle" class="small">d_model（同形）</text>
+<text x="840.0" y="494" text-anchor="middle" class="cap">FFN(x) = 激活(x·W₁ + b₁)·W₂ + b₂　　中间胖、两头瘦；FFN 占一个 block 约 2/3 的参数。</text>
+</svg>

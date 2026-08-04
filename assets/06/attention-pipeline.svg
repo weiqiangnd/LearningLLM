@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 560">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 15px; font-family: 'Noto Sans Mono CJK SC','SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #374151; }
+    .monob  { font-size: 17px; font-weight: 700; font-family: 'Noto Sans Mono CJK SC','SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC','SFMono-Regular','Consolas','Liberation Mono',monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="950.0" y="44" text-anchor="middle" class="title">Scaled Dot-Product Attention 流水线：QKᵀ → 缩放 → (causal mask) → softmax → 乘 V</text>
+<rect x="80.0" y="204.0" width="140" height="92" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="150" y="246" text-anchor="middle" class="monob">Q, K</text>
+<text x="150" y="266" text-anchor="middle" class="small">[L, d_k]</text>
+<line x1="222" y1="250" x2="336.0" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="336.0" y="204.0" width="188" height="92" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="430" y="246" text-anchor="middle" class="mono">S = QKᵀ</text>
+<text x="430" y="266" text-anchor="middle" class="small">点积打分 [L, L]</text>
+<rect x="405.0" y="176.0" width="50" height="20" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.3"/>
+<text x="430" y="190.0" text-anchor="middle" class="tag" fill="#7c3aed">① 打分</text>
+<line x1="524.0" y1="250" x2="626.0" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="626.0" y="204.0" width="188" height="92" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="720" y="246" text-anchor="middle" class="mono">S / √d_k</text>
+<text x="720" y="266" text-anchor="middle" class="small">缩放 [L, L]</text>
+<rect x="695.0" y="176.0" width="50" height="20" rx="6" fill="#ccfbf1" stroke="#0d9488" stroke-width="1.3"/>
+<text x="720" y="190.0" text-anchor="middle" class="tag" fill="#0d9488">② 缩放</text>
+<line x1="814.0" y1="250" x2="916.0" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="916.0" y="204.0" width="188" height="92" rx="11" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="1010" y="246" text-anchor="middle" class="mono">+ mask</text>
+<text x="1010" y="266" text-anchor="middle" class="small">上三角置 -inf</text>
+<rect x="977.0" y="176.0" width="66" height="20" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.3"/>
+<text x="1010" y="190.0" text-anchor="middle" class="tag" fill="#dc2626">②.5 可选</text>
+<text x="1010" y="318.0" text-anchor="middle" class="small">仅自回归(causal)时</text>
+<line x1="1104.0" y1="250" x2="1206.0" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="1206.0" y="204.0" width="188" height="92" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="1300" y="246" text-anchor="middle" class="mono">softmax</text>
+<text x="1300" y="266" text-anchor="middle" class="small">逐行归一 → A [L, L]</text>
+<rect x="1275.0" y="176.0" width="50" height="20" rx="6" fill="#ffedd5" stroke="#ea580c" stroke-width="1.3"/>
+<text x="1300" y="190.0" text-anchor="middle" class="tag" fill="#ea580c">③ 归一</text>
+<text x="1300" y="318.0" text-anchor="middle" class="small">行非负、行和=1</text>
+<line x1="1394.0" y1="250" x2="1506.0" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="1506.0" y="204.0" width="188" height="92" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="1600" y="246" text-anchor="middle" class="mono">A · V</text>
+<text x="1600" y="266" text-anchor="middle" class="small">加权求和 [L, d_v]</text>
+<rect x="1575.0" y="176.0" width="50" height="20" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.3"/>
+<text x="1600" y="190.0" text-anchor="middle" class="tag" fill="#059669">④ 求和</text>
+<rect x="1500.0" y="371.0" width="140" height="58" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="1570" y="396" text-anchor="middle" class="monob">V</text>
+<text x="1570" y="416" text-anchor="middle" class="small">[L, d_v]</text>
+<line x1="1570" y1="371" x2="1580" y2="296.0" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<line x1="1694.0" y1="250" x2="1765" y2="250" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="1755.0" y="204.0" width="130" height="92" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1820" y="246" text-anchor="middle" class="monob">O</text>
+<text x="1820" y="266" text-anchor="middle" class="small">输出 [L, d_v]</text>
+<rect x="480.0" y="482" width="940" height="46" rx="10" fill="#f3f4f6" stroke="#94a3b8" stroke-width="1.4"/>
+<text x="950.0" y="512" text-anchor="middle" class="mono">Attention(Q, K, V) = softmax( QKᵀ / √d_k  + mask ) · V</text>
+</svg>

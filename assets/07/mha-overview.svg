@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1860 760">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 15px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 17px; font-weight: 700; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14.5px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="930.0" y="46" text-anchor="middle" class="title">Multi-Head Attention 全景：投影切头 → H 个头并行 attention → 拼接 → 输出投影 W_O</text>
+<rect x="55.0" y="330.0" width="150" height="100" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="130" y="376" text-anchor="middle" class="monob">X</text>
+<text x="130" y="396" text-anchor="middle" class="small">[B, L, d_model]</text>
+<text x="130" y="444" text-anchor="middle" class="small">输入序列</text>
+<line x1="205" y1="380" x2="285" y2="380" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="285.0" y="325.0" width="190" height="110" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="380" y="376" text-anchor="middle" class="mono">W_Q / W_K / W_V</text>
+<text x="380" y="396" text-anchor="middle" class="small">投影 + 切头</text>
+<text x="380" y="420" text-anchor="middle" class="small">→ Q,K,V 各 [B,H,L,d_k]</text>
+<line x1="475" y1="380" x2="630" y2="185" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#aPurple)"/>
+<rect x="630.0" y="137.0" width="260" height="96" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="760" y="181" text-anchor="middle" class="lbl">head 1</text>
+<text x="760" y="201" text-anchor="middle" class="small">softmax(QₕKₕᵀ/√d_k)·Vₕ</text>
+<text x="760" y="219" text-anchor="middle" class="monos" fill="#334155">[B, L, d_k]</text>
+<line x1="475" y1="380" x2="630" y2="315" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#aPurple)"/>
+<rect x="630.0" y="267.0" width="260" height="96" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="760" y="311" text-anchor="middle" class="lbl">head 2</text>
+<text x="760" y="331" text-anchor="middle" class="small">softmax(QₕKₕᵀ/√d_k)·Vₕ</text>
+<text x="760" y="349" text-anchor="middle" class="monos" fill="#334155">[B, L, d_k]</text>
+<line x1="475" y1="380" x2="630" y2="445" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#aPurple)"/>
+<rect x="630.0" y="397.0" width="260" height="96" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="760" y="441" text-anchor="middle" class="lbl">head 3</text>
+<text x="760" y="461" text-anchor="middle" class="small">softmax(QₕKₕᵀ/√d_k)·Vₕ</text>
+<text x="760" y="479" text-anchor="middle" class="monos" fill="#334155">[B, L, d_k]</text>
+<line x1="475" y1="380" x2="630" y2="575" stroke="#7c3aed" stroke-width="1.7" marker-end="url(#aPurple)"/>
+<text x="760" y="516.0" text-anchor="middle" class="monob" fill="#334155">⋮</text>
+<rect x="630.0" y="527.0" width="260" height="96" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="760" y="571" text-anchor="middle" class="lbl">head H</text>
+<text x="760" y="591" text-anchor="middle" class="small">softmax(QₕKₕᵀ/√d_k)·Vₕ</text>
+<text x="760" y="609" text-anchor="middle" class="monos" fill="#334155">[B, L, d_k]</text>
+<line x1="890" y1="185" x2="1170" y2="380" stroke="#0d9488" stroke-width="1.7" marker-end="url(#aTeal)"/>
+<line x1="890" y1="315" x2="1170" y2="380" stroke="#0d9488" stroke-width="1.7" marker-end="url(#aTeal)"/>
+<line x1="890" y1="445" x2="1170" y2="380" stroke="#0d9488" stroke-width="1.7" marker-end="url(#aTeal)"/>
+<line x1="890" y1="575" x2="1170" y2="380" stroke="#0d9488" stroke-width="1.7" marker-end="url(#aTeal)"/>
+<rect x="1170.0" y="305.0" width="120" height="150" rx="11" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="1230" y="376" text-anchor="middle" class="lbl">Concat</text>
+<text x="1230" y="396" text-anchor="middle" class="small">拼回 d_model</text>
+<text x="1230" y="424" text-anchor="middle" class="monos" fill="#334155">[B,L,d_model]</text>
+<line x1="1290" y1="380" x2="1425" y2="380" stroke="#ea580c" stroke-width="2" marker-end="url(#aOrange)"/>
+<rect x="1425.0" y="330.0" width="150" height="100" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="1500" y="376" text-anchor="middle" class="monob">W_O</text>
+<text x="1500" y="396" text-anchor="middle" class="small">输出投影 / 融合</text>
+<line x1="1575" y1="380" x2="1700" y2="380" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<rect x="1700.0" y="330.0" width="120" height="100" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1760" y="376" text-anchor="middle" class="monob">O</text>
+<text x="1760" y="396" text-anchor="middle" class="small">[B,L,d_model]</text>
+<text x="1760" y="444" text-anchor="middle" class="small">与输入同形</text>
+<rect x="344.0" y="242" width="72.0" height="24" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.3"/>
+<text x="380" y="258.5" text-anchor="middle" class="tag" fill="#7c3aed">① 切头</text>
+<rect x="670.0" y="109" width="180.0" height="24" rx="7" fill="#ccfbf1" stroke="#0d9488" stroke-width="1.3"/>
+<text x="760" y="125.5" text-anchor="middle" class="tag" fill="#0d9488">② 各头独立 attention</text>
+<rect x="1191.0" y="277" width="78.0" height="24" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.3"/>
+<text x="1230" y="293.5" text-anchor="middle" class="tag" fill="#ea580c">③ 拼接</text>
+<rect x="1447.5" y="302" width="105.0" height="24" rx="7" fill="#dcfce7" stroke="#059669" stroke-width="1.3"/>
+<text x="1500" y="318.5" text-anchor="middle" class="tag" fill="#059669">④ 输出投影</text>
+<rect x="370.0" y="688" width="1120" height="46" rx="10" fill="#f3f4f6" stroke="#94a3b8" stroke-width="1.4"/>
+<text x="930.0" y="718" text-anchor="middle" class="mono">MultiHead(X) = Concat(head₁, …, head_H) · W_O,    head_h = softmax(QₕKₕᵀ / √d_k) · Vₕ</text>
+</svg>

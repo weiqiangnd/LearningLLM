@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 560">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="640.0" y="42" text-anchor="middle" class="title">抽掉 RNN、只留 attention，并让序列对「自己」做注意力 → self-attention</text>
+<rect x="60" y="80" width="540" height="400" rx="14" fill="#f8fafc" stroke="#2563eb" stroke-width="2"/>
+<text x="330.0" y="112" text-anchor="middle" class="lbl" fill="#2563eb">本章：RNN + attention</text>
+<rect x="131.0" y="158.0" width="78" height="44" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="170" y="185" text-anchor="middle" class="mono">h₁</text>
+<line x1="209" y1="180" x2="231" y2="180" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="231.0" y="158.0" width="78" height="44" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="270" y="185" text-anchor="middle" class="mono">h₂</text>
+<line x1="309" y1="180" x2="331" y2="180" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="331.0" y="158.0" width="78" height="44" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="370" y="185" text-anchor="middle" class="mono">h₃</text>
+<line x1="409" y1="180" x2="431" y2="180" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<rect x="431.0" y="158.0" width="78" height="44" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="470" y="185" text-anchor="middle" class="mono">h₄</text>
+<text x="330.0" y="150" text-anchor="middle" class="small">encoder 隐藏态（仍由 RNN 顺序产生）</text>
+<rect x="255.0" y="353.0" width="150" height="54" rx="11" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="330.0" y="376" text-anchor="middle" class="lbl">decoder sₜ</text>
+<text x="330.0" y="396" text-anchor="middle" class="small">query</text>
+<path d="M 330.0 353 C 330.0 300, 170 320, 170 204" fill="none" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#aOrange)"/>
+<path d="M 330.0 353 C 330.0 300, 270 320, 270 204" fill="none" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#aOrange)"/>
+<path d="M 330.0 353 C 330.0 300, 370 320, 370 204" fill="none" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#aOrange)"/>
+<path d="M 330.0 353 C 330.0 300, 470 320, 470 204" fill="none" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#aOrange)"/>
+<text x="330.0" y="430" text-anchor="middle" class="small" fill="#334155">attention 只是「外挂」在 RNN 上；token 仍要顺序算</text>
+<line x1="620" y1="280" x2="678" y2="280" stroke="#dc2626" stroke-width="3" marker-end="url(#aRed)"/>
+<text x="649" y="262" text-anchor="middle" class="tag" fill="#dc2626">去掉 RNN</text>
+<rect x="700" y="80" width="520" height="400" rx="14" fill="#f8fafc" stroke="#7c3aed" stroke-width="2"/>
+<text x="960.0" y="112" text-anchor="middle" class="lbl" fill="#7c3aed">第 6 章：self-attention</text>
+<rect x="775.0" y="277.0" width="70" height="46" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="810" y="305" text-anchor="middle" class="mono">x₁</text>
+<rect x="895.0" y="277.0" width="70" height="46" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="930" y="305" text-anchor="middle" class="mono">x₂</text>
+<rect x="1015.0" y="277.0" width="70" height="46" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1050" y="305" text-anchor="middle" class="mono">x₃</text>
+<rect x="1105.0" y="277.0" width="70" height="46" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="1140" y="305" text-anchor="middle" class="mono">x₄</text>
+<path d="M 1050 277 C 1050 210, 810 210, 810 277" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#aPurple)"/>
+<path d="M 1050 277 C 1050 210, 930 210, 930 277" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#aPurple)"/>
+<path d="M 1050 277 C 1050 210, 1140 210, 1140 277" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#aPurple)"/>
+<text x="960.0" y="155" text-anchor="middle" class="small">每个 token 直接对所有 token 做注意力（这里画的是 x₃ 看全体）</text>
+<text x="960.0" y="370" text-anchor="middle" class="sub">每个 token 既出 query，又出 key / value</text>
+<text x="960.0" y="394" text-anchor="middle" class="small" fill="#334155">没有循环，全部位置并行 —— 这就是 Transformer 的内核</text>
+<rect x="60" y="506" width="1160" height="44" rx="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="640.0" y="534" text-anchor="middle" class="lbl" fill="#7c3aed">attention 从 RNN 的「配角」变成唯一主角；代价是丢了顺序，于是需要第 4 章的位置编码补回来</text>
+</svg>

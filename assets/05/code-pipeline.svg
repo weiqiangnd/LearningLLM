@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1840 1000">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 14px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="920.0" y="46" text-anchor="middle" class="title">实战代码流水线：Cell 3–8 怎么拼成一个带 attention 的 seq2seq</text>
+<rect x="56" y="108" width="322" height="348" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="72" y="135" class="lbl" fill="#0d9488">Cell 3 · make_batch()</text>
+<text x="74" y="159" class="small">构造 toy 数据：数字串 → 其逆序</text>
+<text x="74" y="201" class="mono">src      [B, S]</text>
+<text x="74" y="222" class="small">  编码器输入（数字, 右补 PAD）</text>
+<text x="74" y="243" class="mono">src_len  [B]</text>
+<text x="74" y="264" class="small">  每条真实长度（不含 PAD）</text>
+<text x="74" y="285" class="mono">tgt_in   [B, S+1]</text>
+<text x="74" y="306" class="small">  解码器输入：SOS + 逆序</text>
+<text x="74" y="327" class="mono">tgt_out  [B, S+1]</text>
+<text x="74" y="348" class="small">  目标：逆序 + EOS</text>
+<text x="74" y="390" class="small">VOCAB=13：PAD/SOS/EOS + 0–9</text>
+<text x="74" y="411" class="small">tgt_in / tgt_out 错位一格 = teacher forcing</text>
+<rect x="430" y="96" width="1354" height="540" rx="16" fill="#faf5ff" stroke="#7c3aed" stroke-width="2.4"/>
+<text x="450" y="126" class="lbl" fill="#7c3aed">Cell 7 · class Seq2Seq.forward(src, src_len, tgt_in)</text>
+<text x="450" y="148" class="sub">组装 Encoder + 逐步 Decoder，按目标长度 T 循环，返回 (logits, attn)</text>
+<rect x="458" y="198" width="300" height="208" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="474" y="225" class="lbl" fill="#2563eb">Cell 4 · Encoder.forward</text>
+<text x="476" y="249" class="mono">(src, src_len)</text>
+<text x="476" y="270" class="mono">Embedding(V, emb=32)</text>
+<text x="476" y="291" class="mono">→ GRU(emb, hid=96)</text>
+<text x="476" y="312" class="small">pack_padded：跳过 PAD</text>
+<text x="476" y="333" class="small">———— 输出 ————</text>
+<text x="476" y="354" class="mono">H   [B, S, hid]</text>
+<text x="476" y="375" class="mono">h_n [1, B, hid] → s₀</text>
+<rect x="792" y="176" width="970" height="410" rx="14" fill="#ffffff" stroke="#334155" stroke-width="2" stroke-dasharray="9,5"/>
+<text x="810" y="202" class="lbl" fill="#374151">for t = 1 … T :  逐步解码（teacher forcing 喂真值 tgt_in[:, t]）</text>
+<rect x="816" y="218" width="890" height="150" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="832" y="245" class="lbl" fill="#ea580c">Cell 5 · BahdanauAttention(sₜ₋₁, H, mask)</text>
+<text x="834" y="269" class="mono">eₜⱼ = vᵀ tanh(W·sₜ₋₁ + U·hⱼ)        给每个源位置 j 打分</text>
+<text x="834" y="290" class="mono">屏蔽 PAD(mask=False → −∞)，再 αₜ = softmax(eₜ)</text>
+<text x="834" y="311" class="mono">→ context [B, hid] = Σⱼ αₜⱼ·hⱼ      ·      alpha αₜ [B, S]</text>
+<rect x="816" y="406" width="884" height="164" rx="12" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="832" y="433" class="lbl" fill="#059669">Cell 6 · Decoder.step(yₜ₋₁, sₜ₋₁, H, mask)</text>
+<text x="834" y="457" class="small">内部调用 Cell 5 的 attention 拿到 context</text>
+<text x="834" y="478" class="mono">sₜ = GRUCell( [ emb(yₜ₋₁) ; context ] , sₜ₋₁ )      更新隐藏</text>
+<text x="834" y="499" class="mono">logitsₜ = Linear( [ sₜ ; context ] ) → [B, V]      词表打分</text>
+<text x="834" y="520" class="small">use_attention=False：context ≡ s₀（编码器末步）= baseline 瓶颈</text>
+<line x1="378" y1="286" x2="454" y2="286" stroke="#0d9488" stroke-width="2.2" marker-end="url(#aTeal)"/>
+<text x="418.0" y="276" text-anchor="middle" class="small" fill="#0d9488">src · src_len</text>
+<line x1="758" y1="300" x2="812" y2="300" stroke="#2563eb" stroke-width="2.2" marker-end="url(#aBlue)"/>
+<text x="787.0" y="290" text-anchor="middle" class="mono" fill="#2563eb">H</text>
+<path d="M 758 372 C 786 372, 792 470, 812 482" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#aBlue)"/>
+<text x="770" y="398" text-anchor="middle" class="small" fill="#2563eb">s₀</text>
+<path d="M 378 440 C 600 452, 700 500, 812 512" fill="none" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aTeal)"/>
+<text x="500" y="436" text-anchor="middle" class="small" fill="#0d9488">tgt_in[:, t] → yₜ₋₁</text>
+<line x1="1150" y1="368" x2="1150" y2="404" stroke="#ea580c" stroke-width="2.4" marker-end="url(#aOrange)"/>
+<text x="1162" y="392.0" class="mono" fill="#ea580c">context</text>
+<path d="M 1700 470 C 1742 470, 1742 300, 1708 300" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#aGreen)"/>
+<text x="1752" y="388" text-anchor="middle" class="small" fill="#059669" transform="rotate(-90 1752 388)">sₜ → 下一步的 sₜ₋₁</text>
+<text x="1107.0" y="618" text-anchor="middle" class="lbl" fill="#7c3aed">forward 返回 → logits [B, T, V]   ·   attn [B, T, S]</text>
+<rect x="430" y="688" width="624" height="180" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="446" y="715" class="lbl" fill="#dc2626">Cell 7 · train(model, steps)</text>
+<text x="448" y="739" class="mono">每步：logits [B,T,V] 对齐 tgt_out [B,T]</text>
+<text x="448" y="760" class="mono">loss = F.cross_entropy(…, ignore_index=PAD)</text>
+<text x="448" y="781" class="small">  PAD 位置不计损失</text>
+<text x="448" y="802" class="mono">Adam：loss.backward() → opt.step()</text>
+<text x="448" y="823" class="small">（seq_accuracy：整条序列全对才算对）</text>
+<rect x="1110" y="688" width="674" height="180" rx="12" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="1126" y="715" class="lbl" fill="#374151">Cell 8 · 训练两个模型对比</text>
+<text x="1128" y="739" class="mono">model_attn  = Seq2Seq(…, use_attention=True)</text>
+<text x="1128" y="760" class="mono">model_plain = Seq2Seq(…, use_attention=False)</text>
+<text x="1128" y="781" class="small">  后者 context 固定 = baseline 瓶颈</text>
+<text x="1128" y="802" class="mono">两者各 train(steps=1500)</text>
+<text x="1128" y="823" class="small">再比「准确率 vs 源句长度」曲线（Cell 10）</text>
+<line x1="740" y1="636" x2="740" y2="686" stroke="#7c3aed" stroke-width="2.2" marker-end="url(#aPurple)"/>
+<text x="752" y="667.0" class="mono" fill="#7c3aed">logits</text>
+<path d="M 146 456 C 146 720, 300 778, 428 778" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#aTeal)"/>
+<text x="250" y="690" text-anchor="middle" class="small" fill="#0d9488">tgt_out [B, T]</text>
+<path d="M 1000 688 L 1000 638" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#aRed)"/>
+<text x="1012" y="667.0" class="small" fill="#dc2626">梯度更新 Seq2Seq 全部参数</text>
+<line x1="1108" y1="778" x2="1058" y2="778" stroke="#94a3b8" stroke-width="2" marker-end="url(#aGray)"/>
+<text x="1082.0" y="768" text-anchor="middle" class="small" fill="#334155">调用 train()</text>
+<rect x="56" y="898" width="1728" height="76" rx="12" fill="#f3f4f6" stroke="#334155" stroke-width="1.6"/>
+<text x="920.0" y="928" text-anchor="middle" class="lbl" fill="#374151">形状记号：B = 一批样本数 · S = 源序列长(含 PAD) · T = 目标步数(= S+1) · emb = 32 · hid = 96 · V = VOCAB = 13</text>
+<text x="920.0" y="956" text-anchor="middle" class="sub">mask [B, S]：真实 token = True、PAD = False —— attention 用它把 PAD 位置打 −∞，softmax 后权重 ≈ 0</text>
+</svg>

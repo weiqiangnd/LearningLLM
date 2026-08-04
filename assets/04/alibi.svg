@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 540">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+    <marker id="aTeal" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#0d9488"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 24px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 15px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 14px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 600; }
+  </style>
+<text x="590.0" y="40" text-anchor="middle" class="title">ALiBi：在注意力分数上按距离减线性惩罚（q/k 不动）</text>
+<rect x="60" y="80" width="1060" height="56" rx="11" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="590.0" y="116" text-anchor="middle" class="mono" fill="#0d9488">score(i, j) = qᵢ · kⱼ  −  m · (i − j)      （因果：j ≤ i，距离 i−j ≥ 0，斜率 m &gt; 0）</text>
+<text x="90" y="186" class="lbl">同一个 query i 看前面各 key j：离得越远，惩罚越大、权重越小</text>
+<rect x="90" y="230" width="86" height="120" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="133" y="370" text-anchor="middle" class="small">j=i</text>
+<text x="133" y="222" text-anchor="middle" class="tag" fill="#0d9488">−0</text>
+<rect x="220" y="254" width="86" height="96" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="263" y="370" text-anchor="middle" class="small">j=i−1</text>
+<text x="263" y="246" text-anchor="middle" class="tag" fill="#0d9488">−m</text>
+<rect x="350" y="276" width="86" height="74" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="393" y="370" text-anchor="middle" class="small">j=i−2</text>
+<text x="393" y="268" text-anchor="middle" class="tag" fill="#0d9488">−2m</text>
+<rect x="480" y="296" width="86" height="54" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="523" y="370" text-anchor="middle" class="small">j=i−3</text>
+<text x="523" y="288" text-anchor="middle" class="tag" fill="#0d9488">−3m</text>
+<rect x="610" y="314" width="86" height="36" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+<text x="653" y="370" text-anchor="middle" class="small">j=i−4</text>
+<text x="653" y="306" text-anchor="middle" class="tag" fill="#0d9488">−4m</text>
+<text x="90" y="400" class="sub">柱高 ≈ 注意力权重（softmax 后）：距离每 +1，分数固定再减 m。</text>
+<rect x="790" y="178" width="330" height="190" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,3"/>
+<text x="810" y="208" class="lbl">每个注意力头用不同斜率 m</text>
+<text x="810" y="238" class="tag" fill="#dc2626">head 1</text>
+<text x="882" y="238" class="mono">m = 1/2</text>
+<text x="976" y="238" class="small">目光短浅，盯眼前</text>
+<text x="810" y="278" class="tag" fill="#ea580c">head 2</text>
+<text x="882" y="278" class="mono">m = 1/4</text>
+<text x="976" y="278" class="small">看中等距离</text>
+<text x="810" y="318" class="tag" fill="#059669">head 3</text>
+<text x="882" y="318" class="mono">m = 1/8</text>
+<text x="976" y="318" class="small">看得更远</text>
+<text x="810" y="362" class="sub">斜率取等比数列，</text>
+<text x="810" y="384" class="sub">合起来兼顾局部与全局。</text>
+<text x="590.0" y="518" text-anchor="middle" class="cap">ALiBi 的惩罚是按距离外推的纯公式，所以外推极好；代价是「远处不重要」写成了死规则，对需要回看远处的任务偏保守。BLOOM、MPT 用过。</text>
+</svg>
