@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 764">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <defs>
+    <marker id="aGray" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker>
+    <marker id="aSlate" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#334155"/></marker>
+    <marker id="aBlue" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#2563eb"/></marker>
+    <marker id="aOrange" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#ea580c"/></marker>
+    <marker id="aGreen" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#059669"/></marker>
+    <marker id="aRed" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#dc2626"/></marker>
+    <marker id="aPurple" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 11 4, 0 8" fill="#7c3aed"/></marker>
+  </defs>
+
+  <style>
+    text { font-family: 'Noto Sans CJK SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Zen Hei', sans-serif; }
+    .title  { font-size: 25px; font-weight: 700; fill: #374151; }
+    .h2     { font-size: 18px; font-weight: 700; fill: #374151; }
+    .lbl    { font-size: 16px; font-weight: 600; fill: #374151; }
+    .sub    { font-size: 14px; fill: #334155; }
+    .mono   { font-size: 14px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monob  { font-size: 14px; font-weight: 600; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #374151; }
+    .monos  { font-size: 13px; font-family: 'Noto Sans Mono CJK SC', 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace; fill: #334155; }
+    .small  { font-size: 13px; fill: #334155; }
+    .cap    { font-size: 15px; fill: #334155; }
+    .tag    { font-size: 13px; font-weight: 700; }
+  </style>
+<text x="780.0" y="46" text-anchor="middle" class="title">mini-GPT 的两条闭环：训练塑造分布，生成从分布里采样</text>
+<text x="780.0" y="76" text-anchor="middle" class="cap">上排训练闭环把语料变成权重，下排生成闭环把权重变回文本 —— 中间那个模型是同一个，只是一个在更新它、一个在读它</text>
+<rect x="40" y="108" width="1480" height="272" rx="18" fill="#fbfdff" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="7,5"/>
+<text x="64" y="138" text-anchor="start" class="h2">训练闭环（Cell 2 → Cell 8）</text>
+<rect x="95.0" y="194.0" width="190" height="92" rx="12" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="190" y="226" text-anchor="middle" class="lbl">tiny-shakespeare</text>
+<text x="190" y="248" text-anchor="middle" class="monos">1,115,394 字符</text>
+<text x="190" y="268" text-anchor="middle" class="small">一份 1.1 MB 的纯文本</text>
+<rect x="325.0" y="194.0" width="190" height="92" rx="12" fill="#cffafe" stroke="#0891b2" stroke-width="2"/>
+<text x="420" y="226" text-anchor="middle" class="lbl">字符级 tokenizer</text>
+<text x="420" y="248" text-anchor="middle" class="monos">V = 65</text>
+<text x="420" y="268" text-anchor="middle" class="small">每个字符一个 id</text>
+<rect x="555.0" y="194.0" width="190" height="92" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="650" y="226" text-anchor="middle" class="lbl">一条长 id 序列</text>
+<text x="650" y="248" text-anchor="middle" class="monos">[1115394]</text>
+<text x="650" y="268" text-anchor="middle" class="small">前 90% 训练 / 后 10% 验证</text>
+<rect x="785.0" y="194.0" width="190" height="92" rx="12" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="880" y="226" text-anchor="middle" class="lbl">滑窗取一批</text>
+<text x="880" y="248" text-anchor="middle" class="monos">x, y: [32, 128]</text>
+<text x="880" y="268" text-anchor="middle" class="small">y 是 x 右移一位</text>
+<rect x="1020.0" y="194.0" width="220" height="92" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="1130" y="226" text-anchor="middle" class="lbl">mini-GPT</text>
+<text x="1130" y="248" text-anchor="middle" class="monos">logits: [32, 128, 65]</text>
+<text x="1130" y="268" text-anchor="middle" class="small">4.76 M 参数 · 6 层</text>
+<rect x="1295.0" y="194.0" width="190" height="92" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="1390" y="226" text-anchor="middle" class="lbl">cross-entropy</text>
+<text x="1390" y="248" text-anchor="middle" class="monos">一个标量 loss</text>
+<text x="1390" y="268" text-anchor="middle" class="small">4096 个位置取平均</text>
+<line x1="285" y1="240" x2="319" y2="240" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="515" y1="240" x2="549" y2="240" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="745" y1="240" x2="779" y2="240" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="975" y1="240" x2="1014" y2="240" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="1240" y1="240" x2="1289" y2="240" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<path d="M 1390 286 L 1390 336 L 1130 336 L 1130 292" fill="none" stroke="#dc2626" stroke-width="2.4" marker-end="url(#aRed)"/>
+<text x="1260.0" y="356" text-anchor="middle" class="small">反向传播 → 梯度裁剪 → AdamW 更新参数，回到取下一批</text>
+<rect x="40" y="416" width="1480" height="276" rx="18" fill="#fffdfa" stroke="#ea580c" stroke-width="1.4" stroke-dasharray="7,5"/>
+<text x="64" y="446" text-anchor="start" class="h2">生成闭环（Cell 7 / Cell 10）</text>
+<rect x="85.0" y="502.0" width="210" height="92" rx="12" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"/>
+<text x="190" y="534" text-anchor="middle" class="lbl">起始上下文</text>
+<text x="190" y="556" text-anchor="middle" class="monos">ids: [1, L₀]</text>
+<text x="190" y="576" text-anchor="middle" class="small">一个换行符，或一段 prompt</text>
+<rect x="370.0" y="502.0" width="220" height="92" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+<text x="480" y="534" text-anchor="middle" class="lbl">mini-GPT</text>
+<text x="480" y="556" text-anchor="middle" class="monos">只喂最近 128 个</text>
+<text x="480" y="576" text-anchor="middle" class="small">同一套权重，dropout 关掉</text>
+<rect x="670.0" y="502.0" width="220" height="92" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="780" y="534" text-anchor="middle" class="lbl">取最后一个位置</text>
+<text x="780" y="556" text-anchor="middle" class="monos">logits[:, -1, :] → [1, 65]</text>
+<text x="780" y="576" text-anchor="middle" class="small">前面位置的预测用不上</text>
+<rect x="970.0" y="502.0" width="220" height="92" rx="12" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+<text x="1080" y="534" text-anchor="middle" class="lbl">温度 / top-k 采样</text>
+<text x="1080" y="556" text-anchor="middle" class="monos">得到 1 个新 token</text>
+<text x="1080" y="576" text-anchor="middle" class="small">旋钮见第 2 章</text>
+<rect x="1290.0" y="502.0" width="200" height="92" rx="12" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+<text x="1390" y="534" text-anchor="middle" class="lbl">输出文本</text>
+<text x="1390" y="556" text-anchor="middle" class="monos">decode(ids)</text>
+<text x="1390" y="576" text-anchor="middle" class="small">一次一个字符地长出来</text>
+<line x1="295" y1="548" x2="364" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="590" y1="548" x2="664" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="890" y1="548" x2="964" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<line x1="1190" y1="548" x2="1284" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
+<path d="M 1080 594 L 1080 648 L 190 648 L 190 600" fill="none" stroke="#ea580c" stroke-width="2.4" marker-end="url(#aOrange)"/>
+<text x="635.0" y="668" text-anchor="middle" class="small">把新 token 接到序列末尾，再走一遍 —— 每多写一个字符就重跑一次前向</text>
+<rect x="40" y="702" width="1480" height="44" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2"/>
+<text x="780.0" y="730" text-anchor="middle" class="cap">同一个概率分布 P(下一个 token | 前文) 的两面：训练用真实语料把它拟合出来，生成按它一个 token 一个 token 地采样</text>
+</svg>
