@@ -52,20 +52,23 @@ def esc(s: str) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def write_svg(path: Path, body: str, viewbox: str):
+def write_svg(path: Path, body: str, viewbox: str, bump: int = 0):
+    """bump: 整体字号加几 px。节点框宽是按基准字号定死的，所以只给版面本来
+    就宽松、放大后不会撑框的图开（当前只有 batching），其余保持基准字号。"""
+    b = bump
     style = f"""
   <style>
     text {{ font-family: {FONT}; }}
-    .title  {{ font-size: 25px; font-weight: 700; fill: {TXT}; }}
-    .h2     {{ font-size: 18px; font-weight: 700; fill: {TXT}; }}
-    .lbl    {{ font-size: 16px; font-weight: 600; fill: {TXT}; }}
-    .sub    {{ font-size: 14px; fill: {SUB}; }}
-    .mono   {{ font-size: 14px; font-family: {MONO}; fill: {TXT}; }}
-    .monob  {{ font-size: 14px; font-weight: 600; font-family: {MONO}; fill: {TXT}; }}
-    .monos  {{ font-size: 13px; font-family: {MONO}; fill: {SUB}; }}
-    .small  {{ font-size: 13px; fill: {SUB}; }}
-    .cap    {{ font-size: 15px; fill: {SUB}; }}
-    .tag    {{ font-size: 13px; font-weight: 700; }}
+    .title  {{ font-size: {25 + b}px; font-weight: 700; fill: {TXT}; }}
+    .h2     {{ font-size: {18 + b}px; font-weight: 700; fill: {TXT}; }}
+    .lbl    {{ font-size: {16 + b}px; font-weight: 600; fill: {TXT}; }}
+    .sub    {{ font-size: {14 + b}px; fill: {SUB}; }}
+    .mono   {{ font-size: {14 + b}px; font-family: {MONO}; fill: {TXT}; }}
+    .monob  {{ font-size: {14 + b}px; font-weight: 600; font-family: {MONO}; fill: {TXT}; }}
+    .monos  {{ font-size: {13 + b}px; font-family: {MONO}; fill: {SUB}; }}
+    .small  {{ font-size: {13 + b}px; fill: {SUB}; }}
+    .cap    {{ font-size: {15 + b}px; fill: {SUB}; }}
+    .tag    {{ font-size: {13 + b}px; font-weight: 700; }}
   </style>
 """
     defs = f"""
@@ -190,7 +193,7 @@ def loop():
     p += node(gx[3], cy2, 220, 92, "温度 / top-k 采样",
               GREEN_F, GREEN_B, "得到 1 个新 token", "旋钮见第 2 章")
     p += node(gx[4], cy2, 200, 92, "输出文本",
-              PINK_F, PINK_B, "decode(ids)", "一次一个字符地长出来")
+              PINK_F, PINK_B, "decode(ids)", "一次一个字符生成出来")
 
     for a, b, wa, wb in [(0, 1, 105, 110), (1, 2, 110, 110), (2, 3, 110, 110),
                          (3, 4, 110, 100)]:
@@ -292,7 +295,7 @@ def batching():
     p.append(txt(bx + 20, by + 230,
                  "所以不必把语料整整齐齐切成互不重叠的段落", cls="small", anchor="start"))
 
-    write_svg(ASSETS / "batching.svg", "\n".join(p), f"0 0 {W} {H}")
+    write_svg(ASSETS / "batching.svg", "\n".join(p), f"0 0 {W} {H}", bump=2)
 
 
 # ============================================================

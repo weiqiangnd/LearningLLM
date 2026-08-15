@@ -87,7 +87,7 @@
 <rect x="1290.0" y="502.0" width="200" height="92" rx="12" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
 <text x="1390" y="534" text-anchor="middle" class="lbl">输出文本</text>
 <text x="1390" y="556" text-anchor="middle" class="monos">decode(ids)</text>
-<text x="1390" y="576" text-anchor="middle" class="small">一次一个字符地长出来</text>
+<text x="1390" y="576" text-anchor="middle" class="small">一次一个字符生成出来</text>
 <line x1="295" y1="548" x2="364" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
 <line x1="590" y1="548" x2="664" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
 <line x1="890" y1="548" x2="964" y2="548" stroke="#94a3b8" stroke-width="2.2" marker-end="url(#aGray)"/>
